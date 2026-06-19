@@ -5,85 +5,40 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>How an Interpreter Works — Interactive Guide</title>
   <meta name="description" content="An interactive, premium visual guide explaining the inner workings of an interpreter step by step." />
-
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <meta property="og:title" content="How an Interpreter Works — Interactive Guide" />
+  <meta property="og:description" content="An interactive, premium visual guide explaining the inner workings of an interpreter step by step." />
+  <meta property="og:image" content="/assets/logo.svg" />
+  <meta property="og:image:width" content="100" />
+  <meta property="og:image:height" content="100" />
+  <meta property="og:url" content="/interpreter.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How an Interpreter Works — Interactive Guide" />
+  <meta name="twitter:description" content="An interactive, premium visual guide explaining the inner workings of an interpreter step by step." />
+  <meta name="twitter:image" content="/assets/logo.svg" />
+  <meta name="twitter:image:alt" content="Quick Reference logo — Circle of Knowledge" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Tailwind and Google Fonts -->
   <script src="js/theme.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            ink: "#1A1A2E",
-            inkLight: "#374151",
-            inkMuted: "#6B7280",
-            accent: "#E95420",
-            accentLight: "#FDE8E0",
-            accentMid: "#FAD1C0",
-            accentStrong: "#F5A389",
-            paper: "#FFFFFF",
-            paperWarm: "#F8F9FA",
-            error: "#DC2626"
-          },
-          fontFamily: {
-            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
-            mono: ["'JetBrains Mono'", "monospace"]
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     body {
       background-color: #F8F9FA;
       color: #374151;
     }
-    .scene-container {
-      perspective: 1000px;
-    }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
-
-    .ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-    .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .typing-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
-    @keyframes blink { from, to { color: transparent } 50% { color: #E95420 } }
-
-    #fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-    #fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-
     #fullscreen-canvas { background-color: #FFFFFF; border-color: rgba(0, 0, 0, 0.08); }
-
-    .accent-node { background-color: #FFFFFF; border: 1.5px solid #E95420; color: #E95420; }
-    .accent-node-fill { background-color: #FDE8E0; border: 1.5px solid #E95420; color: #E95420; }
-
-    html.dark body {
-      background-color: #0F1115;
-      color: #E8E8E8;
-    }
-    html.dark ::-webkit-scrollbar-thumb { background: #334155; }
     html.dark #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
-    html.dark .accent-node { background-color: #1A1D25; border-color: #F5A389; color: #F5A389; }
-    html.dark .accent-node-fill { background-color: rgba(233, 84, 32, 0.1); border-color: #F5A389; color: #F5A389; }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white dark:focus:bg-slate-900 focus:text-[#E95420] focus:border focus:border-[#E95420] focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold focus:outline-none focus:ring-2 focus:ring-[#E95420]">Skip to main content</a>
 
   <!-- ==================== HEADER ==================== -->
   <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between z-10 bg-white/90 dark:bg-[#0F1115]/90 backdrop-blur-md sticky top-0">
@@ -102,7 +57,7 @@
   </header>
 
   <!-- ==================== MAIN VIEWPORT ==================== -->
-  <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
+  <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
     
     <!-- Info Overlay (Step Labels & Explanations) -->
     <div class="w-full text-center mb-8 min-h-[120px] flex flex-col justify-center gap-2">
@@ -402,17 +357,17 @@
           </button>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-[11px] text-inkMuted dark:text-gray-400" id="scene-tags">
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1">Title</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2">Source</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3">Big Idea</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4">Line 1</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5">Line 2</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6">Expression</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7">Output</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8">Process</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9">Error</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="10">Summary</span>
+        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-[11px] text-inkMuted dark:text-gray-400" id="scene-tags" role="tablist" aria-label="Interpreter scenes">
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1" role="tab" aria-selected="true">Title</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2" role="tab" aria-selected="false">Source</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3" role="tab" aria-selected="false">Big Idea</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4" role="tab" aria-selected="false">Line 1</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5" role="tab" aria-selected="false">Line 2</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6" role="tab" aria-selected="false">Expression</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7" role="tab" aria-selected="false">Output</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8" role="tab" aria-selected="false">Process</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9" role="tab" aria-selected="false">Error</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="10" role="tab" aria-selected="false">Summary</button>
         </div>
       </div>
     </div>
@@ -431,160 +386,35 @@
   </footer>
 
   <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
+  <script src="js/animation-core.js"></script>
   <script>
-    const sceneData = [
-      {
-        title: "How an Interpreter Works",
-        subtitle: "Reading, understanding, and executing code one step at a time.",
-        label: "Scene 1 / 10"
-      },
-      {
-        title: "Source Code",
-        subtitle: "A high-level script is written in languages like Python, JavaScript, or Ruby.",
-        label: "Scene 2 / 10"
-      },
-      {
-        title: "The Big Idea",
-        subtitle: "Unlike a compiler, execution happens immediately during interpretation.",
-        label: "Scene 3 / 10"
-      },
-      {
-        title: "Reading Line by Line",
-        subtitle: "The interpreter fetches the first statement, understands it, and records it in memory.",
-        label: "Scene 4 / 10"
-      },
-      {
-        title: "Continuing Execution",
-        subtitle: "It progresses to the next line, dynamically updating runtime values.",
-        label: "Scene 5 / 10"
-      },
-      {
-        title: "Evaluating Expressions",
-        subtitle: "Expressions are resolved by retrieving variables from the environment and executing functions.",
-        label: "Scene 6 / 10"
-      },
-      {
-        title: "Producing Output",
-        subtitle: "System commands (like print) produce output instantly during interpretation.",
-        label: "Scene 7 / 10"
-      },
-      {
-        title: "How Execution Progresses",
-        subtitle: "A continuous loop of Read → Parse → Execute travels step-by-step through the program.",
-        label: "Scene 8 / 10"
-      },
-      {
-        title: "Error Handling",
-        subtitle: "Interpreters stop execution immediately upon encountering the first runtime error.",
-        label: "Scene 9 / 10"
-      },
-      {
-        title: "Final Summary",
-        subtitle: "An interpreter executes a program incrementally—reading, understanding, and running code one statement at a time.",
-        label: "Scene 10 / 10"
-      }
-    ];
+    var data;
 
-    let currentScene = 1;
-    let isPlaying = false;
-    let autoPlayInterval = null;
-    const TOTAL_SCENES = 10;
-
-    // DOM Elements
-    const sceneCounter = document.getElementById('scene-counter');
-    const sceneTitle = document.getElementById('scene-title');
-    const sceneSubtitle = document.getElementById('scene-subtitle');
-    const timelineProgress = document.getElementById('timeline-progress');
-    const playBtn = document.getElementById('play-btn');
-    const playIcon = document.getElementById('play-icon');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const tags = document.querySelectorAll('#scene-tags span');
-
-    // Scene Transition Handler
-    function showScene(sceneIndex) {
-      if (sceneIndex < 1 || sceneIndex > TOTAL_SCENES) return;
-
-      // Hide all scene containers
-      for (let i = 1; i <= TOTAL_SCENES; i++) {
-        const vis = document.getElementById(`vis-scene-${i}`);
-        if (vis) {
-          vis.classList.add('opacity-0', 'pointer-events-none');
-          if (i === 2) vis.classList.add('translate-x-10');
-        }
-      }
-
-      currentScene = sceneIndex;
-
-      // Update timeline progress
-      const percent = ((sceneIndex - 1) / (TOTAL_SCENES - 1)) * 100;
-      timelineProgress.style.width = `${percent}%`;
-
-      // Update Tag highlights
-      tags.forEach(tag => {
-        if (parseInt(tag.dataset.target) === sceneIndex) {
-          tag.classList.add('text-orange-600', 'dark:text-orange-400');
-          tag.classList.remove('text-inkMuted', 'dark:text-gray-400');
-        } else {
-          tag.classList.remove('text-orange-600', 'dark:text-orange-400');
-          tag.classList.add('text-inkMuted', 'dark:text-gray-400');
-        }
-      });
-
-      // Update texts with fade effect
-      sceneTitle.classList.remove('opacity-100', 'translate-y-0');
-      sceneTitle.classList.add('opacity-0', 'translate-y-2');
-      sceneSubtitle.classList.remove('opacity-100', 'translate-y-0');
-      sceneSubtitle.classList.add('opacity-0', 'translate-y-2');
-
-      setTimeout(() => {
-        sceneCounter.textContent = sceneData[sceneIndex - 1].label;
-        sceneTitle.textContent = sceneData[sceneIndex - 1].title;
-        sceneSubtitle.textContent = sceneData[sceneIndex - 1].subtitle;
-
-        sceneTitle.classList.remove('opacity-0', 'translate-y-2');
-        sceneTitle.classList.add('opacity-100', 'translate-y-0');
-        sceneSubtitle.classList.remove('opacity-0', 'translate-y-2');
-        sceneSubtitle.classList.add('opacity-100', 'translate-y-0');
-      }, 300);
-
-      // Show the selected scene content
-      const activeVis = document.getElementById(`vis-scene-${sceneIndex}`);
-      if (activeVis) {
-        activeVis.classList.remove('opacity-0', 'pointer-events-none');
-        if (sceneIndex === 2) activeVis.classList.remove('translate-x-10');
-      }
-
-      // Trigger scene-specific animations
-      triggerSceneAnimation(sceneIndex);
-    }
-
-    // Custom Animation Trigger per Scene
-    function triggerSceneAnimation(index) {
+    function triggerSceneAnimation(index, state) {
       if (index === 1) {
-        const innerDiv = document.querySelector('#vis-scene-1 > div');
+        var innerDiv = document.querySelector('#vis-scene-1 > div');
         if (innerDiv) {
-          const children = Array.from(innerDiv.children);
-          children.forEach((child, i) => {
+          var children = Array.from(innerDiv.children);
+          children.forEach(function(child, i) {
             child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
             child.style.opacity = '0';
             child.style.transform = 'translateY(10px)';
-            setTimeout(() => {
+            setTimeout(function() {
               child.style.opacity = '1';
               child.style.transform = 'translateY(0)';
             }, 400 + i * 300);
           });
         }
       }
-      
+
       else if (index === 2) {
-        const codeElement = document.getElementById('typed-code');
+        var codeElement = document.getElementById('typed-code');
         codeElement.textContent = "";
-        const codeString = `x = 2\ny = 3\nresult = x + y\nprint(result)`;
-        let charIndex = 0;
-        
+        var codeString = data.codeString;
+        var charIndex = 0;
+
         function typeCode() {
-          if (charIndex < codeString.length && currentScene === 2) {
+          if (charIndex < codeString.length && state.currentScene === 2) {
             codeElement.textContent += codeString.charAt(charIndex);
             charIndex++;
             setTimeout(typeCode, 30);
@@ -592,70 +422,68 @@
         }
         setTimeout(typeCode, 500);
       }
-      
+
       else if (index === 3) {
-        // Sequentially load nodes
-        const nodes = ['node-src', 'node-interpreter', 'node-output'];
-        nodes.forEach(id => {
-          const el = document.getElementById(id);
+        var nodes = ['node-src', 'node-interpreter', 'node-output'];
+        nodes.forEach(function(id) {
+          var el = document.getElementById(id);
           el.className = "flex flex-col items-center gap-3 z-10 opacity-0 transform translate-y-4 transition-all duration-700";
         });
 
-        const pulse = document.getElementById('pipeline-pulse');
+        var pulse = document.getElementById('pipeline-pulse');
         if (pulse) pulse.classList.add('opacity-0');
 
-        nodes.forEach((id, i) => {
-          setTimeout(() => {
-            if (currentScene === 3) {
-              const el = document.getElementById(id);
+        nodes.forEach(function(id, i) {
+          setTimeout(function() {
+            if (state.currentScene === 3) {
+              var el = document.getElementById(id);
               el.classList.remove('opacity-0', 'translate-y-4');
             }
           }, 300 + (i * 300));
         });
 
-        // Trigger loop annotations inside interpreter block
-        setTimeout(() => {
-          if (currentScene === 3) {
-            const annotation = document.getElementById('interpreter-cycles');
-            const box = document.querySelector('#node-interpreter div');
+        setTimeout(function() {
+          if (state.currentScene === 3) {
+            var annotation = document.getElementById('interpreter-cycles');
+            var box = document.querySelector('#node-interpreter div');
             if (annotation) annotation.className = "absolute -bottom-12 flex gap-1.5 font-mono text-[9px] text-orange-600 dark:text-orange-400 transition-opacity duration-500 opacity-100";
             if (box) box.classList.add('border-orange-600', 'dark:border-orange-400');
           }
         }, 1200);
 
-        setTimeout(() => {
-          if (pulse && currentScene === 3) {
+        setTimeout(function() {
+          if (pulse && state.currentScene === 3) {
             pulse.classList.remove('opacity-0');
           }
         }, 1500);
       }
-      
+
       else if (index === 4) {
-        const block = document.getElementById('mem-item-x');
+        var block = document.getElementById('mem-item-x');
         block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
-        setTimeout(() => {
-          if (currentScene === 4) {
+        setTimeout(function() {
+          if (state.currentScene === 4) {
             block.classList.remove('opacity-0', 'translate-y-2');
           }
         }, 600);
       }
-      
+
       else if (index === 5) {
-        const block = document.getElementById('mem-item-y');
+        var block = document.getElementById('mem-item-y');
         block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
-        setTimeout(() => {
-          if (currentScene === 5) {
+        setTimeout(function() {
+          if (state.currentScene === 5) {
             block.classList.remove('opacity-0', 'translate-y-2');
           }
         }, 600);
       }
-      
+
       else if (index === 6) {
-        const valX = document.getElementById('expr-val-x');
-        const valY = document.getElementById('expr-val-y');
-        const resolve = document.getElementById('expr-resolve');
-        const sum = document.getElementById('expr-sum');
-        const memResult = document.getElementById('mem-item-result');
+        var valX = document.getElementById('expr-val-x');
+        var valY = document.getElementById('expr-val-y');
+        var resolve = document.getElementById('expr-resolve');
+        var sum = document.getElementById('expr-sum');
+        var memResult = document.getElementById('mem-item-result');
 
         valX.textContent = "x";
         valY.textContent = "y";
@@ -663,9 +491,8 @@
         sum.className = "text-orange-700 dark:text-orange-300 font-bold opacity-0 transition-opacity duration-500";
         memResult.className = "text-sm flex justify-between py-1 text-orange-700 dark:text-orange-300 font-bold transition-all duration-700 opacity-0 transform translate-y-2";
 
-        // Retrieve step
-        setTimeout(() => {
-          if (currentScene === 6) {
+        setTimeout(function() {
+          if (state.currentScene === 6) {
             valX.textContent = "2";
             valY.textContent = "3";
             valX.classList.add('text-orange-600', 'dark:text-orange-400');
@@ -673,39 +500,36 @@
           }
         }, 1000);
 
-        // Resolve operation step
-        setTimeout(() => {
-          if (currentScene === 6) {
+        setTimeout(function() {
+          if (state.currentScene === 6) {
             resolve.classList.remove('opacity-0');
             resolve.classList.add('opacity-100');
           }
         }, 1800);
 
-        // Compute step
-        setTimeout(() => {
-          if (currentScene === 6) {
+        setTimeout(function() {
+          if (state.currentScene === 6) {
             sum.classList.remove('opacity-0');
             sum.classList.add('opacity-100');
           }
         }, 2600);
 
-        // Update memory stack step
-        setTimeout(() => {
-          if (currentScene === 6) {
+        setTimeout(function() {
+          if (state.currentScene === 6) {
             memResult.classList.remove('opacity-0', 'translate-y-2');
             memResult.classList.add('opacity-100');
           }
         }, 3400);
       }
-      
+
       else if (index === 7) {
-        const text = document.getElementById('stdout-output');
-        const flash = document.getElementById('stdout-flash');
+        var text = document.getElementById('stdout-output');
+        var flash = document.getElementById('stdout-flash');
         text.className = "opacity-0 transition-opacity duration-500";
         flash.className = "absolute inset-0 bg-orange-500/5 opacity-0 transition-opacity duration-300";
 
-        setTimeout(() => {
-          if (currentScene === 7) {
+        setTimeout(function() {
+          if (state.currentScene === 7) {
             text.classList.remove('opacity-0');
             text.classList.add('opacity-100');
             flash.classList.remove('opacity-0');
@@ -713,48 +537,46 @@
           }
         }, 800);
 
-        setTimeout(() => {
-          if (currentScene === 7) {
+        setTimeout(function() {
+          if (state.currentScene === 7) {
             flash.classList.remove('opacity-100');
             flash.classList.add('opacity-0');
           }
         }, 1300);
       }
-      
+
       else if (index === 8) {
-        // Line progression sequence
-        const cursor = document.getElementById('progression-cursor');
+        var cursor = document.getElementById('progression-cursor');
         cursor.style.top = "24px";
-        
-        for (let l = 1; l <= 4; l++) {
-          const line = document.getElementById(`prog-line-${l}`);
-          const check = line.querySelector('span:last-child');
+
+        for (var l = 1; l <= 4; l++) {
+          var line = document.getElementById('prog-line-' + l);
+          var check = line.querySelector('span:last-child');
           check.className = "material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0 transition-all duration-300 transform scale-50";
         }
 
-        const runTimes = [500, 1500, 2500, 3500];
-        runTimes.forEach((ms, idx) => {
-          setTimeout(() => {
-            if (currentScene === 8) {
-              const lineIndex = idx + 1;
-              cursor.style.top = `${24 + (idx * 28)}px`;
-              const check = document.getElementById(`prog-line-${lineIndex}`).querySelector('span:last-child');
+        var runTimes = [500, 1500, 2500, 3500];
+        runTimes.forEach(function(ms, idx) {
+          setTimeout(function() {
+            if (state.currentScene === 8) {
+              var lineIndex = idx + 1;
+              cursor.style.top = (24 + (idx * 28)) + 'px';
+              var check = document.getElementById('prog-line-' + lineIndex).querySelector('span:last-child');
               check.classList.remove('opacity-0', 'scale-50');
               check.classList.add('opacity-100', 'scale-100');
             }
           }, ms);
         });
       }
-      
+
       else if (index === 9) {
-        const subLine = document.getElementById('subsequent-line');
-        const errConsole = document.getElementById('error-console');
+        var subLine = document.getElementById('subsequent-line');
+        var errConsole = document.getElementById('error-console');
         subLine.style.opacity = "1";
         errConsole.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl w-72 text-left font-mono shadow-lg overflow-hidden opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
 
-        // Stop execution animation
-        setTimeout(() => {
-          if (currentScene === 9) {
+        setTimeout(function() {
+          if (state.currentScene === 9) {
             subLine.style.opacity = "0.2";
             errConsole.classList.remove('opacity-0', 'translate-x-4');
           }
@@ -762,121 +584,16 @@
       }
     }
 
-    // Auto Play Logic
-    function startAutoPlay() {
-      isPlaying = true;
-      playIcon.textContent = "pause";
-      
-      autoPlayInterval = setInterval(() => {
-        if (currentScene < TOTAL_SCENES) {
-          showScene(currentScene + 1);
-        } else {
-          showScene(1);
-        }
-      }, 8000); 
-    }
-
-    function stopAutoPlay() {
-      isPlaying = false;
-      playIcon.textContent = "play_arrow";
-      clearInterval(autoPlayInterval);
-    }
-
-    playBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        stopAutoPlay();
-      } else {
-        startAutoPlay();
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene > 1) {
-        showScene(currentScene - 1);
-      }
-    });
-
-    nextBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene < TOTAL_SCENES) {
-        showScene(currentScene + 1);
-      }
-    });
-
-    tags.forEach(tag => {
-      tag.addEventListener('click', () => {
-        stopAutoPlay();
-        showScene(parseInt(tag.dataset.target));
+    fetch('content/interactive/interpreter.json').then(function(r) { return r.json(); }).then(function(json) {
+      data = json;
+      initAnimationPlayer({
+        totalScenes: 10,
+        sceneData: data.scenes,
+        scene2HideClass: 'translate-x-10',
+        activeTagClass: ['text-orange-600', 'dark:text-orange-400'],
+        inactiveTagClass: ['text-inkMuted', 'dark:text-gray-400'],
+        onSceneAnimation: triggerSceneAnimation
       });
-    });
-
-    document.getElementById('timeline-bar').addEventListener('click', (e) => {
-      stopAutoPlay();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const pct = x / rect.width;
-      const targetScene = Math.min(TOTAL_SCENES, Math.max(1, Math.round(pct * (TOTAL_SCENES - 1)) + 1));
-      showScene(targetScene);
-    });
-
-    // Fullscreen behavior
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const fullscreenCanvas = document.getElementById('fullscreen-canvas');
-    if (fullscreenBtn && fullscreenCanvas) {
-      fullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          fullscreenCanvas.requestFullscreen().catch(err => {
-            console.error('Error enabling fullscreen:', err);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      });
-    }
-
-    document.addEventListener('fullscreenchange', () => {
-      const icon = fullscreenBtn?.querySelector('span');
-      if (icon) {
-        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
-      }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene > 1) showScene(currentScene - 1);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene < TOTAL_SCENES) showScene(currentScene + 1);
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        if (isPlaying) stopAutoPlay(); else startAutoPlay();
-      }
-    });
-
-    // Start with Scene 1
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.self !== window.top) {
-        document.querySelector('header')?.classList.add('hidden');
-        document.querySelector('footer')?.classList.add('hidden');
-        document.getElementById('scene-counter')?.parentElement?.classList.add('hidden');
-        document.body.classList.remove('justify-between');
-        document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
-        document.querySelector('main')?.classList.remove('md:py-16', 'py-8', 'px-6');
-        document.querySelector('main')?.classList.add('py-0', 'px-2', 'max-w-full');
-        
-        // Reduce timeline top margin
-        const timeline = document.querySelector('main > div:last-child');
-        if (timeline) {
-          timeline.classList.remove('mt-8');
-          timeline.classList.add('mt-3');
-        }
-      }
-      showScene(1);
     });
   </script>
 </body>

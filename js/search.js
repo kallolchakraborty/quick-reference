@@ -94,15 +94,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (items.length === 0) {
       searchResults.innerHTML = `
-        <div class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
+        <div role="status" aria-live="polite" class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
           No matches found. Try searching for "git", "python", or "go".
         </div>
       `;
       return;
     }
 
-    searchResults.innerHTML = items.map(item => `
-      <a href="${item.url}" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group">
+    searchResults.innerHTML = items.map((item, i) => `
+      <a href="${item.url}" role="option" class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group">
         <div class="flex flex-col gap-1">
           <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">${item.category}</span>
           <span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 transition-colors">${item.title}</span>

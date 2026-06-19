@@ -1,0 +1,89 @@
+{
+  "scenes": [
+    {
+      "title": "How a Compiler Works",
+      "subtitle": "Turning human-readable code into machine instructions",
+      "label": "Scene 1 / 9"
+    },
+    {
+      "title": "Source Code",
+      "subtitle": "A programmer writes high-level statements in languages like C++, Java, or Rust.",
+      "label": "Scene 2 / 9"
+    },
+    {
+      "title": "Compiler Pipeline Overview",
+      "subtitle": "Information flows through a structured, multi-stage machine.",
+      "label": "Scene 3 / 9"
+    },
+    {
+      "title": "Lexical Analysis",
+      "subtitle": "Convert raw characters into structured tokens.",
+      "label": "Scene 4 / 9"
+    },
+    {
+      "title": "Parsing",
+      "subtitle": "Build an Abstract Syntax Tree (AST) to define program structure.",
+      "label": "Scene 5 / 9"
+    },
+    {
+      "title": "Semantic Analysis",
+      "subtitle": "Check node logic to ensure types match, functions exist, and constraints hold.",
+      "label": "Scene 6 / 9"
+    },
+    {
+      "title": "Optimization",
+      "subtitle": "Produce faster and smaller code without changing program behavior.",
+      "label": "Scene 7 / 9"
+    },
+    {
+      "title": "Code Generation",
+      "subtitle": "Translate the optimized structure into processor instructions and binary bytes.",
+      "label": "Scene 8 / 9"
+    },
+    {
+      "title": "Final Summary",
+      "subtitle": "Translating thoughts into execution progress.",
+      "label": "Scene 9 / 9"
+    }
+  ],
+  "codeString": "int add(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    int result = add(2, 3);\n}",
+  "tokens": [
+    { "text": "int", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "add", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "(", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+    { "text": "int", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "a", "class": "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+    { "text": ",", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+    { "text": "int", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "b", "class": "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+    { "text": ")", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+    { "text": "{", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+    { "text": "return", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "a", "class": "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+    { "text": "+", "class": "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+    { "text": "b", "class": "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+    { "text": ";", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+    { "text": "}", "class": "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" }
+  ],
+  "astNodes": [
+    { "x": 300, "y": 50, "label": "Program", "fill": "#E95420" },
+    { "x": 300, "y": 130, "label": "Function (add)", "fill": "#F5A389" },
+    { "x": 300, "y": 210, "label": "ReturnStmt", "fill": "#FAD1C0" },
+    { "x": 300, "y": 290, "label": "Operator (+)", "fill": "#FDE8E0" },
+    { "x": 200, "y": 290, "label": "Param (a)", "fill": "#FAD1C0" },
+    { "x": 400, "y": 290, "label": "Param (b)", "fill": "#FAD1C0" }
+  ],
+  "astEdges": [
+    { "from": 0, "to": 1 },
+    { "from": 1, "to": 2 },
+    { "from": 2, "to": 3 },
+    { "from": 3, "to": 4 },
+    { "from": 3, "to": 5 }
+  ],
+  "assemblyLines": [
+    "MOV R1, 2",
+    "MOV R2, 3",
+    "ADD R3, R1, R2",
+    "STORE result, R3"
+  ]
+}

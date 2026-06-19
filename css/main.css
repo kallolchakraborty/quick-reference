@@ -1,0 +1,109 @@
+/* ========== Shared: Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
+html.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
+html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ========== Shared: Navigation ========== */
+.glass-nav {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+html.dark .glass-nav {
+  background-color: rgba(15, 17, 21, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.active-doc-link {
+  color: #E95420 !important;
+  border-left-color: #E95420 !important;
+  font-weight: 600;
+}
+
+/* ========== Shared: Brand Colors ========== */
+.text-brand-500, .dark\:text-brand-500, .hover\:text-brand-500:hover, .group-hover\:text-brand-500 {
+  color: #E95420 !important;
+}
+.bg-brand-500, .hover\:bg-brand-600:hover {
+  background-color: #E95420 !important;
+  color: #FFFFFF !important;
+}
+.hover\:border-brand-500:hover {
+  border-color: rgba(233, 84, 32, 0.4) !important;
+}
+
+/* ========== Shared: Dark Mode Theme ========== */
+html.dark body {
+  background-color: #0F1115 !important;
+  color: #E8E8E8 !important;
+}
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark p, html.dark label, html.dark input {
+  color: #E8E8E8;
+}
+html.dark .text-slate-900, html.dark .text-slate-800, html.dark .dark\:text-white {
+  color: #E8E8E8 !important;
+}
+html.dark .text-slate-600, html.dark .text-slate-500, html.dark .text-slate-400, html.dark .dark\:text-slate-400 {
+  color: #A0A0A0 !important;
+}
+html.dark .border, html.dark .border-b, html.dark .border-t, html.dark .border-r, html.dark .border-l,
+html.dark .border-slate-200, html.dark .dark\:border-slate-800 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+html.dark .bg-white, html.dark .bg-slate-50, html.dark .dark\:bg-slate-900, html.dark .dark\:bg-slate-800\/40, html.dark .bg-slate-50\/50, html.dark .bg-slate-100 {
+  background-color: #0E1115 !important;
+}
+
+/* ========== Shared: Animation Physics ========== */
+.ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+.ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* ========== Shared: Fullscreen Canvas ========== */
+#fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+#fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+
+/* ========== Animation Pages: Typing Effect ========== */
+.typing-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
+@keyframes blink { from, to { color: transparent } 50% { color: #E95420 } }
+
+/* ========== Animation Pages: Accent Nodes ========== */
+.accent-node { background-color: #FFFFFF; border: 1.5px solid #E95420; color: #E95420; }
+.accent-node-fill { background-color: #FDE8E0; border: 1.5px solid #E95420; color: #E95420; }
+html.dark .accent-node { background-color: #1A1D25; border-color: #F5A389; color: #F5A389; }
+html.dark .accent-node-fill { background-color: rgba(233, 84, 32, 0.1); border-color: #F5A389; color: #F5A389; }
+
+/* ========== Index: Hero Rings ========== */
+.hero-ring {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1px solid rgba(233, 84, 32, 0.06);
+  pointer-events: none;
+}
+html.dark .hero-ring {
+  border-color: rgba(233, 84, 32, 0.12);
+}
+
+/* ========== Index: Grid Background ========== */
+.grid-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+html.dark .grid-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.02) 1px, transparent 0) !important;
+}
+
+/* ========== Scene Container ========== */
+.scene-container {
+  perspective: 1000px;
+}
+
+/* ========== Reduced Motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

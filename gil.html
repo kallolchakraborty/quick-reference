@@ -5,66 +5,36 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>How Python's GIL Works — Interactive Guide</title>
   <meta name="description" content="An interactive, premium visual guide explaining how Python's Global Interpreter Lock works and why Python threads don't always run in parallel." />
-
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <meta property="og:title" content="How Python's GIL Works — Interactive Guide" />
+  <meta property="og:description" content="An interactive, premium visual guide explaining how Python's Global Interpreter Lock works and why Python threads don't always run in parallel." />
+  <meta property="og:image" content="/assets/logo.svg" />
+  <meta property="og:image:width" content="100" />
+  <meta property="og:image:height" content="100" />
+  <meta property="og:url" content="/gil.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How Python's GIL Works — Interactive Guide" />
+  <meta name="twitter:description" content="An interactive, premium visual guide explaining how Python's Global Interpreter Lock works and why Python threads don't always run in parallel." />
+  <meta name="twitter:image" content="/assets/logo.svg" />
+  <meta name="twitter:image:alt" content="Quick Reference logo — Circle of Knowledge" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Tailwind and Google Fonts -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            ink: "#1A1A2E",
-            inkLight: "#E8E8E8",
-            inkMuted: "#A0A0A0",
-            gil: {
-              primary: '#E95420',
-              purple: '#B38CFF',
-              green: '#57D38C',
-              orange: '#FFB454',
-              red: '#FF6B6B',
-              muted: '#A0A0A0',
-            }
-          },
-          fontFamily: {
-            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
-            mono: ["'JetBrains Mono'", "monospace"]
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     body {
       background-color: #0F1115;
       color: #E8E8E8;
     }
-    .scene-container {
-      perspective: 1000px;
-    }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-
-    .ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-    .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-    #fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-    #fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-
     #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
-
     .gil-glow { box-shadow: 0 0 20px rgba(233, 84, 32, 0.3); }
     .gil-glow-green { box-shadow: 0 0 20px rgba(87, 211, 140, 0.3); }
     .gil-glow-orange { box-shadow: 0 0 20px rgba(255, 180, 84, 0.3); }
-
     @keyframes pulse-glow {
       0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
@@ -84,16 +54,11 @@
     }
     .anim-float { animation: float 3s ease-in-out infinite; }
     .anim-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#0F1115] focus:text-[#E95420] focus:border focus:border-[#E95420] focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold focus:outline-none focus:ring-2 focus:ring-[#E95420]">Skip to main content</a>
 
   <!-- ==================== HEADER ==================== -->
   <header class="border-b border-gray-800 px-8 py-4 flex items-center justify-between z-10 bg-[#0F1115]/90 backdrop-blur-md sticky top-0">
@@ -109,7 +74,7 @@
   </header>
 
   <!-- ==================== MAIN VIEWPORT ==================== -->
-  <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
+  <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
     
     <!-- Info Overlay (Step Labels & Explanations) -->
     <div class="w-full text-center mb-8 min-h-[120px] flex flex-col justify-center gap-2">
@@ -477,17 +442,17 @@
           </button>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-[11px] text-gray-400" id="scene-tags">
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors active-tag text-[#E95420]" data-target="1">Title</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="2">Intuition</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="3">GIL</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="4">Switching</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="5">CPU</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="6">Why GIL</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="7">I/O</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="8">Threads</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="9">MultiProc</span>
-          <span class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="10">Summary</span>
+        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-[11px] text-gray-400" id="scene-tags" role="tablist" aria-label="GIL scenes">
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors active-tag text-[#E95420]" data-target="1" role="tab" aria-selected="true">Title</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="2" role="tab" aria-selected="false">Intuition</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="3" role="tab" aria-selected="false">GIL</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="4" role="tab" aria-selected="false">Switching</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="5" role="tab" aria-selected="false">CPU</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="6" role="tab" aria-selected="false">Why GIL</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="7" role="tab" aria-selected="false">I/O</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="8" role="tab" aria-selected="false">Threads</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="9" role="tab" aria-selected="false">MultiProc</button>
+          <button type="button" class="hover:text-[#E95420] cursor-pointer transition-colors" data-target="10" role="tab" aria-selected="false">Summary</button>
         </div>
       </div>
     </div>
@@ -506,77 +471,8 @@
   </footer>
 
   <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
+  <script src="js/animation-core.js"></script>
   <script>
-    const sceneData = [
-      {
-        title: "How Python's GIL Works",
-        subtitle: "Why Python threads don't always run in parallel.",
-        label: "Scene 1 / 10"
-      },
-      {
-        title: "The Intuition",
-        subtitle: "Multiple threads compete for a single lock before executing Python code.",
-        label: "Scene 2 / 10"
-      },
-      {
-        title: "What Is the GIL?",
-        subtitle: "A mutex that prevents multiple threads from executing Python bytecode at once.",
-        label: "Scene 3 / 10"
-      },
-      {
-        title: "Thread Switching",
-        subtitle: "The GIL is periodically released and re-acquired, allowing thread interleaving.",
-        label: "Scene 4 / 10"
-      },
-      {
-        title: "CPU-Bound Work",
-        subtitle: "Compute-heavy threads waste time waiting for the GIL instead of running in parallel.",
-        label: "Scene 5 / 10"
-      },
-      {
-        title: "Why Does the GIL Exist?",
-        subtitle: "It protects shared interpreter state and simplifies reference counting.",
-        label: "Scene 6 / 10"
-      },
-      {
-        title: "I/O Changes Everything",
-        subtitle: "The GIL is released during blocking I/O, allowing other threads to run.",
-        label: "Scene 7 / 10"
-      },
-      {
-        title: "Why Threads Still Help",
-        subtitle: "Threads improve throughput for I/O-bound workloads despite the GIL.",
-        label: "Scene 8 / 10"
-      },
-      {
-        title: "Multiprocessing",
-        subtitle: "Each process gets its own interpreter and GIL, enabling true parallelism.",
-        label: "Scene 9 / 10"
-      },
-      {
-        title: "Final Summary",
-        subtitle: "The GIL is a design trade-off between simplicity and parallelism.",
-        label: "Scene 10 / 10"
-      }
-    ];
-
-    let currentScene = 0;
-    let isPlaying = false;
-    let autoPlayInterval = null;
-    const TOTAL_SCENES = 10;
-
-    // DOM Elements
-    const sceneCounter = document.getElementById('scene-counter');
-    const sceneTitle = document.getElementById('scene-title');
-    const sceneSubtitle = document.getElementById('scene-subtitle');
-    const timelineProgress = document.getElementById('timeline-progress');
-    const playBtn = document.getElementById('play-btn');
-    const playIcon = document.getElementById('play-icon');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const tags = document.querySelectorAll('#scene-tags span');
-
-    // Helper: snap element to hidden state without CSS transition
     function snapHidden(el) {
       if (!el) return;
       el.style.transition = 'none';
@@ -586,14 +482,12 @@
       el.style.transition = '';
     }
 
-    // Helper: reveal element with transition
     function revealEl(el) {
       if (!el) return;
       el.style.opacity = '1';
       el.style.transform = 'translateY(0)';
     }
 
-    // Helper: snap inline-style width element to hidden without transition
     function snapWidth(el) {
       if (!el) return;
       el.style.transition = 'none';
@@ -602,78 +496,7 @@
       el.style.transition = '';
     }
 
-    // Scene Transition Handler
-    function showScene(sceneIndex) {
-      if (sceneIndex < 1 || sceneIndex > TOTAL_SCENES) return;
-      if (currentScene === sceneIndex) return;
-
-      // Clear inline opacity from all scene containers so class-based opacity works
-      for (let i = 1; i <= TOTAL_SCENES; i++) {
-        const vis = document.getElementById(`vis-scene-${i}`);
-        if (vis) {
-          vis.style.opacity = '';
-        }
-      }
-
-      // Add opacity-0 to all scenes (triggers fade-out on previously visible)
-      for (let i = 1; i <= TOTAL_SCENES; i++) {
-        const vis = document.getElementById(`vis-scene-${i}`);
-        if (vis) {
-          vis.classList.add('opacity-0', 'pointer-events-none');
-        }
-      }
-
-      currentScene = sceneIndex;
-
-      // Update timeline progress
-      const percent = ((sceneIndex - 1) / (TOTAL_SCENES - 1)) * 100;
-      timelineProgress.style.width = `${percent}%`;
-
-      // Update Tag highlights
-      tags.forEach(tag => {
-        if (parseInt(tag.dataset.target) === sceneIndex) {
-          tag.classList.add('text-[#E95420]');
-          tag.classList.remove('text-gray-400');
-        } else {
-          tag.classList.remove('text-[#E95420]');
-          tag.classList.add('text-gray-400');
-        }
-      });
-
-      // Update header texts with fade
-      sceneTitle.style.transition = 'none';
-      sceneSubtitle.style.transition = 'none';
-      sceneTitle.style.opacity = '0';
-      sceneTitle.style.transform = 'translateY(8px)';
-      sceneSubtitle.style.opacity = '0';
-      sceneSubtitle.style.transform = 'translateY(8px)';
-      void sceneTitle.offsetHeight;
-      sceneTitle.style.transition = '';
-      sceneSubtitle.style.transition = '';
-
-      setTimeout(() => {
-        sceneCounter.textContent = sceneData[sceneIndex - 1].label;
-        sceneTitle.textContent = sceneData[sceneIndex - 1].title;
-        sceneSubtitle.textContent = sceneData[sceneIndex - 1].subtitle;
-
-        sceneTitle.style.opacity = '1';
-        sceneTitle.style.transform = 'translateY(0)';
-        sceneSubtitle.style.opacity = '1';
-        sceneSubtitle.style.transform = 'translateY(0)';
-      }, 300);
-
-      // Show the selected scene content (class removal triggers CSS fade-in)
-      const activeVis = document.getElementById(`vis-scene-${sceneIndex}`);
-      if (activeVis) {
-        activeVis.classList.remove('opacity-0', 'pointer-events-none');
-      }
-
-      // Trigger scene-specific animations
-      triggerSceneAnimation(sceneIndex);
-    }
-
-    // Custom Animation Trigger per Scene
-    function triggerSceneAnimation(index) {
+    function triggerSceneAnimation(index, state) {
       if (index === 1) {
         const line = document.getElementById('title-line');
         const title = document.querySelector('#vis-scene-1 h1');
@@ -690,21 +513,21 @@
         });
 
         setTimeout(() => {
-          if (currentScene === 1) {
+          if (state.currentScene === 1) {
             title.style.opacity = '1';
             title.style.transform = 'translateY(0)';
           }
         }, 200);
 
         setTimeout(() => {
-          if (currentScene === 1) {
+          if (state.currentScene === 1) {
             subtitle.style.opacity = '1';
             subtitle.style.transform = 'translateY(0)';
           }
         }, 500);
 
         setTimeout(() => {
-          if (currentScene === 1) {
+          if (state.currentScene === 1) {
             line.style.width = '16rem';
           }
         }, 900);
@@ -715,7 +538,7 @@
         ids.forEach(id => snapHidden(document.getElementById(id)));
         ids.forEach((id, i) => {
           setTimeout(() => {
-            if (currentScene === 2) revealEl(document.getElementById(id));
+            if (state.currentScene === 2) revealEl(document.getElementById(id));
           }, 300 + (i * 400));
         });
       }
@@ -739,20 +562,20 @@
         text.style.transition = '';
 
         setTimeout(() => {
-          if (currentScene === 3) {
+          if (state.currentScene === 3) {
             threadA.style.left = '50%';
             threadA.style.transform = 'translate(-50%, -50%)';
           }
         }, 600);
 
         setTimeout(() => {
-          if (currentScene === 3) {
+          if (state.currentScene === 3) {
             threadB.style.right = '35%';
           }
         }, 1200);
 
         setTimeout(() => {
-          if (currentScene === 3) {
+          if (state.currentScene === 3) {
             text.style.opacity = '1';
           }
         }, 2000);
@@ -784,7 +607,7 @@
         // Pulse through code1 lines
         lines1.forEach((line, i) => {
           setTimeout(() => {
-            if (currentScene === 4) {
+            if (state.currentScene === 4) {
               line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
               t1Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
               t2Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
@@ -792,7 +615,7 @@
           }, 500 + (i * 500));
 
           setTimeout(() => {
-            if (currentScene === 4) {
+            if (state.currentScene === 4) {
               line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
             }
           }, 500 + (i * 500) + 400);
@@ -800,7 +623,7 @@
 
         // GIL handoff
         setTimeout(() => {
-          if (currentScene === 4) {
+          if (state.currentScene === 4) {
             gilIcon.style.transform = 'rotate(180deg)';
             t1Label.classList.remove('border-[#57D38C]/50', 'text-[#57D38C]');
             t2Label.classList.add('border-[#57D38C]/50', 'text-[#57D38C]');
@@ -809,20 +632,20 @@
 
         lines2.forEach((line, i) => {
           setTimeout(() => {
-            if (currentScene === 4) {
+            if (state.currentScene === 4) {
               line.classList.add('bg-[#57D38C]/20', 'text-[#57D38C]');
             }
           }, 2700 + (i * 500));
 
           setTimeout(() => {
-            if (currentScene === 4) {
+            if (state.currentScene === 4) {
               line.classList.remove('bg-[#57D38C]/20', 'text-[#57D38C]');
             }
           }, 2700 + (i * 500) + 400);
         });
 
         setTimeout(() => {
-          if (currentScene === 4) text.style.opacity = '1';
+          if (state.currentScene === 4) text.style.opacity = '1';
         }, 4000);
       }
 
@@ -847,11 +670,11 @@
         text.style.transition = '';
 
         setTimeout(() => {
-          if (currentScene === 5) revealEl(code);
+          if (state.currentScene === 5) revealEl(code);
         }, 300);
 
         function coreCycle(cycle) {
-          if (currentScene !== 5) return;
+          if (state.currentScene !== 5) return;
           const isEven = cycle % 2 === 0;
           bar1.style.height = isEven ? '80%' : '10%';
           bar2.style.height = isEven ? '10%' : '80%';
@@ -861,7 +684,7 @@
             setTimeout(() => coreCycle(cycle + 1), 1400);
           } else {
             setTimeout(() => {
-              if (currentScene === 5) text.style.opacity = '1';
+              if (state.currentScene === 5) text.style.opacity = '1';
             }, 600);
           }
         }
@@ -894,7 +717,7 @@
         // Chaotic state
         threads.forEach((t, i) => {
           setTimeout(() => {
-            if (currentScene === 6) {
+            if (state.currentScene === 6) {
               t.style.transform = `rotate(${i % 2 === 0 ? '3' : '-3'}deg)`;
               t.style.borderColor = '#FF6B6B80';
             }
@@ -903,15 +726,15 @@
 
         // Orderly with GIL
         setTimeout(() => {
-          if (currentScene === 6) {
+          if (state.currentScene === 6) {
             gilBadge.style.opacity = '1';
             threads.forEach(t => { t.style.transform = 'rotate(0deg)'; t.style.borderColor = '#B38CFF80'; });
             objects.forEach(o => o.style.borderColor = '#E9542080');
           }
         }, 1200);
 
-        setTimeout(() => { if (currentScene === 6) text1.style.opacity = '1'; }, 2000);
-        setTimeout(() => { if (currentScene === 6) text2.style.opacity = '1'; }, 2600);
+        setTimeout(() => { if (state.currentScene === 6) text1.style.opacity = '1'; }, 2000);
+        setTimeout(() => { if (state.currentScene === 6) text2.style.opacity = '1'; }, 2600);
       }
 
       else if (index === 7) {
@@ -942,10 +765,10 @@
         gilText.style.transition = '';
         text.style.transition = '';
 
-        setTimeout(() => { if (currentScene === 7) revealEl(code); }, 300);
+        setTimeout(() => { if (state.currentScene === 7) revealEl(code); }, 300);
 
         setTimeout(() => {
-          if (currentScene === 7) {
+          if (state.currentScene === 7) {
             aGreen.style.width = '80%';
             aOrange.style.width = '0%';
             bGreen.style.width = '0%';
@@ -959,7 +782,7 @@
         }, 700);
 
         setTimeout(() => {
-          if (currentScene === 7) {
+          if (state.currentScene === 7) {
             aGreen.style.width = '20%';
             aOrange.style.width = '60%';
             gilText.textContent = 'GIL Released';
@@ -969,14 +792,14 @@
         }, 1900);
 
         setTimeout(() => {
-          if (currentScene === 7) {
+          if (state.currentScene === 7) {
             bGreen.style.width = '80%';
             bOrange.style.width = '0%';
           }
         }, 2600);
 
         setTimeout(() => {
-          if (currentScene === 7) {
+          if (state.currentScene === 7) {
             aOrange.style.width = '20%';
             aGreen.style.width = '60%';
             bGreen.style.width = '0%';
@@ -987,7 +810,7 @@
           }
         }, 3400);
 
-        setTimeout(() => { if (currentScene === 7) text.style.opacity = '1'; }, 4200);
+        setTimeout(() => { if (state.currentScene === 7) text.style.opacity = '1'; }, 4200);
       }
 
       else if (index === 8) {
@@ -1010,19 +833,19 @@
           { a: [0, 60], b: [60, 0], c: [60, 0] }
         ];
 
-        states.forEach((state, si) => {
-          setTimeout(() => {
-            if (currentScene !== 8) return;
-            bars.forEach(id => {
-              const run = document.getElementById(`s8-${id}-run`);
-              const wait = document.getElementById(`s8-${id}-wait`);
-              if (run) run.style.width = state[id][0] + '%';
-              if (wait) wait.style.width = state[id][1] + '%';
+        states.forEach(function(st, si) {
+          setTimeout(function() {
+            if (state.currentScene !== 8) return;
+            bars.forEach(function(id) {
+              var run = document.getElementById('s8-' + id + '-run');
+              var wait = document.getElementById('s8-' + id + '-wait');
+              if (run) run.style.width = st[id][0] + '%';
+              if (wait) wait.style.width = st[id][1] + '%';
             });
           }, 400 + si * 1100);
         });
 
-        setTimeout(() => { if (currentScene === 8) text.style.opacity = '1'; }, 3800);
+        setTimeout(() => { if (state.currentScene === 8) text.style.opacity = '1'; }, 3800);
       }
 
       else if (index === 9) {
@@ -1044,15 +867,15 @@
         text.style.opacity = '0';
         text.style.transition = '';
 
-        setTimeout(() => { if (currentScene === 9) before.style.opacity = '1'; }, 300);
-        setTimeout(() => { if (currentScene === 9) arrow.style.opacity = '1'; }, 1000);
-        setTimeout(() => { if (currentScene === 9) after.style.opacity = '1'; }, 1700);
+        setTimeout(() => { if (state.currentScene === 9) before.style.opacity = '1'; }, 300);
+        setTimeout(() => { if (state.currentScene === 9) arrow.style.opacity = '1'; }, 1000);
+        setTimeout(() => { if (state.currentScene === 9) after.style.opacity = '1'; }, 1700);
 
         cores.forEach((core, i) => {
-          setTimeout(() => { if (currentScene === 9) core.style.height = '100%'; }, 2100 + i * 300);
+          setTimeout(() => { if (state.currentScene === 9) core.style.height = '100%'; }, 2100 + i * 300);
         });
 
-        setTimeout(() => { if (currentScene === 9) text.style.opacity = '1'; }, 3200);
+        setTimeout(() => { if (state.currentScene === 9) text.style.opacity = '1'; }, 3200);
       }
 
       else if (index === 10) {
@@ -1069,130 +892,23 @@
 
         cards.forEach((card, i) => {
           setTimeout(() => {
-            if (currentScene === 10) revealEl(card);
+            if (state.currentScene === 10) revealEl(card);
           }, 300 + (i * 350));
         });
 
-        setTimeout(() => { if (currentScene === 10) glowLine.style.width = '16rem'; }, 1600);
-        setTimeout(() => { if (currentScene === 10) quote.style.opacity = '1'; }, 2200);
+        setTimeout(() => { if (state.currentScene === 10) glowLine.style.width = '16rem'; }, 1600);
+        setTimeout(() => { if (state.currentScene === 10) quote.style.opacity = '1'; }, 2200);
       }
     }
 
-    // Auto Play Logic
-    function startAutoPlay() {
-      isPlaying = true;
-      playIcon.textContent = "pause";
-
-      autoPlayInterval = setInterval(() => {
-        if (currentScene < TOTAL_SCENES) {
-          showScene(currentScene + 1);
-        } else {
-          showScene(1);
-        }
-      }, 8000);
-    }
-
-    function stopAutoPlay() {
-      isPlaying = false;
-      playIcon.textContent = "play_arrow";
-      clearInterval(autoPlayInterval);
-    }
-
-    playBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        stopAutoPlay();
-      } else {
-        startAutoPlay();
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene > 1) {
-        showScene(currentScene - 1);
-      }
-    });
-
-    nextBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene < TOTAL_SCENES) {
-        showScene(currentScene + 1);
-      }
-    });
-
-    tags.forEach(tag => {
-      tag.addEventListener('click', () => {
-        stopAutoPlay();
-        showScene(parseInt(tag.dataset.target));
+    fetch('content/interactive/gil.json').then(function(r) { return r.json(); }).then(function(json) {
+      initAnimationPlayer({
+        totalScenes: 10,
+        sceneData: json.scenes,
+        activeTagClass: ['text-[#E95420]'],
+        inactiveTagClass: ['text-gray-400'],
+        onSceneAnimation: triggerSceneAnimation
       });
-    });
-
-    document.getElementById('timeline-bar').addEventListener('click', (e) => {
-      stopAutoPlay();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const pct = x / rect.width;
-      const targetScene = Math.min(TOTAL_SCENES, Math.max(1, Math.round(pct * (TOTAL_SCENES - 1)) + 1));
-      showScene(targetScene);
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene > 1) showScene(currentScene - 1);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene < TOTAL_SCENES) showScene(currentScene + 1);
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        if (isPlaying) stopAutoPlay(); else startAutoPlay();
-      }
-    });
-
-    // Fullscreen behavior
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const fullscreenCanvas = document.getElementById('fullscreen-canvas');
-    if (fullscreenBtn && fullscreenCanvas) {
-      fullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          fullscreenCanvas.requestFullscreen().catch(err => {
-            console.error('Error enabling fullscreen:', err);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      });
-    }
-
-    document.addEventListener('fullscreenchange', () => {
-      const icon = fullscreenBtn?.querySelector('span');
-      if (icon) {
-        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
-      }
-    });
-
-    // Start with Scene 1
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.self !== window.top) {
-        document.querySelector('header')?.classList.add('hidden');
-        document.querySelector('footer')?.classList.add('hidden');
-        document.getElementById('scene-counter')?.parentElement?.classList.add('hidden');
-        document.body.classList.remove('justify-between');
-        document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
-        document.querySelector('main')?.classList.remove('md:py-16', 'py-8', 'px-6');
-        document.querySelector('main')?.classList.add('py-0', 'px-2', 'max-w-full');
-
-        // Reduce timeline top margin
-        const timeline = document.querySelector('main > div:last-child');
-        if (timeline) {
-          timeline.classList.remove('mt-8');
-          timeline.classList.add('mt-3');
-        }
-      }
-      showScene(1);
     });
   </script>
 </body>

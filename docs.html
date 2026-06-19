@@ -5,121 +5,36 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Quick Reference — Documentation & Study Guides</title>
   <meta name="description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
-
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <meta property="og:title" content="Quick Reference — Documentation &amp; Study Guides" />
+  <meta property="og:description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
+  <meta property="og:image" content="/assets/logo.svg" />
+  <meta property="og:image:width" content="100" />
+  <meta property="og:image:height" content="100" />
+  <meta property="og:url" content="/docs.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Quick Reference — Documentation &amp; Study Guides" />
+  <meta name="twitter:description" content="Access structured developer study notes, cheat sheets, syntax references, and technical guides." />
+  <meta name="twitter:image" content="/assets/logo.svg" />
+  <meta name="twitter:image:alt" content="Quick Reference logo — Circle of Knowledge" />
+  
+  <link rel="prefetch" href="compiler.html" as="document" />
+  <link rel="prefetch" href="interpreter.html" as="document" />
+  <link rel="prefetch" href="gil.html" as="document" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script src="js/theme.js"></script>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            charcoal: "#0F1115",
-            accentBlue: "#5DA9FF",
-            accentGreen: "#57D38C",
-            accentOrange: "#FFB454",
-            accentPurple: "#B38CFF",
-            accentRed: "#FF6B6B",
-            textLight: "#E8E8E8",
-            textMuted: "#A0A0A0",
-            brand: {
-              50: "rgba(233, 84, 32, 0.05)",
-              100: "rgba(233, 84, 32, 0.1)",
-              500: "#E95420", // Ubuntu Orange
-              600: "#C34113",
-              700: "#A6390F"
-            }
-          },
-          fontFamily: {
-            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
-            mono: ["'JetBrains Mono'", "monospace"]
-          }
-        }
-      }
-    };
-  </script>
-
-  <style>
-    /* Light mode (default) */
-    .glass-nav {
-      backdrop-filter: blur(8px);
-      background-color: rgba(255, 255, 255, 0.85);
-      border-color: rgba(0, 0, 0, 0.06);
-    }
-
-    /* Active nav links */
-    .active-doc-link {
-      color: #E95420 !important;
-      border-left-color: #E95420 !important;
-      font-weight: 600;
-    }
-    
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
-
-    /* Brand colors — same in both modes */
-    .text-brand-500, .dark\:text-brand-500, .hover\:text-brand-500:hover, .group-hover\:text-brand-500 {
-      color: #E95420 !important;
-    }
-    .bg-brand-500, .hover\:bg-brand-600:hover {
-      background-color: #E95420 !important;
-      color: #FFFFFF !important;
-    }
-    .hover\:border-brand-500:hover {
-      border-color: rgba(233, 84, 32, 0.4) !important;
-    }
-
-    /* Dark mode overrides */
-    html.dark body {
-      background-color: #0F1115 !important;
-      color: #E8E8E8 !important;
-    }
-    html.dark .glass-nav {
-      background-color: rgba(15, 17, 21, 0.8) !important;
-      border-color: rgba(255, 255, 255, 0.05) !important;
-    }
-    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark p, html.dark label, html.dark input {
-      color: #E8E8E8;
-    }
-    html.dark .text-slate-900, html.dark .text-slate-800, html.dark .dark\:text-white {
-      color: #E8E8E8 !important;
-    }
-    html.dark .text-slate-600, html.dark .text-slate-500, html.dark .text-slate-400, html.dark .dark\:text-slate-400 {
-      color: #A0A0A0 !important;
-    }
-    html.dark .border, html.dark .border-b, html.dark .border-t, html.dark .border-r, html.dark .border-l,
-    html.dark .border-slate-200, html.dark .dark\:border-slate-800 {
-      border-color: rgba(255, 255, 255, 0.05) !important;
-    }
-    html.dark .bg-white, html.dark .bg-slate-50, html.dark .dark\:bg-slate-900, html.dark .dark\:bg-slate-800\/40, html.dark .bg-slate-50\/50, html.dark .bg-slate-100 {
-      background-color: #0E1115 !important;
-    }
-    html.dark ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    html.dark ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-  </style>
+  <style></style>
 </head>
 
 <body class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans min-h-screen flex flex-col transition-colors duration-200">
+
+  <a href="#docs-dynamic-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white dark:focus:bg-slate-900 focus:text-[#E95420] focus:border focus:border-[#E95420] focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold focus:outline-none focus:ring-2 focus:ring-[#E95420]">Skip to main content</a>
 
   <!-- ==================== HEADER ==================== -->
   <header class="glass-nav border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 transition-colors duration-200">
@@ -257,19 +172,19 @@
   </footer>
 
   <!-- ==================== INTERACTIVE SEARCH MODAL ==================== -->
-  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start">
+  <div id="search-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4 sm:p-10 justify-center items-start" role="dialog" aria-modal="true" aria-label="Search documentation">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden mt-10">
       <!-- Search Input Header -->
       <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 bg-slate-50/50 dark:bg-slate-900/50">
         <span class="material-symbols-outlined text-slate-400">search</span>
-        <input id="modal-search-input" type="text" placeholder="Type to search study materials..." class="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium placeholder:text-slate-400" />
+        <input id="modal-search-input" type="text" placeholder="Type to search study materials..." aria-label="Search query" class="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-medium placeholder:text-slate-400" />
         <button id="close-search-btn" class="text-xs text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
           ESC
         </button>
       </div>
 
       <!-- Results Body -->
-      <div id="modal-search-results" class="p-4 max-h-[400px] overflow-y-auto flex flex-col gap-3">
+      <div id="modal-search-results" class="p-4 max-h-[400px] overflow-y-auto flex flex-col gap-3" role="listbox" aria-label="Search results">
         <!-- Rendered by search.js -->
       </div>
       

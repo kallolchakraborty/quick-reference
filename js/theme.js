@@ -1,8 +1,16 @@
 (function() {
   var key = 'theme';
 
+  function safeGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  function safeSet(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) {}
+  }
+
   function getTheme() {
-    var stored = localStorage.getItem(key);
+    var stored = safeGet(key);
     if (stored === 'dark' || stored === 'light') return stored;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
@@ -24,13 +32,13 @@
         var isDark = document.documentElement.classList.contains('dark');
         var t = isDark ? 'light' : 'dark';
         apply(t);
-        localStorage.setItem(key, t);
+        safeSet(key, t);
       });
     }
   });
 
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-    if (!localStorage.getItem(key)) {
+    if (!safeGet(key)) {
       apply(e.matches ? 'dark' : 'light');
     }
   });

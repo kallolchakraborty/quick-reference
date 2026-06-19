@@ -1,0 +1,54 @@
+{
+  "scenes": [
+    {
+      "title": "How Python's GIL Works",
+      "subtitle": "Why Python threads don't always run in parallel.",
+      "label": "Scene 1 / 10"
+    },
+    {
+      "title": "The Intuition",
+      "subtitle": "Multiple threads compete for a single lock before executing Python code.",
+      "label": "Scene 2 / 10"
+    },
+    {
+      "title": "What Is the GIL?",
+      "subtitle": "A mutex that prevents multiple threads from executing Python bytecode at once.",
+      "label": "Scene 3 / 10"
+    },
+    {
+      "title": "Thread Switching",
+      "subtitle": "The GIL is periodically released and re-acquired, allowing thread interleaving.",
+      "label": "Scene 4 / 10"
+    },
+    {
+      "title": "CPU-Bound Work",
+      "subtitle": "Compute-heavy threads waste time waiting for the GIL instead of running in parallel.",
+      "label": "Scene 5 / 10"
+    },
+    {
+      "title": "Why Does the GIL Exist?",
+      "subtitle": "It protects shared interpreter state and simplifies reference counting.",
+      "label": "Scene 6 / 10"
+    },
+    {
+      "title": "I/O Changes Everything",
+      "subtitle": "The GIL is released during blocking I/O, allowing other threads to run.",
+      "label": "Scene 7 / 10"
+    },
+    {
+      "title": "Why Threads Still Help",
+      "subtitle": "Threads improve throughput for I/O-bound workloads despite the GIL.",
+      "label": "Scene 8 / 10"
+    },
+    {
+      "title": "Multiprocessing",
+      "subtitle": "Each process gets its own interpreter and GIL, enabling true parallelism.",
+      "label": "Scene 9 / 10"
+    },
+    {
+      "title": "Final Summary",
+      "subtitle": "The GIL is a design trade-off between simplicity and parallelism.",
+      "label": "Scene 10 / 10"
+    }
+  ]
+}

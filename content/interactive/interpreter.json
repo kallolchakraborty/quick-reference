@@ -1,0 +1,55 @@
+{
+  "scenes": [
+    {
+      "title": "How an Interpreter Works",
+      "subtitle": "Reading, understanding, and executing code one step at a time.",
+      "label": "Scene 1 / 10"
+    },
+    {
+      "title": "Source Code",
+      "subtitle": "A high-level script is written in languages like Python, JavaScript, or Ruby.",
+      "label": "Scene 2 / 10"
+    },
+    {
+      "title": "The Big Idea",
+      "subtitle": "Unlike a compiler, execution happens immediately during interpretation.",
+      "label": "Scene 3 / 10"
+    },
+    {
+      "title": "Reading Line by Line",
+      "subtitle": "The interpreter fetches the first statement, understands it, and records it in memory.",
+      "label": "Scene 4 / 10"
+    },
+    {
+      "title": "Continuing Execution",
+      "subtitle": "It progresses to the next line, dynamically updating runtime values.",
+      "label": "Scene 5 / 10"
+    },
+    {
+      "title": "Evaluating Expressions",
+      "subtitle": "Expressions are resolved by retrieving variables from the environment and executing functions.",
+      "label": "Scene 6 / 10"
+    },
+    {
+      "title": "Producing Output",
+      "subtitle": "System commands (like print) produce output instantly during interpretation.",
+      "label": "Scene 7 / 10"
+    },
+    {
+      "title": "How Execution Progresses",
+      "subtitle": "A continuous loop of Read \u2192 Parse \u2192 Execute travels step-by-step through the program.",
+      "label": "Scene 8 / 10"
+    },
+    {
+      "title": "Error Handling",
+      "subtitle": "Interpreters stop execution immediately upon encountering the first runtime error.",
+      "label": "Scene 9 / 10"
+    },
+    {
+      "title": "Final Summary",
+      "subtitle": "An interpreter executes a program incrementally\u2014reading, understanding, and running code one statement at a time.",
+      "label": "Scene 10 / 10"
+    }
+  ],
+  "codeString": "x = 2\ny = 3\nresult = x + y\nprint(result)"
+}

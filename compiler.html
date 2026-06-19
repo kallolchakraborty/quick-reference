@@ -5,91 +5,44 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>How a Compiler Works — Interactive Guide</title>
   <meta name="description" content="An interactive, premium visual guide explaining the inner workings of a compiler from source code to machine code." />
-
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <meta property="og:title" content="How a Compiler Works — Interactive Guide" />
+  <meta property="og:description" content="An interactive, premium visual guide explaining the inner workings of a compiler from source code to machine code." />
+  <meta property="og:image" content="/assets/logo.svg" />
+  <meta property="og:image:width" content="100" />
+  <meta property="og:image:height" content="100" />
+  <meta property="og:url" content="/compiler.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How a Compiler Works — Interactive Guide" />
+  <meta name="twitter:description" content="An interactive, premium visual guide explaining the inner workings of a compiler from source code to machine code." />
+  <meta name="twitter:image" content="/assets/logo.svg" />
+  <meta name="twitter:image:alt" content="Quick Reference logo — Circle of Knowledge" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Tailwind and Google Fonts -->
   <script src="js/theme.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-              colors: {
-            ink: "#1A1A2E",
-            inkLight: "#374151",
-            inkMuted: "#6B7280",
-            accent: "#E95420",
-            accentLight: "#FDE8E0",
-            accentMid: "#FAD1C0",
-            accentStrong: "#F5A389",
-            paper: "#FFFFFF",
-            paperWarm: "#F8F9FA",
-            error: "#DC2626"
-          },
-          fontFamily: {
-            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
-            mono: ["'JetBrains Mono'", "monospace"]
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     body {
       background-color: #F8F9FA;
       color: #374151;
     }
-    .scene-container {
-      perspective: 1000px;
-    }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
-
-    .ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-    .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .pipeline-node { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
-    .typing-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
-    @keyframes blink { from, to { color: transparent } 50% { color: #E95420 } }
-
-    #fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-    #fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
-
     #fullscreen-canvas { background-color: #FFFFFF; border-color: rgba(0, 0, 0, 0.08); }
     #ast-svg text { fill: #374151; }
     #ast-svg line { stroke: #E95420; }
-
-    /* Accent node styling */
-    .accent-node { background-color: #FFFFFF; border: 1.5px solid #E95420; color: #E95420; }
-    .accent-node-fill { background-color: #FDE8E0; border: 1.5px solid #E95420; color: #E95420; }
-
-    /* Dark mode */
-    html.dark body {
-      background-color: #0F1115;
-      color: #E8E8E8;
-    }
-    html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+    .pipeline-node { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
     html.dark #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
     html.dark #ast-svg text { fill: #E8E8E8; }
-    html.dark .accent-node { background-color: #1A1D25; border-color: #F5A389; color: #F5A389; }
-    html.dark .accent-node-fill { background-color: rgba(233, 84, 32, 0.1); border-color: #F5A389; color: #F5A389; }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white dark:focus:bg-slate-900 focus:text-[#E95420] focus:border focus:border-[#E95420] focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold focus:outline-none focus:ring-2 focus:ring-[#E95420]">Skip to main content</a>
 
   <!-- ==================== HEADER ==================== -->
   <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between z-10 bg-white/90 dark:bg-[#0F1115]/90 backdrop-blur-md sticky top-0">
@@ -108,7 +61,7 @@
   </header>
 
   <!-- ==================== MAIN VIEWPORT ==================== -->
-  <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
+  <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
     
     <!-- Info Overlay (Step Labels & Explanations) -->
     <div class="w-full text-center mb-8 min-h-[120px] flex flex-col justify-center gap-2">
@@ -339,16 +292,16 @@
           </button>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-xs text-inkMuted dark:text-gray-400" id="scene-tags">
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1">Title</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2">Source</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3">Pipeline</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4">Lexer</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5">Parser</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6">Semantic</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7">Optimize</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8">CodeGen</span>
-          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9">Summary</span>
+        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-xs text-inkMuted dark:text-gray-400" id="scene-tags" role="tablist" aria-label="Compiler scenes">
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1" role="tab" aria-selected="true">Title</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2" role="tab" aria-selected="false">Source</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3" role="tab" aria-selected="false">Pipeline</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4" role="tab" aria-selected="false">Lexer</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5" role="tab" aria-selected="false">Parser</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6" role="tab" aria-selected="false">Semantic</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7" role="tab" aria-selected="false">Optimize</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8" role="tab" aria-selected="false">CodeGen</button>
+          <button type="button" class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9" role="tab" aria-selected="false">Summary</button>
         </div>
       </div>
     </div>
@@ -367,155 +320,35 @@
   </footer>
 
   <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
+  <script src="js/animation-core.js"></script>
   <script>
-    const sceneData = [
-      {
-        title: "How a Compiler Works",
-        subtitle: "Turning human-readable code into machine instructions",
-        label: "Scene 1 / 9"
-      },
-      {
-        title: "Source Code",
-        subtitle: "A programmer writes high-level statements in languages like C++, Java, or Rust.",
-        label: "Scene 2 / 9"
-      },
-      {
-        title: "Compiler Pipeline Overview",
-        subtitle: "Information flows through a structured, multi-stage machine.",
-        label: "Scene 3 / 9"
-      },
-      {
-        title: "Lexical Analysis",
-        subtitle: "Convert raw characters into structured tokens.",
-        label: "Scene 4 / 9"
-      },
-      {
-        title: "Parsing",
-        subtitle: "Build an Abstract Syntax Tree (AST) to define program structure.",
-        label: "Scene 5 / 9"
-      },
-      {
-        title: "Semantic Analysis",
-        subtitle: "Check node logic to ensure types match, functions exist, and constraints hold.",
-        label: "Scene 6 / 9"
-      },
-      {
-        title: "Optimization",
-        subtitle: "Produce faster and smaller code without changing program behavior.",
-        label: "Scene 7 / 9"
-      },
-      {
-        title: "Code Generation",
-        subtitle: "Translate the optimized structure into processor instructions and binary bytes.",
-        label: "Scene 8 / 9"
-      },
-      {
-        title: "Final Summary",
-        subtitle: "Translating thoughts into execution progress.",
-        label: "Scene 9 / 9"
-      }
-    ];
+    var data;
 
-    let currentScene = 1;
-    let isPlaying = false;
-    let autoPlayInterval = null;
-    const TOTAL_SCENES = 9;
-
-    // DOM Elements
-    const sceneCounter = document.getElementById('scene-counter');
-    const sceneTitle = document.getElementById('scene-title');
-    const sceneSubtitle = document.getElementById('scene-subtitle');
-    const timelineProgress = document.getElementById('timeline-progress');
-    const playBtn = document.getElementById('play-btn');
-    const playIcon = document.getElementById('play-icon');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const tags = document.querySelectorAll('#scene-tags span');
-
-    // Scene Transition Handler
-    function showScene(sceneIndex) {
-      if (sceneIndex < 1 || sceneIndex > TOTAL_SCENES) return;
-
-      // Hide all scene containers
-      for (let i = 1; i <= TOTAL_SCENES; i++) {
-        const vis = document.getElementById(`vis-scene-${i}`);
-        if (vis) {
-          vis.classList.add('opacity-0', 'pointer-events-none');
-          if (i === 2) vis.classList.add('translate-x-10');
-        }
-      }
-
-      currentScene = sceneIndex;
-
-      // Update timeline progress
-      const percent = ((sceneIndex - 1) / (TOTAL_SCENES - 1)) * 100;
-      timelineProgress.style.width = `${percent}%`;
-
-      // Update Tag highlights
-      tags.forEach(tag => {
-        if (parseInt(tag.dataset.target) === sceneIndex) {
-          tag.classList.add('text-orange-600', 'dark:text-orange-400');
-          tag.classList.remove('text-inkMuted', 'dark:text-gray-400');
-        } else {
-          tag.classList.remove('text-orange-600', 'dark:text-orange-400');
-          tag.classList.add('text-inkMuted', 'dark:text-gray-400');
-        }
-      });
-
-      // Update texts with fade effect
-      sceneTitle.classList.remove('opacity-100', 'translate-y-0');
-      sceneTitle.classList.add('opacity-0', 'translate-y-2');
-      sceneSubtitle.classList.remove('opacity-100', 'translate-y-0');
-      sceneSubtitle.classList.add('opacity-0', 'translate-y-2');
-
-      setTimeout(() => {
-        sceneCounter.textContent = sceneData[sceneIndex - 1].label;
-        sceneTitle.textContent = sceneData[sceneIndex - 1].title;
-        sceneSubtitle.textContent = sceneData[sceneIndex - 1].subtitle;
-
-        sceneTitle.classList.remove('opacity-0', 'translate-y-2');
-        sceneTitle.classList.add('opacity-100', 'translate-y-0');
-        sceneSubtitle.classList.remove('opacity-0', 'translate-y-2');
-        sceneSubtitle.classList.add('opacity-100', 'translate-y-0');
-      }, 300);
-
-      // Show the selected scene content
-      const activeVis = document.getElementById(`vis-scene-${sceneIndex}`);
-      if (activeVis) {
-        activeVis.classList.remove('opacity-0', 'pointer-events-none');
-        if (sceneIndex === 2) activeVis.classList.remove('translate-x-10');
-      }
-
-      // Trigger scene-specific animations
-      triggerSceneAnimation(sceneIndex);
-    }
-
-    // Custom Animation Trigger per Scene
-    function triggerSceneAnimation(index) {
+    function triggerSceneAnimation(index, state) {
       if (index === 1) {
-        const innerDiv = document.querySelector('#vis-scene-1 > div');
+        var innerDiv = document.querySelector('#vis-scene-1 > div');
         if (innerDiv) {
-          const children = Array.from(innerDiv.children);
-          children.forEach((child, i) => {
+          var children = Array.from(innerDiv.children);
+          children.forEach(function(child, i) {
             child.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
             child.style.opacity = '0';
             child.style.transform = 'translateY(10px)';
-            setTimeout(() => {
+            setTimeout(function() {
               child.style.opacity = '1';
               child.style.transform = 'translateY(0)';
             }, 400 + i * 300);
           });
         }
       }
-      
+
       else if (index === 2) {
-        const codeElement = document.getElementById('typed-code');
+        var codeElement = document.getElementById('typed-code');
         codeElement.textContent = "";
-        const codeString = `int add(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    int result = add(2, 3);\n}`;
-        let charIndex = 0;
-        
+        var codeString = data.codeString;
+        var charIndex = 0;
+
         function typeCode() {
-          if (charIndex < codeString.length && currentScene === 2) {
+          if (charIndex < codeString.length && state.currentScene === 2) {
             codeElement.textContent += codeString.charAt(charIndex);
             charIndex++;
             setTimeout(typeCode, 25);
@@ -523,110 +356,75 @@
         }
         setTimeout(typeCode, 500);
       }
-      
+
       else if (index === 3) {
-        // Sequentially load nodes
-        const nodes = document.querySelectorAll('.pipeline-node');
-        nodes.forEach(node => {
+        var nodes = document.querySelectorAll('.pipeline-node');
+        nodes.forEach(function(node) {
           node.classList.add('opacity-0', 'translate-y-4');
           node.classList.remove('opacity-100', 'translate-y-0');
         });
 
-        const pulse = document.getElementById('pipeline-pulse');
+        var pulse = document.getElementById('pipeline-pulse');
         if (pulse) pulse.classList.add('opacity-0');
 
-        nodes.forEach((node, i) => {
-          setTimeout(() => {
-            if (currentScene === 3) {
+        nodes.forEach(function(node, i) {
+          setTimeout(function() {
+            if (state.currentScene === 3) {
               node.classList.remove('opacity-0', 'translate-y-4');
               node.classList.add('opacity-100', 'translate-y-0');
             }
           }, 300 + (i * 250));
         });
 
-        // Trigger pulse line glow
-        setTimeout(() => {
-          if (pulse && currentScene === 3) {
+        setTimeout(function() {
+          if (pulse && state.currentScene === 3) {
             pulse.classList.remove('opacity-0');
           }
         }, 300 + (nodes.length * 250));
       }
-      
-      else if (index === 4) {
-        const container = document.getElementById('lexer-token-container');
-        container.innerHTML = "";
-        const tokens = [
-          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "add", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "(", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
-          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "a", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
-          { text: ",", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
-          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "b", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
-          { text: ")", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
-          { text: "{", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
-          { text: "return", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "a", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
-          { text: "+", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
-          { text: "b", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
-          { text: ";", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
-          { text: "}", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" }
-        ];
 
-        tokens.forEach((t, i) => {
-          const el = document.createElement('div');
-          el.className = `px-3 py-1.5 border rounded-lg text-xs font-mono transition-all duration-500 transform translate-y-4 opacity-0 ease-spring ${t.color}`;
+      else if (index === 4) {
+        var container = document.getElementById('lexer-token-container');
+        container.innerHTML = "";
+        var tokens = data.tokens;
+
+        tokens.forEach(function(t, i) {
+          var el = document.createElement('div');
+          el.className = 'px-3 py-1.5 border rounded-lg text-xs font-mono transition-all duration-500 transform translate-y-4 opacity-0 ease-spring ' + t.class;
           el.textContent = t.text;
           container.appendChild(el);
-          setTimeout(() => {
-            if (currentScene === 4) {
+          setTimeout(function() {
+            if (state.currentScene === 4) {
               el.classList.remove('opacity-0', 'translate-y-4');
             }
           }, i * 150);
         });
       }
-      
+
       else if (index === 5) {
-        // Draw Abstract Syntax Tree dynamically
-        const nodeData = [
-          { x: 300, y: 50, label: "Program", fill: "#E95420" },
-          { x: 300, y: 130, label: "Function (add)", fill: "#F5A389" },
-          { x: 300, y: 210, label: "ReturnStmt", fill: "#FAD1C0" },
-          { x: 300, y: 290, label: "Operator (+)", fill: "#FDE8E0" },
-          { x: 200, y: 290, label: "Param (a)", fill: "#FAD1C0" },
-          { x: 400, y: 290, label: "Param (b)", fill: "#FAD1C0" }
-        ];
+        var nodeData = data.astNodes;
+        var edges = data.astEdges;
 
-        const lines = [
-          { from: 0, to: 1 },
-          { from: 1, to: 2 },
-          { from: 2, to: 3 },
-          { from: 3, to: 4 },
-          { from: 3, to: 5 }
-        ];
-
-        const svgLines = document.getElementById('ast-lines');
-        const svgNodes = document.getElementById('ast-nodes');
+        var svgLines = document.getElementById('ast-lines');
+        var svgNodes = document.getElementById('ast-nodes');
         svgLines.innerHTML = "";
         svgNodes.innerHTML = "";
 
-        // Add Nodes
-        nodeData.forEach((node, i) => {
-          setTimeout(() => {
-            if (currentScene === 5) {
-              const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        nodeData.forEach(function(node, i) {
+          setTimeout(function() {
+            if (state.currentScene === 5) {
+              var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
               g.setAttribute("class", "transition-all duration-700 ease-spring transform scale-0");
-              g.style.transformOrigin = `${node.x}px ${node.y}px`;
+              g.style.transformOrigin = node.x + 'px ' + node.y + 'px';
 
-              const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+              var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
               circle.setAttribute("cx", node.x);
               circle.setAttribute("cy", node.y);
               circle.setAttribute("r", 18);
               circle.setAttribute("fill", node.fill);
               circle.setAttribute("opacity", "0.9");
 
-              const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
               text.setAttribute("x", node.x);
               text.setAttribute("y", node.y + 35);
               text.setAttribute("text-anchor", "middle");
@@ -639,126 +437,119 @@
               g.appendChild(text);
               svgNodes.appendChild(g);
 
-              requestAnimationFrame(() => {
+              requestAnimationFrame(function() {
                 g.style.transform = "scale(1)";
               });
             }
           }, i * 300);
         });
 
-        // Add Lines
-        lines.forEach((line, i) => {
-          setTimeout(() => {
-            if (currentScene === 5) {
-              const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
-              const fromNode = nodeData[line.from];
-              const toNode = nodeData[line.to];
-              p.setAttribute("d", `M ${fromNode.x} ${fromNode.y} L ${toNode.x} ${toNode.y}`);
+        edges.forEach(function(edge, i) {
+          setTimeout(function() {
+            if (state.currentScene === 5) {
+              var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              var fromNode = nodeData[edge.from];
+              var toNode = nodeData[edge.to];
+              p.setAttribute("d", "M " + fromNode.x + " " + fromNode.y + " L " + toNode.x + " " + toNode.y);
               p.setAttribute("stroke", "#E95420");
               p.setAttribute("stroke-width", "1.5");
               p.setAttribute("fill", "none");
-              
-              // Animate line drawing
-              const length = Math.hypot(toNode.x - fromNode.x, toNode.y - fromNode.y);
+
+              var length = Math.hypot(toNode.x - fromNode.x, toNode.y - fromNode.y);
               p.style.strokeDasharray = length;
               p.style.strokeDashoffset = length;
               p.style.transition = "stroke-dashoffset 0.6s ease-out";
               svgLines.appendChild(p);
 
-              requestAnimationFrame(() => {
+              requestAnimationFrame(function() {
                 p.style.strokeDashoffset = "0";
               });
             }
           }, 400 + i * 300);
         });
       }
-      
+
       else if (index === 6) {
-        // Reset Semantic scene checks
-        const checks = [1, 2, 3];
-        checks.forEach(n => {
-          const el = document.getElementById(`semantic-check-${n}`);
+        var checksArray = [1, 2, 3];
+        checksArray.forEach(function(n) {
+          var el = document.getElementById('semantic-check-' + n);
           el.className = "flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500";
         });
 
-        const errorPanel = document.getElementById('semantic-error-panel');
+        var errorPanel = document.getElementById('semantic-error-panel');
         errorPanel.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl p-5 w-72 text-left font-mono shadow-lg opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
 
-        checks.forEach((n, i) => {
-          setTimeout(() => {
-            if (currentScene === 6) {
-              const el = document.getElementById(`semantic-check-${n}`);
+        checksArray.forEach(function(n, i) {
+          setTimeout(function() {
+            if (state.currentScene === 6) {
+              var el = document.getElementById('semantic-check-' + n);
               el.classList.remove('opacity-0', '-translate-x-4');
             }
           }, i * 400);
         });
 
-        setTimeout(() => {
-          if (currentScene === 6) {
+        setTimeout(function() {
+          if (state.currentScene === 6) {
             errorPanel.classList.remove('opacity-0', 'translate-x-4');
           }
         }, 1200);
       }
-      
+
       else if (index === 7) {
-        const optBefore = document.getElementById('opt-before');
-        const optArrow = document.getElementById('opt-arrow');
-        const optAfter = document.getElementById('opt-after');
-        const deadBranch = document.getElementById('dead-branch');
+        var optBefore = document.getElementById('opt-before');
+        var optArrow = document.getElementById('opt-arrow');
+        var optAfter = document.getElementById('opt-after');
+        var deadBranch = document.getElementById('dead-branch');
 
         optBefore.className = "text-orange-600 dark:text-orange-400 transition-all duration-1000";
         optAfter.className = "opacity-0 scale-90 transition-all duration-1000 text-orange-700 dark:text-orange-300";
         deadBranch.className = "pl-4 text-inkMuted dark:text-gray-500 line-through";
 
-        // Folding transition
-        setTimeout(() => {
-          if (currentScene === 7) {
+        setTimeout(function() {
+          if (state.currentScene === 7) {
             optBefore.classList.add('opacity-0', 'scale-75');
             optAfter.classList.remove('opacity-0', 'scale-90');
             optAfter.classList.add('opacity-100', 'scale-100');
           }
         }, 1200);
 
-        // Dead code elimination transition
-        setTimeout(() => {
-          if (currentScene === 7) {
+        setTimeout(function() {
+          if (state.currentScene === 7) {
             deadBranch.classList.add('opacity-10', 'line-through');
           }
         }, 1800);
       }
-      
+
       else if (index === 8) {
-        // Reset code lines
-        const asmList = document.querySelectorAll('#asm-lines-container div');
-        asmList.forEach(line => {
+        var asmList = document.querySelectorAll('#asm-lines-container div');
+        asmList.forEach(function(line) {
           line.className = "opacity-0 translate-y-2 transition-all duration-500";
         });
 
-        asmList.forEach((line, i) => {
-          setTimeout(() => {
-            if (currentScene === 8) {
+        asmList.forEach(function(line, i) {
+          setTimeout(function() {
+            if (state.currentScene === 8) {
               line.classList.remove('opacity-0', 'translate-y-2');
             }
           }, i * 350);
         });
 
-        // Trigger binary pulses
-        const binContainer = document.getElementById('binary-pulse-container');
+        var binContainer = document.getElementById('binary-pulse-container');
         binContainer.innerHTML = "";
-        let pulseCount = 0;
-        
+        var pulseCount = 0;
+
         function makePulse() {
-          if (currentScene === 8 && pulseCount < 20) {
-            const el = document.createElement('div');
+          if (state.currentScene === 8 && pulseCount < 20) {
+            var el = document.createElement('div');
             el.className = "opacity-0 translate-y-1 transition-all duration-700 text-orange-600 dark:text-orange-400 font-mono text-[9px]";
             el.textContent = Math.random() > 0.5 ? "10110100" : "01101010";
             binContainer.appendChild(el);
-            
-            setTimeout(() => {
+
+            setTimeout(function() {
               el.classList.remove('opacity-0', 'translate-y-1');
             }, 50);
 
-            setTimeout(() => {
+            setTimeout(function() {
               el.classList.add('opacity-0', '-translate-y-2');
             }, 500);
 
@@ -770,121 +561,16 @@
       }
     }
 
-    // Auto Play Logic
-    function startAutoPlay() {
-      isPlaying = true;
-      playIcon.textContent = "pause";
-      
-      autoPlayInterval = setInterval(() => {
-        if (currentScene < TOTAL_SCENES) {
-          showScene(currentScene + 1);
-        } else {
-          showScene(1);
-        }
-      }, 8000);
-    }
-
-    function stopAutoPlay() {
-      isPlaying = false;
-      playIcon.textContent = "play_arrow";
-      clearInterval(autoPlayInterval);
-    }
-
-    playBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        stopAutoPlay();
-      } else {
-        startAutoPlay();
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene > 1) {
-        showScene(currentScene - 1);
-      }
-    });
-
-    nextBtn.addEventListener('click', () => {
-      stopAutoPlay();
-      if (currentScene < TOTAL_SCENES) {
-        showScene(currentScene + 1);
-      }
-    });
-
-    tags.forEach(tag => {
-      tag.addEventListener('click', () => {
-        stopAutoPlay();
-        showScene(parseInt(tag.dataset.target));
+    fetch('content/interactive/compiler.json').then(function(r) { return r.json(); }).then(function(json) {
+      data = json;
+      initAnimationPlayer({
+        totalScenes: 9,
+        sceneData: data.scenes,
+        scene2HideClass: 'translate-x-10',
+        activeTagClass: ['text-orange-600', 'dark:text-orange-400'],
+        inactiveTagClass: ['text-inkMuted', 'dark:text-gray-400'],
+        onSceneAnimation: triggerSceneAnimation
       });
-    });
-
-    document.getElementById('timeline-bar').addEventListener('click', (e) => {
-      stopAutoPlay();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const pct = x / rect.width;
-      const targetScene = Math.min(TOTAL_SCENES, Math.max(1, Math.round(pct * (TOTAL_SCENES - 1)) + 1));
-      showScene(targetScene);
-    });
-
-    // Fullscreen behavior
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const fullscreenCanvas = document.getElementById('fullscreen-canvas');
-    if (fullscreenBtn && fullscreenCanvas) {
-      fullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          fullscreenCanvas.requestFullscreen().catch(err => {
-            console.error('Error enabling fullscreen:', err);
-          });
-        } else {
-          document.exitFullscreen();
-        }
-      });
-    }
-
-    document.addEventListener('fullscreenchange', () => {
-      const icon = fullscreenBtn?.querySelector('span');
-      if (icon) {
-        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
-      }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene > 1) showScene(currentScene - 1);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        stopAutoPlay();
-        if (currentScene < TOTAL_SCENES) showScene(currentScene + 1);
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        if (isPlaying) stopAutoPlay(); else startAutoPlay();
-      }
-    });
-
-    // Start with Scene 1
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.self !== window.top) {
-        document.querySelector('header')?.classList.add('hidden');
-        document.querySelector('footer')?.classList.add('hidden');
-        document.getElementById('scene-counter')?.parentElement?.classList.add('hidden');
-        document.body.classList.remove('justify-between');
-        document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
-        document.querySelector('main')?.classList.remove('md:py-16', 'py-8', 'px-6');
-        document.querySelector('main')?.classList.add('py-0', 'px-2', 'max-w-full');
-        
-        // Reduce timeline top margin
-        const timeline = document.querySelector('main > div:last-child');
-        if (timeline) {
-          timeline.classList.remove('mt-8');
-          timeline.classList.add('mt-3');
-        }
-      }
-      showScene(1);
     });
   </script>
 </body>
