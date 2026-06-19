@@ -1,9 +1,7 @@
 // Fuzzy Search & Modal Controller for Quick Reference Docs
 const searchIndex = [
-  // Languages
-  { title: "JavaScript Array Methods", category: "Languages", url: "docs.html#js-arrays", tags: ["javascript", "js", "map", "filter", "reduce", "arrays"] },
-  { title: "Go Interfaces & Structs", category: "Languages", url: "docs.html#go-interfaces", tags: ["go", "golang", "struct", "interface", "oop"] },
-  { title: "Python Context Managers", category: "Languages", url: "docs.html#python-context", tags: ["python", "with", "context", "files", "resource"] },
+  // Python
+  { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
 
   // System Internals
   { title: "How Python's GIL Works", category: "System Internals", url: "docs.html#gil", tags: ["python", "gil", "thread", "concurrency", "multiprocessing", "lock"] },
@@ -95,7 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (items.length === 0) {
       searchResults.innerHTML = `
         <div role="status" aria-live="polite" class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
-          No matches found. Try searching for "git", "python", or "go".
+          No matches found. Try searching for "python", "compiler", or "git".
         </div>
       `;
       return;

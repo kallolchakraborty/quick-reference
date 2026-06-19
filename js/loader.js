@@ -1,5 +1,6 @@
 // Dynamic Content Loader for Quick Reference Documentation Portal
 const routeMap = {
+  '#python-history': 'content/python/python-history.json',
   '#js-arrays': 'content/frontend/javascript-arrays.json',
   '#git-commands': 'content/devops/git-commands.json',
   '#go-interfaces': 'content/backend/go-interfaces.json',
@@ -83,8 +84,9 @@ async function loadContent(hash) {
     // Populate right outline dynamically
     const outlineArea = document.getElementById('docs-right-outline');
     if (outlineArea) {
+      var syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
       outlineArea.innerHTML = `
-        <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Syntax Guide</a>
+        <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>
         <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
       `;
       setupOutlineSmoothScroll();
