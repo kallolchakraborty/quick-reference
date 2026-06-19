@@ -74,8 +74,7 @@ async function loadContent(hash) {
         
         ${embedCode}
 
-        <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 border border-brand-100 dark:border-brand-500/20 rounded-xl flex gap-3 text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-          <span class="material-symbols-outlined text-brand-500 shrink-0">info</span>
+        <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 border border-brand-100 dark:border-brand-500/20 rounded-xl text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
           <div>
             <h4 class="font-bold text-slate-900 dark:text-white mb-1">Deep Dive</h4>
             ${data.details}
