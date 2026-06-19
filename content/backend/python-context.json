@@ -1,0 +1,9 @@
+{
+  "id": "python-context",
+  "title": "Python Context Managers",
+  "category": "Backend",
+  "subcategory": "Python",
+  "description": "Python context management using the 'with' statement for resource allocation and release.",
+  "codeBlock": "with open('stats.log', 'r') as file:\n    content = file.read()\n    print(content)\n# File is automatically closed here, even if exceptions occur",
+  "details": "Context managers implement the __enter__ and __exit__ magic methods. They are widely used for file operations, database transactions, and lock allocations."
+}

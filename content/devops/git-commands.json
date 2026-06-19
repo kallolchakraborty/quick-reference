@@ -1,0 +1,9 @@
+{
+  "id": "git-commands",
+  "title": "Common Git Commands",
+  "category": "Tools",
+  "subcategory": "Git",
+  "description": "Daily utilities for checking out branches, staging changes, staging logs, and publishing revisions.",
+  "codeBlock": "# Stage changes and commit\ngit add .\ngit commit -m \"Update docs\"\n\n# Push changes to origin branch\ngit push origin main",
+  "details": "Git tracks changes as snapshots rather than diffs. Common commands like push, pull, commit, and log keep repositories synchronized."
+}

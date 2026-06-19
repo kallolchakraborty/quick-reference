@@ -1,0 +1,9 @@
+{
+  "id": "js-arrays",
+  "title": "JavaScript Array Methods",
+  "category": "Frontend",
+  "subcategory": "JavaScript",
+  "description": "Functional array methods allow declarative data transformations. Key methods include map(), filter(), and reduce().",
+  "codeBlock": "const numbers = [1, 2, 3, 4, 5];\nconst doubledEvens = numbers\n  .filter(n => n % 2 === 0)\n  .map(n => n * 2); // [4, 8]",
+  "details": "Array methods like map and filter return a new array instead of mutating the original array, which promotes immutability and functional programming patterns."
+}

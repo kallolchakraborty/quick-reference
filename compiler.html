@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>How a Compiler Works — Interactive Guide</title>
+  <meta name="description" content="An interactive, premium visual guide explaining the inner workings of a compiler from source code to machine code." />
+
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Tailwind and Google Fonts -->
+  <script src="js/theme.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+              colors: {
+            ink: "#1A1A2E",
+            inkLight: "#374151",
+            inkMuted: "#6B7280",
+            accent: "#E95420",
+            accentLight: "#FDE8E0",
+            accentMid: "#FAD1C0",
+            accentStrong: "#F5A389",
+            paper: "#FFFFFF",
+            paperWarm: "#F8F9FA",
+            error: "#DC2626"
+          },
+          fontFamily: {
+            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
+            mono: ["'JetBrains Mono'", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #F8F9FA;
+      color: #374151;
+    }
+    .scene-container {
+      perspective: 1000px;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+
+    .ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+    .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .pipeline-node { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+    .typing-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
+    @keyframes blink { from, to { color: transparent } 50% { color: #E95420 } }
+
+    #fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+    #fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+
+    #fullscreen-canvas { background-color: #FFFFFF; border-color: rgba(0, 0, 0, 0.08); }
+    #ast-svg text { fill: #374151; }
+    #ast-svg line { stroke: #E95420; }
+
+    /* Accent node styling */
+    .accent-node { background-color: #FFFFFF; border: 1.5px solid #E95420; color: #E95420; }
+    .accent-node-fill { background-color: #FDE8E0; border: 1.5px solid #E95420; color: #E95420; }
+
+    /* Dark mode */
+    html.dark body {
+      background-color: #0F1115;
+      color: #E8E8E8;
+    }
+    html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+    html.dark #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
+    html.dark #ast-svg text { fill: #E8E8E8; }
+    html.dark .accent-node { background-color: #1A1D25; border-color: #F5A389; color: #F5A389; }
+    html.dark .accent-node-fill { background-color: rgba(233, 84, 32, 0.1); border-color: #F5A389; color: #F5A389; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between z-10 bg-white/90 dark:bg-[#0F1115]/90 backdrop-blur-md sticky top-0">
+    <a href="index.html" class="flex items-center gap-3 group">
+      <img src="assets/logo.svg" alt="Logo" class="w-6 h-6 object-contain" />
+      <span class="font-bold text-sm tracking-tight text-ink hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400 transition-colors">Quick Reference</span>
+    </a>
+    <div class="flex items-center gap-6">
+      <button class="theme-toggle-btn w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:hover:text-gray-200 transition-all" aria-label="Toggle theme">
+        <span class="material-symbols-outlined text-lg">light_mode</span>
+      </button>
+      <a href="docs.html" class="text-xs font-semibold text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Back to Docs</a>
+      <div class="h-3 w-px bg-gray-300 dark:bg-gray-700"></div>
+      <span class="text-xs font-mono text-orange-600 dark:text-orange-400">Interactive Visual Essay</span>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN VIEWPORT ==================== -->
+  <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
+    
+    <!-- Info Overlay (Step Labels & Explanations) -->
+    <div class="w-full text-center mb-8 min-h-[120px] flex flex-col justify-center gap-2">
+      <span id="scene-counter" class="text-xs font-mono font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">Scene 1 / 9</span>
+      <h1 id="scene-title" class="text-3xl md:text-5xl font-bold tracking-tight text-ink dark:text-gray-100 transition-all duration-700 ease-physics transform translate-y-2 opacity-0">
+        How a Compiler Works
+      </h1>
+      <p id="scene-subtitle" class="text-base md:text-xl text-inkMuted dark:text-gray-400 max-w-2xl mx-auto transition-all duration-700 ease-physics delay-100 transform translate-y-2 opacity-0">
+        Turning human-readable code into machine instructions
+      </p>
+    </div>
+
+    <!-- Central Sandbox/Canvas Screen -->
+    <div id="fullscreen-canvas" class="w-full aspect-[16/9] max-h-[500px] border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-[#0F1115] p-6 relative overflow-hidden flex items-center justify-center shadow-lg">
+
+      <!-- ==================== SCENE 1: TITLE SCREEN ==================== -->
+      <div id="vis-scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-all duration-1000">
+        <div class="relative py-4 px-6 flex flex-col items-center gap-4">
+          <svg class="w-40 h-6" viewBox="0 0 160 24" fill="none">
+            <path d="M0 12 H60 M100 12 H160" stroke="#E95420" stroke-width="1.5" />
+            <circle cx="80" cy="12" r="3" fill="#E95420" />
+            <circle cx="80" cy="12" r="8" stroke="#E95420" stroke-width="0.75" fill="none" opacity="0.3" />
+          </svg>
+          <div class="w-14 h-14">
+            <img src="assets/logo.svg" alt="Logo" class="w-full h-full" />
+          </div>
+          <span class="text-xs font-mono text-orange-600 dark:text-orange-400 tracking-widest uppercase">Quick Reference presents</span>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 2: SOURCE CODE ==================== -->
+      <div id="vis-scene-2" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
+        <div class="w-full max-w-lg bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl overflow-hidden shadow-lg transition-transform duration-1000 ease-physics" id="code-editor-panel">
+          <div class="bg-orange-50 dark:bg-[#0F1115] px-4 py-2 flex items-center justify-between border-b border-orange-200 dark:border-gray-700">
+            <span class="font-mono text-[10px] text-orange-700 dark:text-orange-400 uppercase tracking-wider">main.cpp</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-orange-300 dark:bg-orange-600"></span>
+            </div>
+          </div>
+          <pre class="p-6 text-sm font-mono text-left overflow-x-auto leading-relaxed text-inkLight dark:text-gray-300"><code id="typed-code" class="typing-cursor"></code></pre>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 3: PIPELINE OVERVIEW ==================== -->
+      <div id="vis-scene-3" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="flex flex-row items-center justify-between w-full max-w-4xl px-6 relative">
+          
+          <!-- Connecting Line -->
+          <svg class="absolute top-[23px] left-12 right-12 h-1 z-0" viewBox="0 2 100 2" preserveAspectRatio="none">
+            <line x1="0" y1="3" x2="100" y2="3" stroke="#E95420" stroke-width="1.5" stroke-dasharray="4 3" />
+          </svg>
+          <div class="absolute top-[22px] left-12 right-12 h-[3px] bg-orange-500/20 z-0 opacity-0 transition-opacity duration-1000" id="pipeline-pulse"></div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="0">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">code</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Source</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="1">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">analytics</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Lexer</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="2">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">account_tree</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Parser</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="3">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">rule</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Semantic</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="4">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">offline_bolt</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Optimize</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="5">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">developer_board</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">CodeGen</span>
+          </div>
+
+          <div class="pipeline-node flex flex-col items-center gap-2 z-10 opacity-0 transform translate-y-4" data-node="6">
+            <div class="w-12 h-12 rounded-xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-lg">memory</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-inkMuted dark:text-gray-400">Machine</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 4: LEXICAL ANALYSIS ==================== -->
+      <div id="vis-scene-4" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="w-full max-w-2xl flex flex-col gap-6">
+          <div class="flex items-center justify-between border-b border-orange-200 dark:border-gray-700 pb-2 text-xs font-mono text-inkMuted dark:text-gray-400">
+            <span>Input Stream</span>
+            <span class="material-symbols-outlined text-orange-600 dark:text-orange-400">arrow_right_alt</span>
+            <span>Token Stream</span>
+          </div>
+          <div class="flex flex-wrap gap-2 justify-center" id="lexer-token-container">
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 5: PARSING ==================== -->
+      <div id="vis-scene-5" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <svg class="w-full h-full max-w-xl" id="ast-svg" viewBox="0 0 600 350">
+          <g id="ast-lines" stroke="#E95420" stroke-width="1.5" fill="none"></g>
+          <g id="ast-nodes"></g>
+        </svg>
+      </div>
+
+      <!-- ==================== SCENE 6: SEMANTIC ANALYSIS ==================== -->
+      <div id="vis-scene-6" class="absolute inset-0 flex flex-col md:flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="flex flex-col gap-3 text-left w-64 font-mono text-sm">
+          <div class="flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500" id="semantic-check-1">
+            <span class="material-symbols-outlined text-orange-600 dark:text-orange-400">check_circle</span>
+            <span class="text-inkLight dark:text-gray-300">variable exists</span>
+          </div>
+          <div class="flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500" id="semantic-check-2">
+            <span class="material-symbols-outlined text-orange-600 dark:text-orange-400">check_circle</span>
+            <span class="text-inkLight dark:text-gray-300">types match</span>
+          </div>
+          <div class="flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500" id="semantic-check-3">
+            <span class="material-symbols-outlined text-orange-600 dark:text-orange-400">check_circle</span>
+            <span class="text-inkLight dark:text-gray-300">function is valid</span>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl p-5 w-72 text-left font-mono shadow-lg opacity-0 transform translate-x-4 transition-all duration-700 delay-300" id="semantic-error-panel">
+          <div class="text-xs text-inkMuted dark:text-gray-400 border-b border-orange-200 dark:border-gray-700 pb-2 mb-3">Type Checker</div>
+          <div class="text-sm mb-2 text-inkLight dark:text-gray-300">
+            <span class="text-orange-600 dark:text-orange-400">int</span> x = <span class="text-orange-500 dark:text-orange-400">"hello"</span>;
+          </div>
+          <div class="h-0.5 bg-red-500 w-16 mb-3"></div>
+          <div class="text-xs text-red-600 dark:text-red-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">error</span> Type Mismatch
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 7: OPTIMIZATION ==================== -->
+      <div id="vis-scene-7" class="absolute inset-0 flex flex-col md:flex-row items-center justify-center gap-12 opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="flex flex-col items-center gap-4 bg-white dark:bg-[#1A1D25] border border-orange-200 dark:border-gray-700 p-6 rounded-2xl w-60">
+          <span class="text-xs font-mono text-inkMuted dark:text-gray-400">Constant Folding</span>
+          <div class="flex items-center gap-3 font-mono text-lg font-bold">
+            <span id="opt-before" class="text-orange-600 dark:text-orange-400 transition-all duration-1000">2 + 3</span>
+            <span class="text-inkMuted dark:text-gray-500" id="opt-arrow">&rarr;</span>
+            <span id="opt-after" class="opacity-0 scale-90 transition-all duration-1000 text-orange-700 dark:text-orange-300">5</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-4 bg-white dark:bg-[#1A1D25] border border-orange-200 dark:border-gray-700 p-6 rounded-2xl w-72 font-mono text-sm text-left">
+          <span class="text-xs text-inkMuted dark:text-gray-400 self-center">Dead Code Elimination</span>
+          <div class="w-full flex flex-col leading-relaxed" id="dead-code-block">
+            <div class="text-orange-600 dark:text-orange-400">if <span class="text-orange-500 dark:text-orange-400">(false)</span> {</div>
+            <div class="pl-4 text-inkMuted dark:text-gray-500 line-through" id="dead-branch">doSomething();</div>
+            <div class="text-orange-600 dark:text-orange-400">}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 8: CODE GENERATION ==================== -->
+      <div id="vis-scene-8" class="absolute inset-0 flex flex-col md:flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="flex flex-col gap-2 text-left font-mono text-sm w-60 bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 p-4 rounded-xl" id="asm-lines-container">
+          <div class="text-orange-600 dark:text-orange-400 text-[10px] uppercase tracking-wider border-b border-orange-200 dark:border-gray-700 pb-1.5 mb-1">Assembly</div>
+          <div class="opacity-0 translate-y-2 transition-all duration-500" data-asm="0"><span class="text-orange-600 dark:text-orange-400 font-bold">MOV</span> R1, 2</div>
+          <div class="opacity-0 translate-y-2 transition-all duration-500" data-asm="1"><span class="text-orange-600 dark:text-orange-400 font-bold">MOV</span> R2, 3</div>
+          <div class="opacity-0 translate-y-2 transition-all duration-500" data-asm="2"><span class="text-orange-600 dark:text-orange-400 font-bold">ADD</span> R3, R1, R2</div>
+          <div class="opacity-0 translate-y-2 transition-all duration-500" data-asm="3"><span class="text-orange-600 dark:text-orange-400 font-bold">STORE</span> result, R3</div>
+        </div>
+
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-16 h-16 rounded-2xl accent-node-fill flex items-center justify-center relative">
+            <span class="material-symbols-outlined text-3xl">memory</span>
+            <div class="absolute -right-24 top-1/2 -translate-y-1/2 flex flex-col gap-1 font-mono text-[10px] text-orange-600 dark:text-orange-400 overflow-hidden h-12 w-20" id="binary-pulse-container">
+            </div>
+          </div>
+          <span class="text-xs font-mono text-inkMuted dark:text-gray-400">Target Processor</span>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 9: SUMMARY & TRANSITION ==================== -->
+      <div id="vis-scene-9" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="max-w-2xl text-center flex flex-col items-center gap-6">
+          <span class="material-symbols-outlined text-4xl text-orange-600 dark:text-orange-400">published_with_changes</span>
+          <p class="text-lg md:text-2xl font-medium text-ink dark:text-gray-100 leading-relaxed" id="summary-final-text">
+            A compiler is a translator that progressively transforms your code into instructions a computer can execute.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Timeline Progress Bar -->
+    <div class="w-full mt-8 flex flex-col gap-4">
+      <div class="w-full h-0.5 bg-orange-200 dark:bg-gray-700 rounded-full relative overflow-hidden cursor-pointer" id="timeline-bar">
+        <div class="absolute inset-y-0 left-0 bg-orange-600 dark:bg-orange-400 w-0 transition-all duration-300" id="timeline-progress"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-3 text-sm">
+        <div class="flex items-center gap-4">
+          <button id="prev-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Previous scene">
+            <span class="material-symbols-outlined">navigate_before</span>
+          </button>
+          <button id="play-btn" class="w-10 h-10 rounded-full bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 flex items-center justify-center text-white transition-all shadow-lg" aria-label="Play/Pause">
+            <span class="material-symbols-outlined" id="play-icon">play_arrow</span>
+          </button>
+          <button id="next-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Next scene">
+            <span class="material-symbols-outlined">navigate_next</span>
+          </button>
+          <button id="fullscreen-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Toggle Fullscreen">
+            <span class="material-symbols-outlined">fullscreen</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-xs text-inkMuted dark:text-gray-400" id="scene-tags">
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1">Title</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2">Source</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3">Pipeline</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4">Lexer</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5">Parser</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6">Semantic</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7">Optimize</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8">CodeGen</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9">Summary</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-gray-200 dark:border-gray-800 py-8 text-center text-xs text-inkMuted dark:text-gray-500">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <span>&copy; 2026 Quick Reference. Open documentation platform.</span>
+      <div class="flex gap-6 font-medium">
+        <a href="docs.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Documentation</a>
+        <a href="index.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Home Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
+  <script>
+    const sceneData = [
+      {
+        title: "How a Compiler Works",
+        subtitle: "Turning human-readable code into machine instructions",
+        label: "Scene 1 / 9"
+      },
+      {
+        title: "Source Code",
+        subtitle: "A programmer writes high-level statements in languages like C++, Java, or Rust.",
+        label: "Scene 2 / 9"
+      },
+      {
+        title: "Compiler Pipeline Overview",
+        subtitle: "Information flows through a structured, multi-stage machine.",
+        label: "Scene 3 / 9"
+      },
+      {
+        title: "Lexical Analysis",
+        subtitle: "Convert raw characters into structured tokens.",
+        label: "Scene 4 / 9"
+      },
+      {
+        title: "Parsing",
+        subtitle: "Build an Abstract Syntax Tree (AST) to define program structure.",
+        label: "Scene 5 / 9"
+      },
+      {
+        title: "Semantic Analysis",
+        subtitle: "Check node logic to ensure types match, functions exist, and constraints hold.",
+        label: "Scene 6 / 9"
+      },
+      {
+        title: "Optimization",
+        subtitle: "Produce faster and smaller code without changing program behavior.",
+        label: "Scene 7 / 9"
+      },
+      {
+        title: "Code Generation",
+        subtitle: "Translate the optimized structure into processor instructions and binary bytes.",
+        label: "Scene 8 / 9"
+      },
+      {
+        title: "Final Summary",
+        subtitle: "Translating thoughts into execution progress.",
+        label: "Scene 9 / 9"
+      }
+    ];
+
+    let currentScene = 1;
+    let isPlaying = false;
+    let autoPlayInterval = null;
+    const TOTAL_SCENES = 9;
+
+    // DOM Elements
+    const sceneCounter = document.getElementById('scene-counter');
+    const sceneTitle = document.getElementById('scene-title');
+    const sceneSubtitle = document.getElementById('scene-subtitle');
+    const timelineProgress = document.getElementById('timeline-progress');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const tags = document.querySelectorAll('#scene-tags span');
+
+    // Scene Transition Handler
+    function showScene(sceneIndex) {
+      if (sceneIndex < 1 || sceneIndex > TOTAL_SCENES) return;
+
+      // Hide all scene containers
+      for (let i = 1; i <= TOTAL_SCENES; i++) {
+        const vis = document.getElementById(`vis-scene-${i}`);
+        if (vis) {
+          vis.classList.add('opacity-0', 'pointer-events-none');
+          if (i === 2) vis.classList.add('translate-x-10');
+        }
+      }
+
+      currentScene = sceneIndex;
+
+      // Update timeline progress
+      const percent = ((sceneIndex - 1) / (TOTAL_SCENES - 1)) * 100;
+      timelineProgress.style.width = `${percent}%`;
+
+      // Update Tag highlights
+      tags.forEach(tag => {
+        if (parseInt(tag.dataset.target) === sceneIndex) {
+          tag.classList.add('text-orange-600', 'dark:text-orange-400');
+          tag.classList.remove('text-inkMuted', 'dark:text-gray-400');
+        } else {
+          tag.classList.remove('text-orange-600', 'dark:text-orange-400');
+          tag.classList.add('text-inkMuted', 'dark:text-gray-400');
+        }
+      });
+
+      // Update texts with fade effect
+      sceneTitle.classList.remove('opacity-100', 'translate-y-0');
+      sceneTitle.classList.add('opacity-0', 'translate-y-2');
+      sceneSubtitle.classList.remove('opacity-100', 'translate-y-0');
+      sceneSubtitle.classList.add('opacity-0', 'translate-y-2');
+
+      setTimeout(() => {
+        sceneCounter.textContent = sceneData[sceneIndex - 1].label;
+        sceneTitle.textContent = sceneData[sceneIndex - 1].title;
+        sceneSubtitle.textContent = sceneData[sceneIndex - 1].subtitle;
+
+        sceneTitle.classList.remove('opacity-0', 'translate-y-2');
+        sceneTitle.classList.add('opacity-100', 'translate-y-0');
+        sceneSubtitle.classList.remove('opacity-0', 'translate-y-2');
+        sceneSubtitle.classList.add('opacity-100', 'translate-y-0');
+      }, 300);
+
+      // Show the selected scene content
+      const activeVis = document.getElementById(`vis-scene-${sceneIndex}`);
+      if (activeVis) {
+        activeVis.classList.remove('opacity-0', 'pointer-events-none');
+        if (sceneIndex === 2) activeVis.classList.remove('translate-x-10');
+      }
+
+      // Trigger scene-specific animations
+      triggerSceneAnimation(sceneIndex);
+    }
+
+    // Custom Animation Trigger per Scene
+    function triggerSceneAnimation(index) {
+      if (index === 1) {
+      }
+      
+      else if (index === 2) {
+        const codeElement = document.getElementById('typed-code');
+        codeElement.textContent = "";
+        const codeString = `int add(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    int result = add(2, 3);\n}`;
+        let charIndex = 0;
+        
+        function typeCode() {
+          if (charIndex < codeString.length && currentScene === 2) {
+            codeElement.textContent += codeString.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeCode, 25);
+          }
+        }
+        setTimeout(typeCode, 500);
+      }
+      
+      else if (index === 3) {
+        // Sequentially load nodes
+        const nodes = document.querySelectorAll('.pipeline-node');
+        nodes.forEach(node => {
+          node.classList.add('opacity-0', 'translate-y-4');
+          node.classList.remove('opacity-100', 'translate-y-0');
+        });
+
+        const pulse = document.getElementById('pipeline-pulse');
+        if (pulse) pulse.classList.add('opacity-0');
+
+        nodes.forEach((node, i) => {
+          setTimeout(() => {
+            if (currentScene === 3) {
+              node.classList.remove('opacity-0', 'translate-y-4');
+              node.classList.add('opacity-100', 'translate-y-0');
+            }
+          }, 300 + (i * 250));
+        });
+
+        // Trigger pulse line glow
+        setTimeout(() => {
+          if (pulse && currentScene === 3) {
+            pulse.classList.remove('opacity-0');
+          }
+        }, 300 + (nodes.length * 250));
+      }
+      
+      else if (index === 4) {
+        const container = document.getElementById('lexer-token-container');
+        container.innerHTML = "";
+        const tokens = [
+          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "add", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "(", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "a", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+          { text: ",", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+          { text: "int", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "b", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+          { text: ")", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+          { text: "{", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+          { text: "return", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "a", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+          { text: "+", color: "border-orange-600/30 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30 dark:text-orange-400" },
+          { text: "b", color: "border-orange-400/30 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400/30" },
+          { text: ";", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" },
+          { text: "}", color: "border-gray-300 dark:border-gray-600 text-inkLight dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50" }
+        ];
+
+        tokens.forEach((t, i) => {
+          const el = document.createElement('div');
+          el.className = `px-3 py-1.5 border rounded-lg text-xs font-mono transition-all duration-500 transform translate-y-4 opacity-0 ease-spring ${t.color}`;
+          el.textContent = t.text;
+          container.appendChild(el);
+          setTimeout(() => {
+            if (currentScene === 4) {
+              el.classList.remove('opacity-0', 'translate-y-4');
+            }
+          }, i * 150);
+        });
+      }
+      
+      else if (index === 5) {
+        // Draw Abstract Syntax Tree dynamically
+        const nodeData = [
+          { x: 300, y: 50, label: "Program", fill: "#E95420" },
+          { x: 300, y: 130, label: "Function (add)", fill: "#F5A389" },
+          { x: 300, y: 210, label: "ReturnStmt", fill: "#FAD1C0" },
+          { x: 300, y: 290, label: "Operator (+)", fill: "#FDE8E0" },
+          { x: 200, y: 290, label: "Param (a)", fill: "#FAD1C0" },
+          { x: 400, y: 290, label: "Param (b)", fill: "#FAD1C0" }
+        ];
+
+        const lines = [
+          { from: 0, to: 1 },
+          { from: 1, to: 2 },
+          { from: 2, to: 3 },
+          { from: 3, to: 4 },
+          { from: 3, to: 5 }
+        ];
+
+        const svgLines = document.getElementById('ast-lines');
+        const svgNodes = document.getElementById('ast-nodes');
+        svgLines.innerHTML = "";
+        svgNodes.innerHTML = "";
+
+        // Add Nodes
+        nodeData.forEach((node, i) => {
+          setTimeout(() => {
+            if (currentScene === 5) {
+              const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+              g.setAttribute("class", "transition-all duration-700 ease-spring transform scale-0");
+              g.style.transformOrigin = `${node.x}px ${node.y}px`;
+
+              const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+              circle.setAttribute("cx", node.x);
+              circle.setAttribute("cy", node.y);
+              circle.setAttribute("r", 18);
+              circle.setAttribute("fill", node.fill);
+              circle.setAttribute("opacity", "0.9");
+
+              const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              text.setAttribute("x", node.x);
+              text.setAttribute("y", node.y + 35);
+              text.setAttribute("text-anchor", "middle");
+              text.setAttribute("fill", "#1F2937");
+              text.setAttribute("font-size", "11");
+              text.setAttribute("font-family", "'Ubuntu', sans-serif");
+              text.textContent = node.label;
+
+              g.appendChild(circle);
+              g.appendChild(text);
+              svgNodes.appendChild(g);
+
+              requestAnimationFrame(() => {
+                g.style.transform = "scale(1)";
+              });
+            }
+          }, i * 300);
+        });
+
+        // Add Lines
+        lines.forEach((line, i) => {
+          setTimeout(() => {
+            if (currentScene === 5) {
+              const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              const fromNode = nodeData[line.from];
+              const toNode = nodeData[line.to];
+              p.setAttribute("d", `M ${fromNode.x} ${fromNode.y} L ${toNode.x} ${toNode.y}`);
+              p.setAttribute("stroke", "#E95420");
+              p.setAttribute("stroke-width", "1.5");
+              p.setAttribute("fill", "none");
+              
+              // Animate line drawing
+              const length = Math.hypot(toNode.x - fromNode.x, toNode.y - fromNode.y);
+              p.style.strokeDasharray = length;
+              p.style.strokeDashoffset = length;
+              p.style.transition = "stroke-dashoffset 0.6s ease-out";
+              svgLines.appendChild(p);
+
+              requestAnimationFrame(() => {
+                p.style.strokeDashoffset = "0";
+              });
+            }
+          }, 400 + i * 300);
+        });
+      }
+      
+      else if (index === 6) {
+        // Reset Semantic scene checks
+        const checks = [1, 2, 3];
+        checks.forEach(n => {
+          const el = document.getElementById(`semantic-check-${n}`);
+          el.className = "flex items-center gap-3 opacity-0 transform -translate-x-4 transition-all duration-500";
+        });
+
+        const errorPanel = document.getElementById('semantic-error-panel');
+        errorPanel.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl p-5 w-72 text-left font-mono shadow-lg opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
+
+        checks.forEach((n, i) => {
+          setTimeout(() => {
+            if (currentScene === 6) {
+              const el = document.getElementById(`semantic-check-${n}`);
+              el.classList.remove('opacity-0', '-translate-x-4');
+            }
+          }, i * 400);
+        });
+
+        setTimeout(() => {
+          if (currentScene === 6) {
+            errorPanel.classList.remove('opacity-0', 'translate-x-4');
+          }
+        }, 1200);
+      }
+      
+      else if (index === 7) {
+        const optBefore = document.getElementById('opt-before');
+        const optArrow = document.getElementById('opt-arrow');
+        const optAfter = document.getElementById('opt-after');
+        const deadBranch = document.getElementById('dead-branch');
+
+        optBefore.className = "text-orange-600 dark:text-orange-400 transition-all duration-1000";
+        optAfter.className = "opacity-0 scale-90 transition-all duration-1000 text-orange-700 dark:text-orange-300";
+        deadBranch.className = "pl-4 text-inkMuted dark:text-gray-500 line-through";
+
+        // Folding transition
+        setTimeout(() => {
+          if (currentScene === 7) {
+            optBefore.classList.add('opacity-0', 'scale-75');
+            optAfter.classList.remove('opacity-0', 'scale-90');
+            optAfter.classList.add('opacity-100', 'scale-100');
+          }
+        }, 1200);
+
+        // Dead code elimination transition
+        setTimeout(() => {
+          if (currentScene === 7) {
+            deadBranch.classList.add('opacity-10', 'line-through');
+          }
+        }, 1800);
+      }
+      
+      else if (index === 8) {
+        // Reset code lines
+        const asmList = document.querySelectorAll('#asm-lines-container div');
+        asmList.forEach(line => {
+          line.className = "opacity-0 translate-y-2 transition-all duration-500";
+        });
+
+        asmList.forEach((line, i) => {
+          setTimeout(() => {
+            if (currentScene === 8) {
+              line.classList.remove('opacity-0', 'translate-y-2');
+            }
+          }, i * 350);
+        });
+
+        // Trigger binary pulses
+        const binContainer = document.getElementById('binary-pulse-container');
+        binContainer.innerHTML = "";
+        let pulseCount = 0;
+        
+        function makePulse() {
+          if (currentScene === 8 && pulseCount < 20) {
+            const el = document.createElement('div');
+            el.className = "opacity-0 translate-y-1 transition-all duration-700 text-orange-600 dark:text-orange-400 font-mono text-[9px]";
+            el.textContent = Math.random() > 0.5 ? "10110100" : "01101010";
+            binContainer.appendChild(el);
+            
+            setTimeout(() => {
+              el.classList.remove('opacity-0', 'translate-y-1');
+            }, 50);
+
+            setTimeout(() => {
+              el.classList.add('opacity-0', '-translate-y-2');
+            }, 500);
+
+            pulseCount++;
+            setTimeout(makePulse, 300);
+          }
+        }
+        setTimeout(makePulse, 1000);
+      }
+    }
+
+    // Auto Play Logic
+    function startAutoPlay() {
+      isPlaying = true;
+      playIcon.textContent = "pause";
+      
+      autoPlayInterval = setInterval(() => {
+        if (currentScene < TOTAL_SCENES) {
+          showScene(currentScene + 1);
+        } else {
+          showScene(1);
+        }
+      }, 6500); // 6.5 seconds per scene transition
+    }
+
+    function stopAutoPlay() {
+      isPlaying = false;
+      playIcon.textContent = "play_arrow";
+      clearInterval(autoPlayInterval);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentScene > 1) {
+        showScene(currentScene - 1);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentScene < TOTAL_SCENES) {
+        showScene(currentScene + 1);
+      }
+    });
+
+    tags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        stopAutoPlay();
+        showScene(parseInt(tag.dataset.target));
+      });
+    });
+
+    document.getElementById('timeline-bar').addEventListener('click', (e) => {
+      stopAutoPlay();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const pct = x / rect.width;
+      const targetScene = Math.min(TOTAL_SCENES, Math.max(1, Math.round(pct * (TOTAL_SCENES - 1)) + 1));
+      showScene(targetScene);
+    });
+
+    // Fullscreen behavior
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const fullscreenCanvas = document.getElementById('fullscreen-canvas');
+    if (fullscreenBtn && fullscreenCanvas) {
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          fullscreenCanvas.requestFullscreen().catch(err => {
+            console.error('Error enabling fullscreen:', err);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      });
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = fullscreenBtn?.querySelector('span');
+      if (icon) {
+        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
+      }
+    });
+
+    // Start with Scene 1
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.self !== window.top) {
+        document.querySelector('header')?.classList.add('hidden');
+        document.querySelector('footer')?.classList.add('hidden');
+        document.getElementById('scene-counter')?.parentElement?.classList.add('hidden');
+        document.body.classList.remove('justify-between');
+        document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
+        document.querySelector('main')?.classList.remove('md:py-16', 'py-8', 'px-6');
+        document.querySelector('main')?.classList.add('py-0', 'px-2', 'max-w-full');
+        
+        // Reduce timeline top margin
+        const timeline = document.querySelector('main > div:last-child');
+        if (timeline) {
+          timeline.classList.remove('mt-8');
+          timeline.classList.add('mt-3');
+        }
+      }
+      showScene(1);
+    });
+  </script>
+</body>
+</html>

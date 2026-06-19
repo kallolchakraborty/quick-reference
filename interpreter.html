@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>How an Interpreter Works — Interactive Guide</title>
+  <meta name="description" content="An interactive, premium visual guide explaining the inner workings of an interpreter step by step." />
+
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Tailwind and Google Fonts -->
+  <script src="js/theme.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1A1A2E",
+            inkLight: "#374151",
+            inkMuted: "#6B7280",
+            accent: "#E95420",
+            accentLight: "#FDE8E0",
+            accentMid: "#FAD1C0",
+            accentStrong: "#F5A389",
+            paper: "#FFFFFF",
+            paperWarm: "#F8F9FA",
+            error: "#DC2626"
+          },
+          fontFamily: {
+            sans: ["Ubuntu", "-apple-system", "BlinkMacSystemFont", "\"Segoe UI\"", "\"Noto Sans\"", "Helvetica", "Arial", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\""],
+            mono: ["'JetBrains Mono'", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #F8F9FA;
+      color: #374151;
+    }
+    .scene-container {
+      perspective: 1000px;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+
+    .ease-physics { transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+    .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .typing-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
+    @keyframes blink { from, to { color: transparent } 50% { color: #E95420 } }
+
+    #fullscreen-canvas:fullscreen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+    #fullscreen-canvas:-webkit-full-screen { aspect-ratio: unset; max-height: 100vh; border-radius: 0; border: none; padding: 0; width: 100vw; }
+
+    #fullscreen-canvas { background-color: #FFFFFF; border-color: rgba(0, 0, 0, 0.08); }
+
+    .accent-node { background-color: #FFFFFF; border: 1.5px solid #E95420; color: #E95420; }
+    .accent-node-fill { background-color: #FDE8E0; border: 1.5px solid #E95420; color: #E95420; }
+
+    html.dark body {
+      background-color: #0F1115;
+      color: #E8E8E8;
+    }
+    html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+    html.dark #fullscreen-canvas { background-color: #0F1115; border-color: rgba(255, 255, 255, 0.08); }
+    html.dark .accent-node { background-color: #1A1D25; border-color: #F5A389; color: #F5A389; }
+    html.dark .accent-node-fill { background-color: rgba(233, 84, 32, 0.1); border-color: #F5A389; color: #F5A389; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="border-b border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between z-10 bg-white/90 dark:bg-[#0F1115]/90 backdrop-blur-md sticky top-0">
+    <a href="index.html" class="flex items-center gap-3 group">
+      <img src="assets/logo.svg" alt="Logo" class="w-6 h-6 object-contain" />
+      <span class="font-bold text-sm tracking-tight text-ink hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400 transition-colors">Quick Reference</span>
+    </a>
+    <div class="flex items-center gap-6">
+      <button class="theme-toggle-btn w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Toggle theme">
+        <span class="material-symbols-outlined text-lg">light_mode</span>
+      </button>
+      <a href="docs.html" class="text-xs font-semibold text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Back to Docs</a>
+      <div class="h-3 w-px bg-gray-300 dark:bg-gray-700"></div>
+      <span class="text-xs font-mono text-orange-600 dark:text-orange-400">Interactive Visual Essay</span>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN VIEWPORT ==================== -->
+  <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 md:py-16 max-w-6xl w-full mx-auto scene-container">
+    
+    <!-- Info Overlay (Step Labels & Explanations) -->
+    <div class="w-full text-center mb-8 min-h-[120px] flex flex-col justify-center gap-2">
+      <span id="scene-counter" class="text-xs font-mono font-bold tracking-widest text-orange-600 dark:text-orange-400 uppercase">Scene 1 / 10</span>
+      <h1 id="scene-title" class="text-3xl md:text-5xl font-bold tracking-tight text-ink dark:text-gray-100 transition-all duration-700 ease-physics transform translate-y-2 opacity-0">
+        How an Interpreter Works
+      </h1>
+      <p id="scene-subtitle" class="text-base md:text-xl text-inkMuted dark:text-gray-400 max-w-2xl mx-auto transition-all duration-700 ease-physics delay-100 transform translate-y-2 opacity-0">
+        Reading, understanding, and executing code one step at a time.
+      </p>
+    </div>
+
+    <!-- Central Sandbox/Canvas Screen -->
+    <div id="fullscreen-canvas" class="w-full aspect-[16/9] max-h-[500px] border border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-[#0F1115] p-6 relative overflow-hidden flex items-center justify-center shadow-lg">
+
+      <!-- ==================== SCENE 1: TITLE SCREEN ==================== -->
+      <div id="vis-scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-all duration-1000">
+        <div class="relative py-4 px-6 flex flex-col items-center gap-4">
+          <svg class="w-40 h-6" viewBox="0 0 160 24" fill="none">
+            <path d="M0 12 H60 M100 12 H160" stroke="#E95420" stroke-width="1.5" />
+            <circle cx="80" cy="12" r="3" fill="#E95420" />
+            <circle cx="80" cy="12" r="8" stroke="#E95420" stroke-width="0.75" fill="none" opacity="0.3" />
+          </svg>
+          <div class="w-14 h-14">
+            <img src="assets/logo.svg" alt="Logo" class="w-full h-full" />
+          </div>
+          <span class="text-xs font-mono text-orange-600 dark:text-orange-400 tracking-widest uppercase">Quick Reference presents</span>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 2: SOURCE CODE ==================== -->
+      <div id="vis-scene-2" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
+        <div class="w-full max-w-lg bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl overflow-hidden shadow-lg transition-transform duration-1000 ease-physics">
+          <div class="bg-orange-50 dark:bg-[#0F1115] px-4 py-2 flex items-center justify-between border-b border-orange-200 dark:border-gray-700">
+            <span class="font-mono text-[10px] text-orange-700 dark:text-orange-400 uppercase tracking-wider">script.py</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-orange-300 dark:bg-orange-600"></span>
+            </div>
+          </div>
+          <pre class="p-6 text-sm font-mono text-left overflow-x-auto leading-relaxed text-orange-600 dark:text-orange-400"><code id="typed-code" class="typing-cursor"></code></pre>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 3: BIG IDEA PIPELINE ==================== -->
+      <div id="vis-scene-3" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="flex flex-row items-center justify-between w-full max-w-3xl px-8 relative">
+          
+          <!-- Connecting Line -->
+          <svg class="absolute top-[39px] left-16 right-16 h-1 z-0" viewBox="0 2 100 2" preserveAspectRatio="none">
+            <line x1="0" y1="3" x2="100" y2="3" stroke="#E95420" stroke-width="1.5" stroke-dasharray="4 3" />
+          </svg>
+          <div class="absolute top-[38px] left-16 right-16 h-[3px] bg-orange-500/20 z-0 opacity-0 transition-opacity duration-1000" id="pipeline-pulse"></div>
+
+          <!-- Stage 1 -->
+          <div class="flex flex-col items-center gap-3 z-10" id="node-src">
+            <div class="w-16 h-16 rounded-2xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl">code</span>
+            </div>
+            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Source Code</span>
+          </div>
+
+          <!-- Stage 2 -->
+          <div class="flex flex-col items-center gap-3 z-10" id="node-interpreter">
+            <div class="w-20 h-20 rounded-2xl accent-node-fill flex flex-col items-center justify-center relative transition-all duration-500">
+              <span class="material-symbols-outlined text-4xl">dynamic_form</span>
+              <div class="absolute -bottom-12 flex gap-1.5 font-mono text-[9px] text-orange-600 dark:text-orange-400 opacity-0" id="interpreter-cycles">
+                <span>Read</span> &bull; <span>Parse</span> &bull; <span>Execute</span>
+              </div>
+            </div>
+            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Interpreter</span>
+          </div>
+
+          <!-- Stage 3 -->
+          <div class="flex flex-col items-center gap-3 z-10" id="node-output">
+            <div class="w-16 h-16 rounded-2xl accent-node flex items-center justify-center">
+              <span class="material-symbols-outlined text-3xl">terminal</span>
+            </div>
+            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Program Output</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 4: READING LINE 1 ==================== -->
+      <div id="vis-scene-4" class="absolute inset-0 flex flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Editor Left -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 p-4 rounded-xl font-mono text-xs text-left w-56">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1">Current Line</div>
+          <div class="text-inkLight dark:text-gray-200 py-1 px-2 bg-orange-50 dark:bg-orange-950/20 border-l-2 border-orange-600 dark:border-orange-400 rounded">x = 2</div>
+          <div class="text-inkMuted/40 dark:text-gray-500/40 py-1 px-2">y = 3</div>
+          <div class="text-inkMuted/40 dark:text-gray-500/40 py-1 px-2">result = x + y</div>
+        </div>
+
+        <!-- Flow Trace arrow -->
+        <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl rotate-0">arrow_forward</span>
+
+        <!-- Engine and Memory -->
+        <div class="flex flex-col gap-4">
+          <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl p-4 w-60 text-left font-mono shadow-lg relative" id="memory-block-4">
+            <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1 flex justify-between">
+              <span>Environment Memory</span>
+              <span class="text-orange-600 dark:text-orange-400">Stack</span>
+            </div>
+            <div class="text-sm flex justify-between py-1 transition-all duration-500 transform translate-y-2 opacity-0" id="mem-item-x">
+              <span class="text-orange-600 dark:text-orange-400">x</span>
+              <span class="text-inkMuted dark:text-gray-500">&rarr;</span>
+              <span class="text-orange-600 dark:text-orange-400 font-bold">2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 5: CONTINUE EXECUTION ==================== -->
+      <div id="vis-scene-5" class="absolute inset-0 flex flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Editor Left -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 p-4 rounded-xl font-mono text-xs text-left w-56">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1">Current Line</div>
+          <div class="text-inkMuted/60 dark:text-gray-500/60 py-1 px-2">x = 2</div>
+          <div class="text-inkLight dark:text-gray-200 py-1 px-2 bg-orange-50 dark:bg-orange-950/20 border-l-2 border-orange-600 dark:border-orange-400 rounded">y = 3</div>
+          <div class="text-inkMuted/40 dark:text-gray-500/40 py-1 px-2">result = x + y</div>
+        </div>
+
+        <!-- Flow Trace arrow -->
+        <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl rotate-0">arrow_forward</span>
+
+        <!-- Memory State -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl p-4 w-60 text-left font-mono shadow-lg">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1 flex justify-between">
+            <span>Environment Memory</span>
+            <span class="text-orange-600 dark:text-orange-400">Stack</span>
+          </div>
+          <div class="text-sm flex justify-between py-1">
+            <span class="text-orange-600 dark:text-orange-400">x</span>
+            <span class="text-inkMuted dark:text-gray-500">&rarr;</span>
+            <span class="text-orange-600 dark:text-orange-400">2</span>
+          </div>
+          <div class="text-sm flex justify-between py-1 transition-all duration-500 transform translate-y-2 opacity-0" id="mem-item-y">
+            <span class="text-orange-600 dark:text-orange-400">y</span>
+            <span class="text-inkMuted dark:text-gray-500">&rarr;</span>
+            <span class="text-orange-600 dark:text-orange-400 font-bold">3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 6: EVALUATING EXPRESSIONS ==================== -->
+      <div id="vis-scene-6" class="absolute inset-0 flex flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Operation Sandbox -->
+        <div class="flex flex-col gap-3 font-mono text-sm bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 p-5 rounded-2xl w-64 text-left shadow-lg">
+          <div class="text-xs text-inkMuted dark:text-gray-400 border-b border-orange-200 dark:border-gray-700 pb-1 flex justify-between">
+            <span>Evaluation Arena</span>
+            <span class="text-orange-600 dark:text-orange-400">Node</span>
+          </div>
+          <div class="flex items-center gap-2 justify-center py-4 text-lg">
+            <span id="expr-val-x" class="text-orange-600 dark:text-orange-400">x</span>
+            <span class="text-inkLight dark:text-gray-300">+</span>
+            <span id="expr-val-y" class="text-orange-600 dark:text-orange-400">y</span>
+          </div>
+          <div class="h-px bg-orange-200 dark:bg-gray-700 my-1"></div>
+          <div class="flex items-center justify-between text-xs py-1">
+            <span class="text-inkMuted dark:text-gray-400">Fetched:</span>
+            <span id="expr-resolve" class="text-orange-600 dark:text-orange-400 font-bold opacity-0">2 + 3</span>
+          </div>
+          <div class="flex items-center justify-between text-xs py-1">
+            <span class="text-inkMuted dark:text-gray-400">Result:</span>
+            <span id="expr-sum" class="text-orange-700 dark:text-orange-300 font-bold opacity-0">5</span>
+          </div>
+        </div>
+
+        <!-- Memory State -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl p-4 w-60 text-left font-mono shadow-lg">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1">Environment Memory</div>
+          <div class="text-sm flex justify-between py-1 text-inkMuted/60 dark:text-gray-500/60">
+            <span>x</span> <span>&rarr;</span> <span>2</span>
+          </div>
+          <div class="text-sm flex justify-between py-1 text-inkMuted/60 dark:text-gray-500/60">
+            <span>y</span> <span>&rarr;</span> <span>3</span>
+          </div>
+          <div class="text-sm flex justify-between py-1 text-orange-700 dark:text-orange-300 font-bold transition-all duration-500 opacity-0" id="mem-item-result">
+            <span>result</span> <span>&rarr;</span> <span>5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 7: PRODUCING OUTPUT ==================== -->
+      <div id="vis-scene-7" class="absolute inset-0 flex flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Print statement -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 p-4 rounded-xl font-mono text-xs text-left w-56">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1">Statement</div>
+          <div class="text-inkLight dark:text-gray-200 py-1 px-2 bg-orange-50 dark:bg-orange-950/20 border-l-2 border-orange-600 dark:border-orange-400 rounded">print(result)</div>
+        </div>
+
+        <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl rotate-0">arrow_forward</span>
+
+        <!-- Console panel -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl w-64 text-left font-mono shadow-lg overflow-hidden">
+          <div class="bg-orange-50 dark:bg-[#0F1115] px-4 py-1.5 text-[10px] text-orange-700 dark:text-orange-400 flex items-center gap-1.5 border-b border-orange-200 dark:border-gray-700">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+            <span>Stdout Console</span>
+          </div>
+          <div class="p-4 h-24 text-base flex flex-col justify-end text-orange-700 dark:text-orange-300 font-bold relative">
+            <span id="stdout-output" class="opacity-0 transition-opacity duration-500">5</span>
+            <div class="absolute inset-0 bg-orange-500/5 opacity-0 transition-opacity duration-300" id="stdout-flash"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 8: PROGRESSION LOOP ==================== -->
+      <div id="vis-scene-8" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="w-full max-w-lg bg-white dark:bg-[#1A1D25] border-2 border-orange-600 dark:border-orange-400 rounded-xl p-5 relative overflow-hidden font-mono text-left text-sm leading-relaxed">
+          <div id="progression-cursor" class="absolute left-1.5 h-6 w-0.5 bg-orange-600 dark:bg-orange-400 rounded transition-all duration-500 ease-physics" style="top: 24px;"></div>
+          
+          <div class="flex items-center justify-between py-1 pl-4" id="prog-line-1">
+            <span class="text-inkLight dark:text-gray-200">x = 2</span>
+            <span class="material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0">check</span>
+          </div>
+          <div class="flex items-center justify-between py-1 pl-4" id="prog-line-2">
+            <span class="text-inkLight dark:text-gray-200">y = 3</span>
+            <span class="material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0">check</span>
+          </div>
+          <div class="flex items-center justify-between py-1 pl-4" id="prog-line-3">
+            <span class="text-inkLight dark:text-gray-200">result = x + y</span>
+            <span class="material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0">check</span>
+          </div>
+          <div class="flex items-center justify-between py-1 pl-4" id="prog-line-4">
+            <span class="text-inkLight dark:text-gray-200">print(result)</span>
+            <span class="material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0">check</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 9: ERROR HANDLING ==================== -->
+      <div id="vis-scene-9" class="absolute inset-0 flex flex-row items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-1000">
+        <!-- Faulty Editor -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 p-5 rounded-xl font-mono text-xs text-left w-64">
+          <div class="text-[10px] text-inkMuted dark:text-gray-400 mb-2 border-b border-orange-200 dark:border-gray-700 pb-1">Code Execution</div>
+          <div class="text-inkMuted/50 dark:text-gray-500/50 py-1">x = 2</div>
+          <div class="text-inkMuted/50 dark:text-gray-500/50 py-1">y = 3</div>
+          <div class="text-red-600 dark:text-red-400 py-1.5 px-2 bg-red-50 dark:bg-red-950/20 border-l-2 border-red-500 rounded flex justify-between items-center" id="faulty-line">
+            <span>print(z)</span>
+            <span class="material-symbols-outlined text-xs text-red-500">warning</span>
+          </div>
+          <div class="text-inkMuted/20 dark:text-gray-600/40 py-1 transition-opacity duration-500" id="subsequent-line">print(result)</div>
+        </div>
+
+        <!-- Exception console -->
+        <div class="bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl w-72 text-left font-mono shadow-lg overflow-hidden opacity-0 transform translate-x-4 transition-all duration-700 delay-300" id="error-console">
+          <div class="bg-red-50 dark:bg-red-950/20 px-4 py-1.5 text-[10px] text-red-600 dark:text-red-400 flex items-center gap-1.5 border-b border-red-200 dark:border-red-900/50">
+            <span class="material-symbols-outlined text-xs">error</span>
+            <span>Runtime Traceback</span>
+          </div>
+          <div class="p-4 text-xs flex flex-col gap-1 text-red-600 dark:text-red-400 leading-relaxed">
+            <div class="text-inkMuted dark:text-gray-400 font-bold">Traceback (most recent call):</div>
+            <div class="text-inkMuted dark:text-gray-400">File "script.py", line 3</div>
+            <div class="text-inkLight dark:text-gray-200">print(z)</div>
+            <div class="font-bold mt-1 text-red-600 dark:text-red-400">NameError: name 'z' is not defined</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 10: FINAL SUMMARY ==================== -->
+      <div id="vis-scene-10" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+        <div class="max-w-2xl text-center flex flex-col items-center gap-6">
+          <div class="inline-flex gap-3 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/20 px-4 py-1.5 rounded-full text-xs font-mono">
+            <span>Read</span> &rarr; <span>Parse</span> &rarr; <span>Execute</span>
+          </div>
+          <p class="text-lg md:text-2xl font-medium text-ink dark:text-gray-100 leading-relaxed" id="summary-final-text">
+            An interpreter executes a program incrementally—reading, understanding, and running code one statement at a time.
+          </p>
+          <div class="h-px w-24 bg-orange-200 dark:bg-gray-700"></div>
+          <p class="text-sm font-mono text-orange-600 dark:text-orange-400">
+            No separate executable is generated.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Timeline Progress Bar -->
+    <div class="w-full mt-8 flex flex-col gap-4">
+      <div class="w-full h-0.5 bg-orange-200 dark:bg-gray-700 rounded-full relative overflow-hidden cursor-pointer" id="timeline-bar">
+        <div class="absolute inset-y-0 left-0 bg-orange-600 dark:bg-orange-400 w-0 transition-all duration-300" id="timeline-progress"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-3 text-sm">
+        <div class="flex items-center gap-4">
+          <button id="prev-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Previous scene">
+            <span class="material-symbols-outlined">navigate_before</span>
+          </button>
+          <button id="play-btn" class="w-10 h-10 rounded-full bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 flex items-center justify-center text-white transition-all shadow-lg" aria-label="Play/Pause">
+            <span class="material-symbols-outlined" id="play-icon">play_arrow</span>
+          </button>
+          <button id="next-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Next scene">
+            <span class="material-symbols-outlined">navigate_next</span>
+          </button>
+          <button id="fullscreen-btn" class="w-8 h-8 rounded-lg hover:bg-orange-50 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Toggle Fullscreen">
+            <span class="material-symbols-outlined">fullscreen</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-1.5 md:gap-4 font-mono text-[10px] md:text-[11px] text-inkMuted dark:text-gray-400" id="scene-tags">
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors active-tag text-orange-600 dark:text-orange-400" data-target="1">Title</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="2">Source</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="3">Big Idea</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="4">Line 1</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="5">Line 2</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="6">Expression</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="7">Output</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="8">Process</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="9">Error</span>
+          <span class="hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer transition-colors" data-target="10">Summary</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-gray-200 dark:border-gray-800 py-8 text-center text-xs text-inkMuted dark:text-gray-500">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <span>&copy; 2026 Quick Reference. Open documentation platform.</span>
+      <div class="flex gap-6 font-medium">
+        <a href="docs.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Documentation</a>
+        <a href="index.html" class="hover:text-orange-600 dark:hover:text-orange-400 transition-colors">Home Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
+  <script>
+    const sceneData = [
+      {
+        title: "How an Interpreter Works",
+        subtitle: "Reading, understanding, and executing code one step at a time.",
+        label: "Scene 1 / 10"
+      },
+      {
+        title: "Source Code",
+        subtitle: "A high-level script is written in languages like Python, JavaScript, or Ruby.",
+        label: "Scene 2 / 10"
+      },
+      {
+        title: "The Big Idea",
+        subtitle: "Unlike a compiler, execution happens immediately during interpretation.",
+        label: "Scene 3 / 10"
+      },
+      {
+        title: "Reading Line by Line",
+        subtitle: "The interpreter fetches the first statement, understands it, and records it in memory.",
+        label: "Scene 4 / 10"
+      },
+      {
+        title: "Continuing Execution",
+        subtitle: "It progresses to the next line, dynamically updating runtime values.",
+        label: "Scene 5 / 10"
+      },
+      {
+        title: "Evaluating Expressions",
+        subtitle: "Expressions are resolved by retrieving variables from the environment and executing functions.",
+        label: "Scene 6 / 10"
+      },
+      {
+        title: "Producing Output",
+        subtitle: "System commands (like print) produce output instantly during interpretation.",
+        label: "Scene 7 / 10"
+      },
+      {
+        title: "How Execution Progresses",
+        subtitle: "A continuous loop of Read → Parse → Execute travels step-by-step through the program.",
+        label: "Scene 8 / 10"
+      },
+      {
+        title: "Error Handling",
+        subtitle: "Interpreters stop execution immediately upon encountering the first runtime error.",
+        label: "Scene 9 / 10"
+      },
+      {
+        title: "Final Summary",
+        subtitle: "An interpreter executes a program incrementally—reading, understanding, and running code one statement at a time.",
+        label: "Scene 10 / 10"
+      }
+    ];
+
+    let currentScene = 1;
+    let isPlaying = false;
+    let autoPlayInterval = null;
+    const TOTAL_SCENES = 10;
+
+    // DOM Elements
+    const sceneCounter = document.getElementById('scene-counter');
+    const sceneTitle = document.getElementById('scene-title');
+    const sceneSubtitle = document.getElementById('scene-subtitle');
+    const timelineProgress = document.getElementById('timeline-progress');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const tags = document.querySelectorAll('#scene-tags span');
+
+    // Scene Transition Handler
+    function showScene(sceneIndex) {
+      if (sceneIndex < 1 || sceneIndex > TOTAL_SCENES) return;
+
+      // Hide all scene containers
+      for (let i = 1; i <= TOTAL_SCENES; i++) {
+        const vis = document.getElementById(`vis-scene-${i}`);
+        if (vis) {
+          vis.classList.add('opacity-0', 'pointer-events-none');
+          if (i === 2) vis.classList.add('translate-x-10');
+        }
+      }
+
+      currentScene = sceneIndex;
+
+      // Update timeline progress
+      const percent = ((sceneIndex - 1) / (TOTAL_SCENES - 1)) * 100;
+      timelineProgress.style.width = `${percent}%`;
+
+      // Update Tag highlights
+      tags.forEach(tag => {
+        if (parseInt(tag.dataset.target) === sceneIndex) {
+          tag.classList.add('text-orange-600', 'dark:text-orange-400');
+          tag.classList.remove('text-inkMuted', 'dark:text-gray-400');
+        } else {
+          tag.classList.remove('text-orange-600', 'dark:text-orange-400');
+          tag.classList.add('text-inkMuted', 'dark:text-gray-400');
+        }
+      });
+
+      // Update texts with fade effect
+      sceneTitle.classList.remove('opacity-100', 'translate-y-0');
+      sceneTitle.classList.add('opacity-0', 'translate-y-2');
+      sceneSubtitle.classList.remove('opacity-100', 'translate-y-0');
+      sceneSubtitle.classList.add('opacity-0', 'translate-y-2');
+
+      setTimeout(() => {
+        sceneCounter.textContent = sceneData[sceneIndex - 1].label;
+        sceneTitle.textContent = sceneData[sceneIndex - 1].title;
+        sceneSubtitle.textContent = sceneData[sceneIndex - 1].subtitle;
+
+        sceneTitle.classList.remove('opacity-0', 'translate-y-2');
+        sceneTitle.classList.add('opacity-100', 'translate-y-0');
+        sceneSubtitle.classList.remove('opacity-0', 'translate-y-2');
+        sceneSubtitle.classList.add('opacity-100', 'translate-y-0');
+      }, 300);
+
+      // Show the selected scene content
+      const activeVis = document.getElementById(`vis-scene-${sceneIndex}`);
+      if (activeVis) {
+        activeVis.classList.remove('opacity-0', 'pointer-events-none');
+        if (sceneIndex === 2) activeVis.classList.remove('translate-x-10');
+      }
+
+      // Trigger scene-specific animations
+      triggerSceneAnimation(sceneIndex);
+    }
+
+    // Custom Animation Trigger per Scene
+    function triggerSceneAnimation(index) {
+      if (index === 1) {
+      }
+      
+      else if (index === 2) {
+        const codeElement = document.getElementById('typed-code');
+        codeElement.textContent = "";
+        const codeString = `x = 2\ny = 3\nresult = x + y\nprint(result)`;
+        let charIndex = 0;
+        
+        function typeCode() {
+          if (charIndex < codeString.length && currentScene === 2) {
+            codeElement.textContent += codeString.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeCode, 30);
+          }
+        }
+        setTimeout(typeCode, 500);
+      }
+      
+      else if (index === 3) {
+        // Sequentially load nodes
+        const nodes = ['node-src', 'node-interpreter', 'node-output'];
+        nodes.forEach(id => {
+          const el = document.getElementById(id);
+          el.className = "flex flex-col items-center gap-3 z-10 opacity-0 transform translate-y-4 transition-all duration-700";
+        });
+
+        const pulse = document.getElementById('pipeline-pulse');
+        if (pulse) pulse.classList.add('opacity-0');
+
+        nodes.forEach((id, i) => {
+          setTimeout(() => {
+            if (currentScene === 3) {
+              const el = document.getElementById(id);
+              el.classList.remove('opacity-0', 'translate-y-4');
+            }
+          }, 300 + (i * 300));
+        });
+
+        // Trigger loop annotations inside interpreter block
+        setTimeout(() => {
+          if (currentScene === 3) {
+            const annotation = document.getElementById('interpreter-cycles');
+            const box = document.querySelector('#node-interpreter div');
+            if (annotation) annotation.className = "absolute -bottom-12 flex gap-1.5 font-mono text-[9px] text-orange-600 dark:text-orange-400 transition-opacity duration-500 opacity-100";
+            if (box) box.classList.add('border-orange-600', 'dark:border-orange-400');
+          }
+        }, 1200);
+
+        setTimeout(() => {
+          if (pulse && currentScene === 3) {
+            pulse.classList.remove('opacity-0');
+          }
+        }, 1500);
+      }
+      
+      else if (index === 4) {
+        const block = document.getElementById('mem-item-x');
+        block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
+        setTimeout(() => {
+          if (currentScene === 4) {
+            block.classList.remove('opacity-0', 'translate-y-2');
+          }
+        }, 600);
+      }
+      
+      else if (index === 5) {
+        const block = document.getElementById('mem-item-y');
+        block.className = "text-sm flex justify-between py-1 transition-all duration-700 transform translate-y-2 opacity-0";
+        setTimeout(() => {
+          if (currentScene === 5) {
+            block.classList.remove('opacity-0', 'translate-y-2');
+          }
+        }, 600);
+      }
+      
+      else if (index === 6) {
+        const valX = document.getElementById('expr-val-x');
+        const valY = document.getElementById('expr-val-y');
+        const resolve = document.getElementById('expr-resolve');
+        const sum = document.getElementById('expr-sum');
+        const memResult = document.getElementById('mem-item-result');
+
+        valX.textContent = "x";
+        valY.textContent = "y";
+        resolve.className = "text-orange-600 dark:text-orange-400 font-bold opacity-0 transition-opacity duration-500";
+        sum.className = "text-orange-700 dark:text-orange-300 font-bold opacity-0 transition-opacity duration-500";
+        memResult.className = "text-sm flex justify-between py-1 text-orange-700 dark:text-orange-300 font-bold transition-all duration-700 opacity-0 transform translate-y-2";
+
+        // Retrieve step
+        setTimeout(() => {
+          if (currentScene === 6) {
+            valX.textContent = "2";
+            valY.textContent = "3";
+            valX.classList.add('text-orange-600', 'dark:text-orange-400');
+            valY.classList.add('text-orange-600', 'dark:text-orange-400');
+          }
+        }, 1000);
+
+        // Resolve operation step
+        setTimeout(() => {
+          if (currentScene === 6) {
+            resolve.classList.remove('opacity-0');
+            resolve.classList.add('opacity-100');
+          }
+        }, 1800);
+
+        // Compute step
+        setTimeout(() => {
+          if (currentScene === 6) {
+            sum.classList.remove('opacity-0');
+            sum.classList.add('opacity-100');
+          }
+        }, 2600);
+
+        // Update memory stack step
+        setTimeout(() => {
+          if (currentScene === 6) {
+            memResult.classList.remove('opacity-0', 'translate-y-2');
+            memResult.classList.add('opacity-100');
+          }
+        }, 3400);
+      }
+      
+      else if (index === 7) {
+        const text = document.getElementById('stdout-output');
+        const flash = document.getElementById('stdout-flash');
+        text.className = "opacity-0 transition-opacity duration-500";
+        flash.className = "absolute inset-0 bg-orange-500/5 opacity-0 transition-opacity duration-300";
+
+        setTimeout(() => {
+          if (currentScene === 7) {
+            text.classList.remove('opacity-0');
+            text.classList.add('opacity-100');
+            flash.classList.remove('opacity-0');
+            flash.classList.add('opacity-100');
+          }
+        }, 800);
+
+        setTimeout(() => {
+          if (currentScene === 7) {
+            flash.classList.remove('opacity-100');
+            flash.classList.add('opacity-0');
+          }
+        }, 1300);
+      }
+      
+      else if (index === 8) {
+        // Line progression sequence
+        const cursor = document.getElementById('progression-cursor');
+        cursor.style.top = "24px";
+        
+        for (let l = 1; l <= 4; l++) {
+          const line = document.getElementById(`prog-line-${l}`);
+          const check = line.querySelector('span:last-child');
+          check.className = "material-symbols-outlined text-xs text-orange-600 dark:text-orange-400 opacity-0 transition-all duration-300 transform scale-50";
+        }
+
+        const runTimes = [500, 1500, 2500, 3500];
+        runTimes.forEach((ms, idx) => {
+          setTimeout(() => {
+            if (currentScene === 8) {
+              const lineIndex = idx + 1;
+              cursor.style.top = `${24 + (idx * 28)}px`;
+              const check = document.getElementById(`prog-line-${lineIndex}`).querySelector('span:last-child');
+              check.classList.remove('opacity-0', 'scale-50');
+              check.classList.add('opacity-100', 'scale-100');
+            }
+          }, ms);
+        });
+      }
+      
+      else if (index === 9) {
+        const subLine = document.getElementById('subsequent-line');
+        const errConsole = document.getElementById('error-console');
+        subLine.style.opacity = "1";
+        errConsole.className = "bg-white dark:bg-[#1A1D25] border-2 border-red-400 dark:border-red-500/50 rounded-xl w-72 text-left font-mono shadow-lg overflow-hidden opacity-0 transform translate-x-4 transition-all duration-700 delay-300";
+
+        // Stop execution animation
+        setTimeout(() => {
+          if (currentScene === 9) {
+            subLine.style.opacity = "0.2";
+            errConsole.classList.remove('opacity-0', 'translate-x-4');
+          }
+        }, 1200);
+      }
+    }
+
+    // Auto Play Logic
+    function startAutoPlay() {
+      isPlaying = true;
+      playIcon.textContent = "pause";
+      
+      autoPlayInterval = setInterval(() => {
+        if (currentScene < TOTAL_SCENES) {
+          showScene(currentScene + 1);
+        } else {
+          showScene(1);
+        }
+      }, 6500); 
+    }
+
+    function stopAutoPlay() {
+      isPlaying = false;
+      playIcon.textContent = "play_arrow";
+      clearInterval(autoPlayInterval);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentScene > 1) {
+        showScene(currentScene - 1);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      stopAutoPlay();
+      if (currentScene < TOTAL_SCENES) {
+        showScene(currentScene + 1);
+      }
+    });
+
+    tags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        stopAutoPlay();
+        showScene(parseInt(tag.dataset.target));
+      });
+    });
+
+    document.getElementById('timeline-bar').addEventListener('click', (e) => {
+      stopAutoPlay();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const pct = x / rect.width;
+      const targetScene = Math.min(TOTAL_SCENES, Math.max(1, Math.round(pct * (TOTAL_SCENES - 1)) + 1));
+      showScene(targetScene);
+    });
+
+    // Fullscreen behavior
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const fullscreenCanvas = document.getElementById('fullscreen-canvas');
+    if (fullscreenBtn && fullscreenCanvas) {
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          fullscreenCanvas.requestFullscreen().catch(err => {
+            console.error('Error enabling fullscreen:', err);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      });
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = fullscreenBtn?.querySelector('span');
+      if (icon) {
+        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
+      }
+    });
+
+    // Start with Scene 1
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.self !== window.top) {
+        document.querySelector('header')?.classList.add('hidden');
+        document.querySelector('footer')?.classList.add('hidden');
+        document.getElementById('scene-counter')?.parentElement?.classList.add('hidden');
+        document.body.classList.remove('justify-between');
+        document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
+        document.querySelector('main')?.classList.remove('md:py-16', 'py-8', 'px-6');
+        document.querySelector('main')?.classList.add('py-0', 'px-2', 'max-w-full');
+        
+        // Reduce timeline top margin
+        const timeline = document.querySelector('main > div:last-child');
+        if (timeline) {
+          timeline.classList.remove('mt-8');
+          timeline.classList.add('mt-3');
+        }
+      }
+      showScene(1);
+    });
+  </script>
+</body>
+</html>

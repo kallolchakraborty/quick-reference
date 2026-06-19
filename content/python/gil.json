@@ -1,0 +1,9 @@
+{
+  "id": "gil",
+  "title": "How Python's GIL Works",
+  "category": "Python",
+  "subcategory": "Concurrency",
+  "description": "An interactive visual guide explaining Python's Global Interpreter Lock (GIL) — what it is, why it exists, and how it affects threading and multiprocessing.",
+  "codeBlock": "import threading\n\ndef task(n):\n    total = 0\n    for i in range(n):\n        total += i\n    return total\n\n# Two threads, but only one runs at a time\n# due to the GIL",
+  "details": "<p>The Global Interpreter Lock (GIL) is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecode simultaneously in a single interpreter. This interactive visual guide explores how the GIL works and its implications for concurrent programming in Python.</p><p><a href=\"gil.html\" class=\"text-blue-400 hover:text-blue-300 underline\">Launch the interactive visual guide →</a></p>"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "compiler",
+  "title": "How a Compiler Works",
+  "category": "Programming",
+  "subcategory": "Concepts",
+  "description": "Compilers translate high-level source code into low-level machine instructions or executables before running them.",
+  "codeBlock": "Source Code\n  ↓ [Lexical Analysis (Lexer)] -> Tokens\n  ↓ [Syntax Analysis (Parser)] -> AST\n  ↓ [Semantic Analysis] -> Checked AST\n  ↓ [Optimization] -> Optimized AST\n  ↓ [Code Generation] -> Target Machine Code",
+  "details": "A compiler compiles the entire program beforehand, producing a standalone executable. For a detailed step-by-step visual run, view the <a href=\"compiler.html\" class=\"text-brand-500 font-bold underline hover:text-brand-600 transition-colors\">Interactive Compiler Pipeline Guide</a>."
+}

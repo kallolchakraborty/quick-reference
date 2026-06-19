@@ -1,0 +1,9 @@
+{
+  "id": "interpreter",
+  "title": "How an Interpreter Works",
+  "category": "Programming",
+  "subcategory": "Concepts",
+  "description": "Interpreters read, translate, and execute code line-by-line in a continuous loop at runtime.",
+  "codeBlock": "Source Code Line\n  ↓\nRead Line\n  ↓\nParse Statement\n  ↓\nExecute Instructions (Stack/Memory)\n  ↓\nOutput / Error (Halt on first error)",
+  "details": "An interpreter reads statements and runs them immediately without producing an intermediate binary. For a detailed step-by-step visual run, view the <a href=\"interpreter.html\" class=\"text-brand-500 font-bold underline hover:text-brand-600 transition-colors\">Interactive Interpreter Guide</a>."
+}

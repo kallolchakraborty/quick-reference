@@ -1,0 +1,146 @@
+// Dynamic Content Loader for Quick Reference Documentation Portal
+const routeMap = {
+  '#js-variables': 'content/frontend/javascript-variables.json',
+  '#js-arrays': 'content/frontend/javascript-arrays.json',
+  '#css-flexbox': 'content/frontend/css-flexbox.json',
+  '#git-commands': 'content/devops/git-commands.json',
+  '#docker-lifecycle': 'content/devops/docker-lifecycle.json',
+  '#go-interfaces': 'content/backend/go-interfaces.json',
+  '#python-context': 'content/backend/python-context.json',
+  '#gil': 'content/python/gil.json',
+  '#compiler': 'content/programming/compiler.json',
+  '#interpreter': 'content/programming/interpreter.json'
+};
+
+async function loadContent(hash) {
+  const path = routeMap[hash] || routeMap['#js-variables'];
+  const contentArea = document.getElementById('docs-dynamic-content');
+  if (!contentArea) return;
+
+  // Show loading state
+  contentArea.innerHTML = `
+    <div class="animate-pulse space-y-6">
+      <div class="h-8 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+      <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+      <div class="h-40 bg-slate-200 dark:bg-slate-800 rounded"></div>
+      <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6"></div>
+    </div>
+  `;
+
+  try {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error('Failed to fetch content');
+    const data = await response.json();
+
+    // Render content dynamically
+    let embedCode = '';
+    if (data.id === 'compiler' || data.id === 'interpreter' || data.id === 'gil') {
+      embedCode = `
+        <div class="w-full aspect-[16/12] border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
+          <iframe src="${data.id}.html" class="w-full h-full border-none" allowfullscreen></iframe>
+        </div>
+      `;
+    } else {
+      embedCode = `
+        <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 font-mono text-sm leading-relaxed overflow-x-auto relative group">
+          <button onclick="navigator.clipboard.writeText(\`${data.codeBlock.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+          </button>
+          <pre><code class="text-slate-800 dark:text-slate-200">${escapeHtml(data.codeBlock)}</code></pre>
+        </div>
+      `;
+    }
+
+    contentArea.innerHTML = `
+      <section class="flex flex-col gap-6">
+        <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider">
+          <span>${data.category}</span>
+          <span>&bull;</span>
+          <span>${data.subcategory}</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
+        <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base">${data.description}</p>
+        
+        ${embedCode}
+
+        <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 border border-brand-100 dark:border-brand-500/20 rounded-xl flex gap-3 text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          <span class="material-symbols-outlined text-brand-500 shrink-0">info</span>
+          <div>
+            <h4 class="font-bold text-slate-900 dark:text-white mb-1">Deep Dive</h4>
+            <p>${data.details}</p>
+          </div>
+        </div>
+      </section>
+    `;
+
+    // Highlight active link in left sidebar
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      if (link.getAttribute('href') === hash) {
+        link.classList.add('active-doc-link');
+      } else {
+        link.classList.remove('active-doc-link');
+      }
+    });
+
+    // Populate right outline dynamically
+    const outlineArea = document.getElementById('docs-right-outline');
+    if (outlineArea) {
+      outlineArea.innerHTML = `
+        <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Syntax Guide</a>
+        <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
+      `;
+      setupOutlineSmoothScroll();
+    }
+
+  } catch (error) {
+    contentArea.innerHTML = `
+      <div class="p-6 border-2 border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-950/10 rounded-xl text-red-600 dark:text-red-400 text-sm">
+        <h3 class="font-bold mb-1">Error Loading Document</h3>
+        <p>Failed to load the requested study guide from path: ${path}. Please check your connection or try again.</p>
+      </div>
+    `;
+  }
+}
+
+function setupOutlineSmoothScroll() {
+  document.querySelectorAll('.outline-link').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        e.preventDefault();
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Highlight active right outline
+        document.querySelectorAll('.outline-link').forEach(link => {
+          if (link.getAttribute('href') === targetId) {
+            link.classList.add('text-brand-500');
+            link.classList.remove('text-slate-500');
+          } else {
+            link.classList.remove('text-brand-500');
+            link.classList.add('text-slate-500');
+          }
+        });
+      }
+    });
+  });
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const initialHash = window.location.hash || '#js-variables';
+  loadContent(initialHash);
+});
+
+window.addEventListener('hashchange', () => {
+  loadContent(window.location.hash);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});

@@ -1,0 +1,9 @@
+{
+  "id": "go-interfaces",
+  "title": "Go Interfaces & Structs",
+  "category": "Backend",
+  "subcategory": "Go",
+  "description": "Quick syntax checklists for Go interfaces, structs composition, and OOP patterns in Golang.",
+  "codeBlock": "type Reader interface {\n    Read(p []byte) (n int, err error)\n}\n\ntype File struct {\n    name string\n}\n\nfunc (f *File) Read(p []byte) (int, error) {\n    // Implementation\n    return 0, nil\n}",
+  "details": "Go interfaces are satisfied implicitly. A concrete type does not need to declare that it implements an interface; it only needs to implement the required methods."
+}
