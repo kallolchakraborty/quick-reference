@@ -386,7 +386,7 @@
         var nodes = document.querySelectorAll('.pipeline-node');
         var svg = document.querySelector('#vis-scene-3 svg');
         var pulse = document.getElementById('pipeline-pulse');
-        if (pulse) pulse.style.opacity = '0';
+        if (pulse) pulse.classList.add('opacity-0');
 
         // Remove translate-y-4 (no more slide-up), start nodes dimmed
         nodes.forEach(function(node) {
@@ -409,8 +409,9 @@
 
         var steps = [];
         var runnerPositions = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
-        // Step 0: just light up first node, runner stays at position 0
+        // Step 0: light up first node, position runner at start
         steps.push(function() {
+          rg.setAttribute('transform', 'translate(0, 3)');
           nodes[0].classList.remove('opacity-20');
           nodes[0].classList.add('opacity-100', 'node-active');
         });
@@ -601,6 +602,10 @@
         steps.push(function() { setTimeout(makePulse, 100); });
         steps.push(function() { /* pulse continues */ });
         state.setSteps(steps);
+      }
+
+      else if (index === 9) {
+        state.setSteps([]);
       }
     }
 

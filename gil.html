@@ -113,7 +113,7 @@
       </div>
 
       <!-- ==================== SCENE 2: THE INTUITION ==================== -->
-      <div id="vis-scene-2" class="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 pointer-events-none transition-all duration-1000">
+      <div id="vis-scene-2" class="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
         <div class="flex flex-col items-center gap-2">
           <div class="gil-card-bg border border-[#E95420]/40 rounded-lg px-5 py-2.5 font-mono text-sm text-left text-[#E95420] opacity-0 translate-y-4 transition-all duration-700" id="s2-code">
             <span class="gil-muted">def </span>task():<br/>
@@ -1006,6 +1006,7 @@
         scenePauseMs: 1000,
         activeTagClass: ['bg-[#E95420]', 'text-white', 'font-semibold'],
         inactiveTagClass: ['gil-muted', 'hover:text-[#E95420]', 'hover:bg-white/5', 'font-medium'],
+        scene2HideClass: 'translate-x-10',
         onSceneAnimation: triggerSceneAnimation
       });
     });

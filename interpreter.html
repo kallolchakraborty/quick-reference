@@ -547,7 +547,7 @@
         });
         steps.push(function() {
           // Animate flow arrow
-          if (flowPath) {
+          if (flowPath && flowArrow) {
             var len = flowPath.getTotalLength();
             flowPath.style.strokeDasharray = len;
             flowPath.style.strokeDashoffset = len;

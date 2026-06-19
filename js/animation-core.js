@@ -362,7 +362,7 @@ function initAnimationPlayer(config) {
     }
     var tl = document.querySelector('main > div:last-child');
     if (tl) {
-      tl.classList.remove('mt-8');
+      tl.classList.remove('mt-6', 'mt-8');
       tl.classList.add('mt-3');
     }
   }
