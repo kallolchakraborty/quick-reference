@@ -315,7 +315,7 @@ html.dark .timeline-event {
 pre[class*="language-"] {
   background: #f8fafc !important;
   color: #374151 !important;
-  font-family: 'Ubuntu', sans-serif !important;
+  font-family: 'JetBrains Mono', monospace !important;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
   padding: 1.25rem !important;
@@ -335,7 +335,7 @@ html.dark pre[class*="language-"] {
   padding: 0 !important;
   border-radius: 0 !important;
 }
-code[class*="language-"] { text-shadow: none !important; color: inherit !important; font-family: 'Ubuntu', sans-serif !important; font-size: inherit !important; }
+code[class*="language-"] { text-shadow: none !important; color: inherit !important; font-family: 'JetBrains Mono', monospace !important; font-size: inherit !important; }
 :not(pre) > code[class*="language-"] { background: transparent !important; padding: 0 !important; }
 
 html.dark .token.operator { color: #E8E8E8; }
