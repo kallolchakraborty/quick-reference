@@ -21,5 +21,43 @@
       "codeBlock": "import asyncio\n\nasync def fetch_async(service_id):\n    print(f\"[Async] Call start to service {service_id}\")\n    await asyncio.sleep(1.5)  # Cooperative sleep yields execution back to Event Loop\n    print(f\"[Async] Call finish for service {service_id}\")\n    return f\"result_{service_id}\"\n\nasync def main():\n    results = await asyncio.gather(\n        fetch_async(1),\n        fetch_async(2),\n        fetch_async(3)\n    )\n    print(\"All API calls finished successfully:\", results)\n\nasyncio.run(main())"
     }
   ],
-  "details": "<p class=\"mb-4\">Python provides multiple concurrency models to write responsive and high-throughput applications. Choosing the right concurrency mechanism depends primarily on whether your workload is <strong>I/O-Bound</strong> (network, database, file system wait times) or <strong>CPU-Bound</strong> (heavy numerical operations, calculations, image resizing).</p><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-3 mt-6\">CPython Concurrency Comparison Matrix</h4><div class=\"overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl my-6 bg-white dark:bg-[#0E1115]\"><table class=\"w-full text-xs text-left border-collapse\"><thead class=\"bg-slate-50 dark:bg-slate-900/60 font-bold font-mono border-b border-slate-200 dark:border-slate-800\"><tr><th class=\"p-3 text-slate-700 dark:text-slate-200\">Model</th><th class=\"p-3 text-slate-700 dark:text-slate-200\">Execution Paradigm</th><th class=\"p-3 text-slate-700 dark:text-slate-200\">GIL Restriction</th><th class=\"p-3 text-slate-700 dark:text-slate-200\">Memory Overhead</th><th class=\"p-3 text-slate-700 dark:text-slate-200\">Best Suitability</th></tr></thead><tbody class=\"font-mono divide-y divide-slate-100 dark:divide-slate-800/60\"><tr class=\"hover:bg-slate-50/50 dark:hover:bg-slate-900/20\"><td class=\"p-3 font-semibold text-orange-600\">Synchronous</td><td class=\"p-3\">Sequential Blocked</td><td class=\"p-3 text-slate-400\">No GIL Issue</td><td class=\"p-3\">Minimal</td><td class=\"p-3\">Short script logic</td></tr><tr class=\"hover:bg-slate-50/50 dark:hover:bg-slate-900/20\"><td class=\"p-3 font-semibold text-blue-500\">Threading</td><td class=\"p-3\">Preemptive context switch</td><td class=\"p-3 text-red-500\">Yes (CPython lock)</td><td class=\"p-3\">Low (Shared process)</td><td class=\"p-3\">Web scrapers, network requests</td></tr><tr class=\"hover:bg-slate-50/50 dark:hover:bg-slate-900/20\"><td class=\"p-3 font-semibold text-green-500\">Asyncio</td><td class=\"p-3\">Cooperative event loop</td><td class=\"p-3 text-slate-400\">No (Single Thread)</td><td class=\"p-3\">Very Low (Single Stack)</td><td class=\"p-3\">Websockets, high-connection servers</td></tr><tr class=\"hover:bg-slate-50/50 dark:hover:bg-slate-900/20\"><td class=\"p-3 font-semibold text-purple-500\">Multiprocess</td><td class=\"p-3\">True parallel cores</td><td class=\"p-3 text-green-500\">No (Multiple GILs)</td><td class=\"p-3\">High (Copied resources)</td><td class=\"p-3\">Image editing, AI/math engines</td></tr></tbody></table></div><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-2 mt-6\">CPython Concurrency & Evolution Reference Specs</h4><ul class=\"list-disc list-inside space-y-1.5 text-xs text-inkLight dark:text-gray-300\"><li><a href=\"https://docs.python.org/3/library/concurrency.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Python Concurrency Documentation</a> — Official CPython libraries for threading, multiprocessing, and concurrent futures.</li><li><a href=\"https://docs.python.org/3/library/asyncio.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Asyncio Event Loop Specifications</a> — Dynamic runtime documentation detailing asynchronous cooperative routines.</li></ul>"
+  "comparisonTable": [
+    {
+      "model": "Synchronous",
+      "paradigm": "Sequential execution",
+      "gil": "No GIL Issue",
+      "colorClass": "text-orange-600",
+      "gilColorClass": "text-slate-400",
+      "memory": "Minimal",
+      "suitability": "Simple sequential script logic"
+    },
+    {
+      "model": "Threading",
+      "paradigm": "Preemptive context switch",
+      "gil": "Yes (CPython Lock)",
+      "colorClass": "text-blue-500",
+      "gilColorClass": "text-red-500",
+      "memory": "Low (Shared memory)",
+      "suitability": "I/O bound apps, scraping, sockets"
+    },
+    {
+      "model": "Asyncio",
+      "paradigm": "Cooperative event loop",
+      "gil": "No (Single thread)",
+      "colorClass": "text-green-500",
+      "gilColorClass": "text-slate-400",
+      "memory": "Very Low (Single Stack)",
+      "suitability": "High concurrent network connections"
+    },
+    {
+      "model": "Multiprocess",
+      "paradigm": "Parallel cores",
+      "gil": "No (Multiple GILs)",
+      "colorClass": "text-purple-500",
+      "gilColorClass": "text-green-500",
+      "memory": "High (Copied stack)",
+      "suitability": "CPU bound math, processing, ML"
+    }
+  ],
+  "details": "<p class=\"mb-4\">Python provides multiple concurrency models to write responsive and high-throughput applications. Choosing the right concurrency mechanism depends primarily on whether your workload is <strong>I/O-Bound</strong> (network, database, file system wait times) or <strong>CPU-Bound</strong> (heavy numerical operations, calculations, image resizing).</p><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-2\">The Four Concurrency Paradigms</h4><ul class=\"list-disc list-inside mb-4 space-y-1.5 text-xs text-inkLight dark:text-gray-300\"><li><strong>Synchronous (Single-Thread):</strong> Executing one instruction after another. If an I/O blocking operation occurs, the entire program pauses and waits.</li><li><strong>Multithreading (`threading`):</strong> Running multiple threads within a single process. Due to CPython's Global Interpreter Lock (GIL), only one thread executes Python bytecode at a time, making it excellent for interleaving I/O-bound wait times but useless for parallel CPU scaling.</li><li><strong>Asynchronous (`asyncio`):</strong> Single-threaded cooperative multitasking utilizing an Event Loop. Tasks explicitly yield control back to the loop using the <code>await</code> keyword while waiting for I/O, avoiding OS thread context-switch overheads.</li><li><strong>Multiprocessing (`multiprocessing`):</strong> Spawning independent OS processes, each with its own CPython interpreter instance and GIL. This allows processes to run in parallel on separate physical CPU cores, making it the correct choice for CPU-bound computation.</li></ul><h4 class=\"text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-2\">CPython Concurrency & Evolution Reference Specs</h4><ul class=\"list-disc list-inside space-y-1.5 text-xs text-inkLight dark:text-gray-300\"><li><a href=\"https://docs.python.org/3/library/concurrency.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Python Concurrency Documentation</a> — Official CPython libraries for threading, multiprocessing, and concurrent futures.</li><li><a href=\"https://docs.python.org/3/library/asyncio.html\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 dark:text-orange-400 dark:hover:text-orange-500 transition-colors font-semibold underline\">Asyncio Event Loop Specifications</a> — Dynamic runtime documentation detailing asynchronous cooperative routines.</li></ul>"
 }

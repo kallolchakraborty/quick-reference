@@ -111,6 +111,36 @@ async function loadContent(hash) {
         
         ${embedCode}
 
+        ${data.comparisonTable ? `
+          <div id="section-comparison" class="scroll-mt-24">
+            <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-3 mt-6">CPython Concurrency Comparison Matrix</h4>
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#0E1115]">
+              <table class="w-full text-xs text-left border-collapse">
+                <thead class="bg-slate-50 dark:bg-slate-900/60 font-bold font-mono border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="p-3 text-slate-700 dark:text-slate-200">Model</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200">Execution Paradigm</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200">GIL Restriction</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200">Memory Overhead</th>
+                    <th class="p-3 text-slate-700 dark:text-slate-200">Best Suitability</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono divide-y divide-slate-100 dark:divide-slate-800/60">
+                  ${data.comparisonTable.map(row => `
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
+                      <td class="p-3 font-semibold ${row.colorClass || 'text-slate-800 dark:text-slate-200'}">${row.model}</td>
+                      <td class="p-3">${row.paradigm}</td>
+                      <td class="p-3 ${row.gilColorClass || ''}">${row.gil}</td>
+                      <td class="p-3">${row.memory}</td>
+                      <td class="p-3">${row.suitability}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ` : ''}
+        
         <div id="section-dive" class="scroll-mt-24 p-5 bg-brand-50 border border-brand-100 dark:border-brand-500/20 rounded-xl text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
           <div>
             <h4 class="font-bold text-slate-900 dark:text-white mb-1">Deep Dive</h4>
@@ -138,14 +168,19 @@ async function loadContent(hash) {
           const sectionId = `section-${data.id}-${idx}`;
           return `<a href="#${sectionId}" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${section.title}</a>`;
         }).join('\n');
+        if (data.comparisonTable) {
+          outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
+        }
         outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
         outlineArea.innerHTML = outlineHtml;
       } else {
         const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
-        outlineArea.innerHTML = `
-          <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>
-          <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
-        `;
+        let outlineHtml = `<a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>`;
+        if (data.comparisonTable) {
+          outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
+        }
+        outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
+        outlineArea.innerHTML = outlineHtml;
       }
       setupOutlineSmoothScroll();
     }
