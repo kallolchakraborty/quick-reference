@@ -9,22 +9,22 @@
     {
       "title": "HTTP GET Requests",
       "description": "Perform basic HTTP GET requests to fetch resources, handle parameters, check status codes, and parse JSON payloads.",
-      "codeBlock": "import requests\n\n# Basic GET Request\nresponse = requests.get(\"https://api.github.com/users/python\")\nprint(response.status_code)       # 200\nprint(response.ok)                # True (status code < 400)\nprint(response.headers[\"Content-Type\"])\n\n# Parse response JSON\ndata = response.json()            # Decoded dictionary / list\nprint(data[\"login\"])\nprint(data[\"public_repos\"])\n\n# Request with Query Parameters (?q=python&page=1)\nparams = {\"q\": \"python\", \"page\": 1}\nresp = requests.get(\"https://api.github.com/search/repositories\", params=params)\nprint(\"Search Response Status:\", resp.status_code) # 200"
+      "codeBlock": "import requests\n\n# Basic GET Request - Fetch products from Northwind API\nresponse = requests.get(\"https://northwind.vercel.app/api/products\")\nprint(response.status_code)       # 200\nprint(response.ok)                # True (status code < 400)\nprint(response.headers[\"Content-Type\"])\n\n# Parse response JSON\nproducts = response.json()        # Decoded list of products\nfirst_product = products[0]\nprint(\"Product Name:\", first_product[\"name\"])\nprint(\"Unit Price:\", first_product[\"unitPrice\"])\n\n# Request a single resource by ID (Product ID: 2)\nresp = requests.get(\"https://northwind.vercel.app/api/products/2\")\nprint(\"Product 2 Status:\", resp.status_code) # 200\nprint(\"Product 2 Name:\", resp.json()[\"name\"])"
     },
     {
       "title": "HTTP POST Requests",
       "description": "Submit data payloads to APIs using HTTP POST requests by passing dictionaries to the json parameter.",
-      "codeBlock": "import requests\n\npayload = {\"title\": \"Bug fix\", \"body\": \"Fixed the issue\"}\n\n# Send JSON payload using httpbin.org (safe public echo test API)\nresp = requests.post(\"https://httpbin.org/post\", json=payload)\nprint(resp.status_code)           # 200 OK\nprint(resp.json()[\"json\"])        # {'title': 'Bug fix', 'body': 'Fixed the issue'}"
+      "codeBlock": "import requests\n\n# Prepare payload to add a new category to Northwind\npayload = {\n    \"name\": \"Beverages Extra\",\n    \"description\": \"Mock description for test\"\n}\n\n# Send JSON payload via POST request\nresp = requests.post(\"https://northwind.vercel.app/api/categories\", json=payload)\nprint(resp.status_code)           # 201 Created\nprint(\"Added Category ID:\", resp.json().get(\"id\"))"
     },
     {
       "title": "Request Headers & Timeouts",
       "description": "Configure request behaviors by adding HTTP headers, passing bearer tokens, and setting request timeout limits to prevent hanging.",
-      "codeBlock": "import requests\n\n# Custom headers & authorization bearer token\nheaders = {\n    \"Authorization\": \"Bearer YOUR_TOKEN\",\n    \"Accept\": \"application/json\"\n}\nresp = requests.get(\"https://httpbin.org/headers\", headers=headers)\nprint(resp.status_code)           # 200 OK\nprint(resp.json()[\"headers\"].get(\"Authorization\"))\n\n# Set Timeout limit (in seconds)\nresp = requests.get(\"https://httpbin.org/delay/1\", timeout=10)\nprint(\"Timeout Test Status:\", resp.status_code)"
+      "codeBlock": "import requests\n\n# Custom headers\nheaders = {\n    \"Accept\": \"application/json\",\n    \"User-Agent\": \"Python-Quick-Bytes\"\n}\nresp = requests.get(\"https://northwind.vercel.app/api/products\", headers=headers)\nprint(\"Request Status with custom headers:\", resp.status_code) # 200 OK\n\n# Set Timeout limit (in seconds)\ntry:\n    resp = requests.get(\"https://northwind.vercel.app/api/customers\", timeout=5)\n    print(\"Total Customers Fetched:\", len(resp.json()))\nexcept requests.exceptions.Timeout:\n    print(\"Request timed out\")"
     },
     {
       "title": "HTTP Error Handling",
       "description": "Use raise_for_status() to automatically raise HTTPError exceptions on 4xx/5xx status codes, and catch errors using try/except blocks.",
-      "codeBlock": "import requests\n\ntry:\n    # Using httpbin.org to trigger a safe 404 response\n    resp = requests.get(\"https://httpbin.org/status/404\", timeout=5)\n    resp.raise_for_status()       # Raises HTTPError if status is 4xx/5xx\n    data = resp.json()\nexcept requests.exceptions.Timeout:\n    print(\"Request timed out\")\nexcept requests.exceptions.HTTPError as e:\n    print(f\"HTTP error occurred (expected): {e}\")\nexcept requests.exceptions.RequestException as e:\n    print(f\"Ambiguous request failed: {e}\")"
+      "codeBlock": "import requests\n\ntry:\n    # Attempt to fetch a non-existent category ID (99999) from Northwind API\n    resp = requests.get(\"https://northwind.vercel.app/api/categories/99999\", timeout=5)\n    resp.raise_for_status()       # Raises HTTPError if status is 4xx/5xx\n    data = resp.json()\nexcept requests.exceptions.Timeout:\n    print(\"Request timed out\")\nexcept requests.exceptions.HTTPError as e:\n    print(f\"HTTP error occurred (expected): {e}\")\nexcept requests.exceptions.RequestException as e:\n    print(f\"Ambiguous request failed: {e}\")"
     },
     {
       "title": "XML Parsing (ElementTree)",
