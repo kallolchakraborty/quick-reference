@@ -172,6 +172,36 @@ function setupOutlineSmoothScroll() {
   });
 }
 
+// Sidebar toggle: click handler for expand/collapse
+document.addEventListener('click', function(e) {
+  var toggle = e.target.closest('.sidebar-toggle');
+  if (!toggle) return;
+
+  var group = toggle.closest('.sidebar-group');
+  if (!group) return;
+  var collapse = group.querySelector('.sidebar-collapse');
+  var chevron = group.querySelector('.sidebar-chevron');
+  var expanded = toggle.getAttribute('aria-expanded') === 'true';
+
+  // Close sibling groups
+  var sibling = group.parentElement;
+  if (sibling) {
+    sibling.querySelectorAll('.sidebar-group .sidebar-toggle[aria-expanded="true"]').forEach(function(other) {
+      if (other !== toggle) {
+        other.setAttribute('aria-expanded', 'false');
+        var otherCollapse = other.closest('.sidebar-group').querySelector('.sidebar-collapse');
+        var otherChevron = other.closest('.sidebar-group').querySelector('.sidebar-chevron');
+        if (otherCollapse) otherCollapse.style.maxHeight = '0';
+        if (otherChevron) otherChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+
+  toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  if (collapse) collapse.style.maxHeight = expanded ? '0' : collapse.scrollHeight + 'px';
+  if (chevron) chevron.style.transform = expanded ? 'rotate(0deg)' : 'rotate(90deg)';
+});
+
 function openActiveSidebarSection() {
   const active = document.querySelector('.sidebar-link.active-doc-link');
   if (!active) return;
