@@ -5,6 +5,32 @@
   "subcategory": "Basics",
   "description": "Reading user input, printing output, string formatting techniques (f-strings, .format(), %-formatting), and the print function's advanced options.",
   "language": "python",
-  "codeBlock": "# print — basic output\nprint(\"Hello, World!\")\n\n# Multiple arguments (space-separated)\nprint(\"The answer is\", 42)\n\n# Custom separator and end\nprint(\"a\", \"b\", \"c\", sep=\", \", end=\"!\\n\")\n# a, b, c!\n\n# print to file\nwith open(\"log.txt\", \"w\") as f:\n    print(\"[ERROR] something broke\", file=f)\n\n# input — always returns str\nname = input(\"Enter your name: \")\nage = int(input(\"Enter your age: \"))\n\n# f-strings (Python 3.6+, preferred)\nname = \"Alice\"\nage = 30\nprint(f\"{name} is {age} years old\")\nprint(f\"{2 * 3 + 1}\")               # \"7\" — expressions\n\n# Format specifiers\npi = 3.14159\nf\"{pi:.2f}\"                       # \"3.14\"\nf\"{1000000:,}\"                     # \"1,000,000\"\nf\"{42:08b}\"                        # \"00101010\" binary\nf\"{name:>10}\"                      # \"     Alice\" right-align\nf\"{name:<10}\"                      # \"Alice     \" left-align\nf\"{name:^10}\"                      # \"  Alice   \" center\nf\"{name!r}\"                        # \"'Alice'\" repr\n\n# .format() method (older)\n\"{} is {} years old\".format(name, age)\n\"{n} is {a} years old\".format(n=name, a=age)\n\"{0} is {1} years old\".format(name, age)\n\n# %-formatting (oldest, C-style)\n\"%s is %d years old\" % (name, age)\n\"pi = %.2f\" % pi",
+  "sections": [
+    {
+      "title": "Basic Output (print)",
+      "description": "Print outputs values. You can customize separators, end characters, and redirect print outputs directly to files.",
+      "codeBlock": "# Simple console print\nprint(\"Hello, World!\")\n\n# Printing multiple values (space-separated by default)\nprint(\"The answer is\", 42)\n\n# Custom separator and custom end character\nprint(\"a\", \"b\", \"c\", sep=\", \", end=\"!\\n\") # a, b, c!\n\n# Redirect output to file\nwith open(\"log.txt\", \"w\") as f:\n    print(\"[ERROR] something broke\", file=f)"
+    },
+    {
+      "title": "User Input (input)",
+      "description": "The input function halts execution and reads a line from the user. It always returns a string, which can be explicitly type-cast.",
+      "codeBlock": "# Read string input\nname = input(\"Enter your name: \")\n\n# Read numeric input and cast it\nage = int(input(\"Enter your age: \"))"
+    },
+    {
+      "title": "Formatted Output (f-strings)",
+      "description": "F-strings provide a readable and efficient way to embed expressions inside string literals using curly braces.",
+      "codeBlock": "name = \"Alice\"\nage = 30\n\n# Basic f-string interpolation\nprint(f\"{name} is {age} years old\")\n\n# Evaluating expressions at runtime\nprint(f\"{2 * 3 + 1}\") # \"7\""
+    },
+    {
+      "title": "Format Specifiers",
+      "description": "F-strings support a robust mini-language for aligning text, specifying numeric precision, showing binary conversions, and formatting large numbers.",
+      "codeBlock": "pi = 3.14159\nlarge_num = 1000000\nname = \"Alice\"\n\n# Floating-point precision\nprint(f\"{pi:.2f}\") # \"3.14\"\n\n# Thousands separator\nprint(f\"{large_num:,}\") # \"1,000,000\"\n\n# Integer to binary formatting\nprint(f\"{42:08b}\") # \"00101010\"\n\n# Alignment and Padding\nprint(f\"{name:>10}\") # \"     Alice\" (right align)\nprint(f\"{name:<10}\") # \"Alice     \" (left align)\nprint(f\"{name:^10}\") # \"  Alice   \" (center align)\n\n# Debug representation (repr)\nprint(f\"{name!r}\") # \"'Alice'\""
+    },
+    {
+      "title": "Legacy Formatting (.format & %)",
+      "description": "Older versions of Python use the .format() string method and C-style % modulo operator. Avoid using these in new codebases.",
+      "codeBlock": "name = \"Alice\"\nage = 30\npi = 3.14159\n\n# positional and keyword .format() formatting\nfmt1 = \"{} is {} years old\".format(name, age)\nfmt2 = \"{n} is {a} years old\".format(n=name, a=age)\n\n# C-style modulo formatting\nfmt_legacy = \"%s is %d years old\" % (name, age)\nfmt_float = \"pi = %.2f\" % pi"
+    }
+  ],
   "details": "<p class=\"mb-3\">The <code>print()</code> function is Python's primary output mechanism. By default it appends a newline and separates arguments with a space, but both are customizable via the <code>sep</code> and <code>end</code> keyword arguments. The <code>file</code> argument redirects output to any object with a <code>.write()</code> method — commonly a file handle, but also <code>sys.stdout</code>, <code>sys.stderr</code>, or <code>io.StringIO</code> buffers.</p>\n\n<p class=\"mb-3\">The <code>input()</code> function reads a line from standard input, always returning a string. Convert to the desired type explicitly (<code>int()</code>, <code>float()</code>) — a non-numeric input raises <code>ValueError</code>, so wrap in <code>try</code>/<code>except</code> for robust programs. There is no built-in <code>input_int()</code> in Python; the pattern <code>int(input(...))</code> is idiomatic.</p>\n\n<p class=\"mb-3\"><a href=\"https://peps.python.org/pep-0498/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 transition-colors\">F-strings (PEP 498)</a> are the modern and preferred string formatting approach. They evaluate arbitrary Python expressions at runtime, support format specifiers (precision, alignment, type coercion, grouping), and are generally faster than both <code>.format()</code> and <code>%-formatting</code>. Inside f-strings, use <code>!</code> to apply <code>repr()</code>, <code>str()</code>, or <code>ascii()</code> conversion.</p>\n\n<p class=\"mb-3\">The older <code>str.format()</code> method (Python 2.6+) supports positional and keyword arguments with the same format specifier mini-language. The <code>%</code> operator (C <code>printf</code>-style) is the oldest approach, still found in legacy codebases but avoided in new code. The <code>string</code> module's <code>Formatter</code> class provides programmatic access to the formatting logic.</p>\n\n<p class=\"mb-3\">For the full formatting mini-language specification, see <a href=\"https://docs.python.org/3/library/string.html#formatspec\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 transition-colors\">Format Specification Mini-Language</a> and the <a href=\"https://docs.python.org/3/library/functions.html#print\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-brand-500 hover:text-brand-600 transition-colors\">print() documentation</a>.</p>"
 }
