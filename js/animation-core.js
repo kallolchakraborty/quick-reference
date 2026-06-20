@@ -135,7 +135,20 @@ function initAnimationPlayer(config) {
     }
     state.currentStep = stepIndex;
     renderStepDots();
+
+    // Dynamically update subtitle if stepSubtitles exists
+    if (el.subtitle && data && data[state.currentScene - 1] && data[state.currentScene - 1].stepSubtitles) {
+      var subs = data[state.currentScene - 1].stepSubtitles;
+      if (subs[stepIndex]) {
+        el.subtitle.style.opacity = '0';
+        setTimeout(function() {
+          el.subtitle.textContent = subs[stepIndex];
+          el.subtitle.style.opacity = '1';
+        }, 150);
+      }
+    }
   }
+
 
   state.setSteps = function(steps) {
     state.steps = steps || [];

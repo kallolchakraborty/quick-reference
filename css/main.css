@@ -309,6 +309,7 @@ html.dark .timeline-event {
 .token.none { color: #E95420; }
 pre[class*="language-"] {
   background: #f8fafc !important;
+  color: #374151 !important;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
   padding: 1.25rem !important;
@@ -318,6 +319,7 @@ pre[class*="language-"] {
 }
 html.dark pre[class*="language-"] {
   background: #0E1115 !important;
+  color: #e2e8f0 !important;
   border-color: rgba(255, 255, 255, 0.05);
 }
 #section-syntax pre[class*="language-"] {
