@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Python Concurrency Visualizer — Interactive Guide</title>
+  <title>Concurrency & Multithreading Visualizer — Interactive Guide</title>
   <meta name="description" content="An interactive visual guide comparing Synchronous, Multithreading, Asynchronous, and Multiprocessing models in Python." />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <script src="js/theme.js"></script>
@@ -13,11 +13,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
   <style>
-    body { background-color: #F8F9FA; color: #374151; }
-    .loop-spin { animation: spin 4s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .code-line { transition: background-color 0.3s ease; padding: 0.125rem 0.25rem; border-radius: 0.25rem; }
-    .code-line-active { background-color: rgba(233, 84, 32, 0.25); color: #FFB454 !important; font-weight: 500; }
+    body { background-color: #F8F9FA; color: #374151; font-family: 'Ubuntu', sans-serif; }
+    html.dark body { background-color: #0E1115; color: #E2E8F0; }
+    
+    .ease-physics { transition-all: cubic-bezier(0.25, 1, 0.5, 1); }
+    .spring-effect { transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    /* Custom Animations */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(233, 84, 32, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(233, 84, 32, 0.6); }
+    }
+    .pulse-glow-orange { animation: pulse-glow 2s infinite ease-in-out; }
+
+    @keyframes pulse-glow-blue {
+      0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+    }
+    .pulse-glow-blue { animation: pulse-glow-blue 2s infinite ease-in-out; }
+
+    @keyframes pulse-glow-green {
+      0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+    }
+    .pulse-glow-green { animation: pulse-glow-green 2s infinite ease-in-out; }
+
+    @keyframes spin-slow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spin-slow { animation: spin-slow 8s linear infinite; }
+
+    /* Timeline scrubber custom handles */
+    input[type="range"]::-webkit-slider-thumb {
+      background-color: #E95420;
+      border: 2px solid #FFFFFF;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -42,224 +78,319 @@
   </header>
 
   <!-- ==================== MAIN VIEWPORT ==================== -->
-  <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-6 md:py-10 max-w-6xl w-full mx-auto scene-container">
+  <main id="main-content" class="flex-grow flex flex-col items-center justify-center px-6 py-4 md:py-8 max-w-5xl w-full mx-auto scene-container">
 
     <!-- Central Sandbox/Canvas Screen -->
-    <div id="fullscreen-canvas" class="w-full aspect-auto min-h-[500px] md:aspect-[16/9] md:min-h-0 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-3 relative overflow-hidden flex items-center justify-center">
-
-      <!-- ==================== SCENE 1: TITLE SCREEN ==================== -->
-      <div id="vis-scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-all duration-1000">
-        <div class="relative py-4 px-6 flex flex-col items-center gap-4">
-          <svg class="w-40 h-6" viewBox="0 0 160 24" fill="none">
-            <path d="M0 12 H60 M100 12 H160" stroke="#E95420" stroke-width="1.5" />
-            <circle cx="80" cy="12" r="3" fill="#E95420" />
-            <circle cx="80" cy="12" r="8" stroke="#E95420" stroke-width="0.75" fill="none" opacity="0.3" />
-          </svg>
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-ink dark:text-gray-100">Python Concurrency Models</h1>
-          <span class="text-xs font-mono text-orange-600 dark:text-orange-400 tracking-widest uppercase">Quick Bytes Interactive Visualizer</span>
-        </div>
-      </div>
-
-      <!-- ==================== SCENE 2: SYNCHRONOUS EXECUTION ==================== -->
-      <div id="vis-scene-2" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000 transform translate-x-10">
-        <!-- Code Column -->
-        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
-          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
-            <span>sync.py</span>
+    <div id="fullscreen-canvas" class="w-full aspect-auto min-h-[500px] md:aspect-[16/9] md:min-h-0 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-6 relative overflow-hidden flex flex-col items-center justify-center transition-colors duration-200">
+      
+      <!-- STEP 1: Thread Spawning -->
+      <div id="scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-6 w-full max-w-xl">
+          <!-- Main Process container -->
+          <div class="bg-orange-500/10 border-2 border-orange-500 px-6 py-4 rounded-2xl text-center w-60 pulse-glow-orange transition-all duration-500">
+            <span class="font-mono font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400">Main Process (PID 1024)</span>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Main executing unit</p>
           </div>
-          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="sync-code" class="block"><div class="code-line" data-line="0">def task1():</div><div class="code-line" data-line="1">    compute()  # blocks thread</div><div class="code-line" data-line="2"></div><div class="code-line" data-line="3">def task2():</div><div class="code-line" data-line="4">    write_file()</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">task1()</div><div class="code-line" data-line="7">task2()</div></code></pre>
-        </div>
-        <!-- Animation Column -->
-        <div class="flex flex-col items-center justify-center gap-4">
-          <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg text-xs font-mono">
-            <span class="w-3 h-3 rounded-full bg-orange-600"></span>
-            <span class="text-inkLight dark:text-gray-300">Single Thread Context</span>
-          </div>
-          <div class="flex flex-col gap-3 w-64">
-            <!-- Task 1 block -->
-            <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task1">
-              <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 1 (Calculate)</div>
-              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-                <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task1-progress"></div>
-              </div>
+          
+          <!-- Spawning lanes / threads -->
+          <div class="flex justify-between w-full mt-4 gap-4">
+            <div id="s1-t1" class="flex-1 bg-blue-500/10 border border-blue-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700 delay-100">
+              <span class="font-bold text-xs text-blue-600 dark:text-blue-400 font-mono">Thread-1</span>
+              <div class="w-2 h-2 rounded-full bg-blue-500 mx-auto mt-2 animate-ping"></div>
             </div>
-            <!-- Task 2 block -->
-            <div class="bg-white dark:bg-[#1A1D25] border-2 border-gray-200 dark:border-gray-700 p-4 rounded-xl text-left relative overflow-hidden transition-all duration-500" id="sync-task2">
-              <div class="font-bold text-xs uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">Task 2 (Write File)</div>
-              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-                <div class="h-full bg-orange-500 w-0 transition-all duration-700" id="sync-task2-progress"></div>
-              </div>
+            <div id="s1-t2" class="flex-1 bg-green-500/10 border border-green-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700 delay-300">
+              <span class="font-bold text-xs text-green-600 dark:text-green-400 font-mono">Thread-2</span>
+              <div class="w-2 h-2 rounded-full bg-green-500 mx-auto mt-2 animate-ping"></div>
+            </div>
+            <div id="s1-t3" class="flex-1 bg-purple-500/10 border border-purple-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700 delay-500">
+              <span class="font-bold text-xs text-purple-600 dark:text-purple-400 font-mono">Thread-3</span>
+              <div class="w-2 h-2 rounded-full bg-purple-500 mx-auto mt-2 animate-ping"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SCENE 3: MULTITHREADING ==================== -->
-      <div id="vis-scene-3" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
-        <!-- Code Column -->
-        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
-          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
-            <span>threading_run.py</span>
+      <!-- STEP 2: Task Execution Timeline -->
+      <div id="scene-2" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="grid grid-cols-3 gap-6 w-full max-w-3xl">
+          <!-- Shared Queue -->
+          <div class="col-span-1 border border-gray-200 dark:border-gray-800 rounded-xl p-4 bg-slate-50 dark:bg-slate-900/40 text-left">
+            <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Shared Task Queue</span>
+            <div class="flex flex-col gap-2 mt-3">
+              <div id="s2-q1" class="bg-blue-500/20 border border-blue-400 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-500">Task A</div>
+              <div id="s2-q2" class="bg-green-500/20 border border-green-400 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-500">Task B</div>
+              <div id="s2-q3" class="bg-purple-500/20 border border-purple-400 text-purple-700 dark:text-purple-300 px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-500">Task C</div>
+            </div>
           </div>
-          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="thread-code" class="block"><div class="code-line" data-line="0">import threading</div><div class="code-line" data-line="1"></div><div class="code-line" data-line="2"># Runs concurrently on one GIL</div><div class="code-line" data-line="3">t1 = threading.Thread(target=task1)</div><div class="code-line" data-line="4">t2 = threading.Thread(target=task2)</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">t1.start()</div><div class="code-line" data-line="7">t2.start()</div></code></pre>
-        </div>
-        <!-- Animation Column -->
-        <div class="flex flex-col items-center justify-center gap-4">
-          <div class="flex items-center gap-6">
-            <div class="flex flex-col items-center gap-2">
-              <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Core 1 (CPU)</span>
-              <div class="w-16 h-16 rounded-2xl border-2 border-orange-600 dark:border-orange-400 flex items-center justify-center relative bg-orange-500/5">
-                <span class="material-symbols-outlined text-orange-600 dark:text-orange-400 text-3xl">developer_board</span>
-                <div class="absolute -top-1.5 -right-1.5 bg-orange-600 text-white text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border border-orange-700" id="t-gil-badge">GIL</div>
+          <!-- Thread Execution Lanes -->
+          <div class="col-span-2 flex flex-col gap-3 justify-center">
+            <!-- Lane 1 -->
+            <div class="flex items-center gap-3 border border-gray-200 dark:border-gray-800 p-3 rounded-xl bg-white dark:bg-slate-900/20">
+              <span class="w-16 font-mono font-bold text-xs text-blue-500">Thread-1</span>
+              <div class="flex-grow h-6 bg-slate-100 dark:bg-slate-800 rounded-lg relative overflow-hidden flex items-center px-3">
+                <div id="s2-lane-1-task" class="absolute inset-y-0 left-0 bg-blue-500/20 w-0 transition-all duration-1000 flex items-center px-3 font-mono text-[10px] text-blue-600 dark:text-blue-300">Task A Running</div>
               </div>
             </div>
-
-            <div class="flex flex-col gap-3 w-48">
-              <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-a">
-                <span class="font-bold font-mono text-[#B38CFF]">Thread A</span>
-                <span class="material-symbols-outlined text-[#B38CFF] text-base" id="t-thread-a-state">pause_circle</span>
+            <!-- Lane 2 -->
+            <div class="flex items-center gap-3 border border-gray-200 dark:border-gray-800 p-3 rounded-xl bg-white dark:bg-slate-900/20">
+              <span class="w-16 font-mono font-bold text-xs text-green-500">Thread-2</span>
+              <div class="flex-grow h-6 bg-slate-100 dark:bg-slate-800 rounded-lg relative overflow-hidden flex items-center px-3">
+                <div id="s2-lane-2-task" class="absolute inset-y-0 left-0 bg-green-500/20 w-0 transition-all duration-1000 flex items-center px-3 font-mono text-[10px] text-green-600 dark:text-green-300">Task B Running</div>
               </div>
-              <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg flex items-center justify-between text-xs transition-all duration-500" id="t-thread-b">
-                <span class="font-bold font-mono text-[#57D38C]">Thread B</span>
-                <span class="material-symbols-outlined text-[#57D38C] text-base" id="t-thread-b-state">pause_circle</span>
+            </div>
+            <!-- Lane 3 -->
+            <div class="flex items-center gap-3 border border-gray-200 dark:border-gray-800 p-3 rounded-xl bg-white dark:bg-slate-900/20">
+              <span class="w-16 font-mono font-bold text-xs text-purple-500">Thread-3</span>
+              <div class="flex-grow h-6 bg-slate-100 dark:bg-slate-800 rounded-lg relative overflow-hidden flex items-center px-3">
+                <div id="s2-lane-3-task" class="absolute inset-y-0 left-0 bg-purple-500/20 w-0 transition-all duration-1000 flex items-center px-3 font-mono text-[10px] text-purple-600 dark:text-purple-300">Task C Running</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SCENE 4: ASYNCHRONOUS ==================== -->
-      <div id="vis-scene-4" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
-        <!-- Code Column -->
-        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
-          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
-            <span>async_loop.py</span>
-          </div>
-          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="async-code" class="block"><div class="code-line" data-line="0">async def task():</div><div class="code-line" data-line="1">    await asyncio.sleep(1) # yields</div><div class="code-line" data-line="2"></div><div class="code-line" data-line="3">async def main():</div><div class="code-line" data-line="4">    await asyncio.gather(</div><div class="code-line" data-line="5">        task(), task()</div><div class="code-line" data-line="6">    )</div></code></pre>
-        </div>
-        <!-- Animation Column -->
-        <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-          <!-- Event loop cycle -->
+      <!-- STEP 3: Context Switching -->
+      <div id="scene-3" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-12 w-full max-w-3xl">
+          <!-- CPU Pointer block -->
           <div class="flex flex-col items-center gap-2">
-            <span class="text-xs font-mono font-bold text-inkLight dark:text-gray-300">Event Loop</span>
-            <div class="w-16 h-16 rounded-full border-4 border-dashed border-orange-500 flex items-center justify-center loop-spin" id="async-loop-wheel">
-              <span class="material-symbols-outlined text-orange-500 text-2xl">sync</span>
+            <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">OS CPU Scheduler</span>
+            <div class="w-20 h-20 rounded-2xl bg-orange-600 text-white flex flex-col items-center justify-center relative shadow-lg shadow-orange-500/20">
+              <span class="material-symbols-outlined text-3xl">memory</span>
+              <span class="text-[9px] font-mono font-bold mt-1">CPU CORE</span>
+              <!-- Pointer Arrow -->
+              <div id="s3-arrow" class="absolute -right-4 top-1/2 -translate-y-1/2 text-orange-600 transition-all duration-500 transform rotate-0">
+                <span class="material-symbols-outlined text-2xl font-bold">arrow_right_alt</span>
+              </div>
             </div>
           </div>
 
-          <div class="flex flex-col gap-3 w-48 font-mono text-xs text-left">
-            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg relative overflow-hidden" id="async-task1">
-              <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
-                <span>task_one()</span>
-                <span id="async-t1-status">pending</span>
-              </div>
-              <div class="text-[9px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
+          <!-- Active status lane cards -->
+          <div class="flex flex-col gap-3 w-64">
+            <div id="s3-t1" class="border p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30 transition-all duration-300">
+              <span class="font-bold text-xs text-blue-500 font-mono">Thread-1</span>
+              <span id="s3-t1-status" class="px-2.5 py-0.5 rounded font-mono text-[9px] font-bold">Sleeping</span>
             </div>
-            <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg relative overflow-hidden" id="async-task2">
-              <div class="flex justify-between font-bold text-orange-600 dark:text-orange-400">
-                <span>task_two()</span>
-                <span id="async-t2-status">pending</span>
-              </div>
-              <div class="text-[9px] text-inkMuted dark:text-gray-400 mt-1">await asyncio.sleep()</div>
+            <div id="s3-t2" class="border p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30 transition-all duration-300">
+              <span class="font-bold text-xs text-green-500 font-mono">Thread-2</span>
+              <span id="s3-t2-status" class="px-2.5 py-0.5 rounded font-mono text-[9px] font-bold">Sleeping</span>
+            </div>
+            <div id="s3-t3" class="border p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30 transition-all duration-300">
+              <span class="font-bold text-xs text-purple-500 font-mono">Thread-3</span>
+              <span id="s3-t3-status" class="px-2.5 py-0.5 rounded font-mono text-[9px] font-bold">Sleeping</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SCENE 5: MULTIPROCESSING ==================== -->
-      <div id="vis-scene-5" class="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 opacity-0 pointer-events-none transition-all duration-1000">
-        <!-- Code Column -->
-        <div class="bg-[#0E1115] text-[#e2e8f0] border border-gray-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-full font-mono text-[10px] sm:text-xs text-left">
-          <div class="bg-[#1A1D25] px-4 py-1.5 border-b border-gray-800 flex items-center justify-between text-[9px] uppercase tracking-wider text-orange-400">
-            <span>multi_process.py</span>
-          </div>
-          <pre class="p-4 overflow-x-auto leading-relaxed flex-grow font-mono text-[#b5ced2]"><code id="mp-code" class="block"><div class="code-line" data-line="0">import multiprocessing</div><div class="code-line" data-line="1"></div><div class="code-line" data-line="2"># Bypasses the GIL entirely</div><div class="code-line" data-line="3">p1 = multiprocessing.Process(target=compute)</div><div class="code-line" data-line="4">p2 = multiprocessing.Process(target=compute)</div><div class="code-line" data-line="5"></div><div class="code-line" data-line="6">p1.start()</div><div class="code-line" data-line="7">p2.start()</div></code></pre>
+      <!-- STEP 4: GIL (Global Interpreter Lock) -->
+      <div id="scene-4" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <!-- GIL Lock Badge -->
+        <div id="s4-gil-lock" class="flex items-center gap-2 px-4 py-2 border-2 border-red-500 bg-red-500/10 rounded-xl transition-all duration-500">
+          <span class="material-symbols-outlined text-red-500 text-lg">lock</span>
+          <span class="font-mono font-bold text-xs uppercase tracking-wider text-red-600 dark:text-red-400">Global Interpreter Lock (GIL)</span>
         </div>
-        <!-- Animation Column -->
-        <div class="flex flex-col items-center justify-center gap-3">
-          <div class="flex gap-4">
-            <div class="flex flex-col items-center gap-2.5 p-3 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-36 transition-all duration-700" id="mp-proc-a">
-              <span class="text-[10px] font-mono font-bold text-orange-600 dark:text-orange-400">Process A (Core 1)</span>
-              <div class="w-10 h-10 rounded-xl accent-node-fill flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">memory</span>
-              </div>
-              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
-                <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-a-progress"></div>
-              </div>
-              <span class="text-[8px] font-mono text-inkMuted dark:text-gray-500" id="mp-a-label">Waiting</span>
-            </div>
 
-            <div class="flex flex-col items-center gap-2.5 p-3 bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl w-36 transition-all duration-700" id="mp-proc-b">
-              <span class="text-[10px] font-mono font-bold text-orange-600 dark:text-orange-400">Process B (Core 2)</span>
-              <div class="w-10 h-10 rounded-xl accent-node-fill flex items-center justify-center">
-                <span class="material-symbols-outlined text-white text-lg">memory</span>
+        <div class="flex justify-around w-full max-w-2xl mt-4 gap-4">
+          <!-- Thread-1 -->
+          <div id="s4-t1" class="flex-1 border p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300">
+            <span class="font-mono font-bold text-xs text-blue-500">Thread-1</span>
+            <div id="s4-t1-status" class="text-[9px] font-mono mt-2 font-bold text-slate-400">WAITING FOR GIL</div>
+          </div>
+          <!-- Thread-2 -->
+          <div id="s4-t2" class="flex-1 border p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300">
+            <span class="font-mono font-bold text-xs text-green-500">Thread-2</span>
+            <div id="s4-t2-status" class="text-[9px] font-mono mt-2 font-bold text-slate-400">WAITING FOR GIL</div>
+          </div>
+          <!-- Thread-3 -->
+          <div id="s4-t3" class="flex-1 border p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300">
+            <span class="font-mono font-bold text-xs text-purple-500">Thread-3</span>
+            <div id="s4-t3-status" class="text-[9px] font-mono mt-2 font-bold text-slate-400">WAITING FOR GIL</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: I/O Bound Example -->
+      <div id="scene-5" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="grid grid-cols-3 gap-6 w-full max-w-3xl items-center">
+          <!-- Active Threads -->
+          <div class="col-span-2 flex flex-col gap-4">
+            <!-- Thread 1 (Waiting on Network) -->
+            <div class="flex items-center gap-3 border border-gray-200 dark:border-gray-800 p-3 rounded-xl bg-white dark:bg-slate-900/20 relative">
+              <span class="w-16 font-mono font-bold text-xs text-blue-500">Thread-1</span>
+              <div class="flex-grow flex items-center justify-between text-xs font-mono">
+                <span class="text-blue-600 dark:text-blue-400 animate-pulse">Waiting on API Response...</span>
+                <span class="material-symbols-outlined text-blue-500 animate-spin text-sm">hourglass_empty</span>
               </div>
-              <div class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
-                <div class="h-full bg-orange-600 w-0 transition-all duration-700" id="mp-b-progress"></div>
+              <!-- Packet flying -->
+              <div id="s5-packet" class="absolute right-[-40px] top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-[8px] transition-all duration-1000 opacity-0">📦</div>
+            </div>
+            <!-- Thread 2 (Executing while GIL is released) -->
+            <div class="flex items-center gap-3 border border-green-400 bg-green-500/5 p-3 rounded-xl relative">
+              <span class="w-16 font-mono font-bold text-xs text-green-500">Thread-2</span>
+              <div class="flex-grow flex items-center justify-between text-xs font-mono">
+                <span class="text-green-600 dark:text-green-400 font-bold">Executing CPU Tasks (GIL Active)</span>
+                <span class="material-symbols-outlined text-green-500 text-sm">lock_open</span>
               </div>
-              <span class="text-[8px] font-mono text-inkMuted dark:text-gray-500" id="mp-b-label">Waiting</span>
+            </div>
+          </div>
+
+          <!-- Remote Server -->
+          <div class="col-span-1 flex flex-col items-center gap-2 border border-gray-200 dark:border-gray-800 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40">
+            <span class="material-symbols-outlined text-3xl text-orange-500">cloud</span>
+            <span class="text-[10px] font-mono font-bold text-slate-500 uppercase">API SERVER</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: CPU Bound Example -->
+      <div id="scene-6" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-4 w-full max-w-2xl">
+          <div class="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-500 rounded-lg text-xs font-mono font-bold">
+            <span class="material-symbols-outlined text-xs">warning</span>
+            <span>GIL Contention Detected (Gears spinning, wait states frequent)</span>
+          </div>
+
+          <div class="flex justify-around w-full mt-2 gap-4">
+            <!-- Thread 1 -->
+            <div id="s6-t1" class="flex-1 border p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300">
+              <span class="font-mono font-bold text-xs text-blue-500">Thread-1</span>
+              <div class="flex justify-center my-3">
+                <span id="s6-gear-1" class="material-symbols-outlined text-2xl text-blue-500 transition-transform duration-1000">settings</span>
+              </div>
+              <div id="s6-t1-status" class="text-[9px] font-mono font-bold uppercase">Executing</div>
+            </div>
+            <!-- Thread 2 -->
+            <div id="s6-t2" class="flex-1 border p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300">
+              <span class="font-mono font-bold text-xs text-green-500">Thread-2</span>
+              <div class="flex justify-center my-3">
+                <span id="s6-gear-2" class="material-symbols-outlined text-2xl text-green-500 transition-transform duration-1000">settings</span>
+              </div>
+              <div id="s6-t2-status" class="text-[9px] font-mono font-bold uppercase">Blocked</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SCENE 6: SUMMARY ==================== -->
-      <div id="vis-scene-6" class="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 pointer-events-none transition-all duration-1000">
-        <div class="flex flex-wrap justify-center gap-3 px-4 max-w-3xl">
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl p-3 w-40 text-center opacity-0 translate-y-4 transition-all duration-700" id="s6-card-1">
-            <span class="text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">Synchronous</span>
-            <p class="text-[9px] text-inkMuted dark:text-gray-400 mt-2">Single thread, linear run. Straightforward but blocking.</p>
+      <!-- STEP 7: Multiprocessing -->
+      <div id="scene-7" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="grid grid-cols-2 gap-8 w-full max-w-3xl">
+          <!-- Process 1 -->
+          <div class="border-2 border-blue-500 bg-blue-500/5 rounded-2xl p-4 text-center flex flex-col items-center gap-3">
+            <span class="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">Process-1 (Core 1)</span>
+            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 animate-spin">
+              <span class="material-symbols-outlined text-xl">settings</span>
+            </div>
+            <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
+              <div id="s7-p1-progress" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
+            </div>
+            <span class="text-[9px] font-mono text-blue-500 font-bold uppercase">Executing (GIL 1 Active)</span>
           </div>
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl p-3 w-40 text-center opacity-0 translate-y-4 transition-all duration-700" id="s6-card-2">
-            <span class="text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">Threading</span>
-            <p class="text-[9px] text-inkMuted dark:text-gray-400 mt-2">Shared memory. Perfect for I/O bounds. GIL blocks parallelism.</p>
+
+          <!-- Process 2 -->
+          <div class="border-2 border-green-500 bg-green-500/5 rounded-2xl p-4 text-center flex flex-col items-center gap-3">
+            <span class="text-xs font-mono font-bold text-green-600 dark:text-green-400">Process-2 (Core 2)</span>
+            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 animate-spin">
+              <span class="material-symbols-outlined text-xl">settings</span>
+            </div>
+            <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mt-1">
+              <div id="s7-p2-progress" class="h-full bg-green-500 w-0 transition-all duration-1000"></div>
+            </div>
+            <span class="text-[9px] font-mono text-green-500 font-bold uppercase">Executing (GIL 2 Active)</span>
           </div>
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl p-3 w-40 text-center opacity-0 translate-y-4 transition-all duration-700" id="s6-card-3">
-            <span class="text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">Asyncio</span>
-            <p class="text-[9px] text-inkMuted dark:text-gray-400 mt-2">Event loop cooperative yielding. Scalable networking.</p>
-          </div>
-          <div class="bg-white dark:bg-[#1A1D25] border border-gray-200 dark:border-gray-700 rounded-xl p-3 w-40 text-center opacity-0 translate-y-4 transition-all duration-700" id="s6-card-4">
-            <span class="text-orange-600 dark:text-orange-400 text-xs font-mono font-bold">Multiprocess</span>
-            <p class="text-[9px] text-inkMuted dark:text-gray-400 mt-2">Spawns independent GILs. Leverages multiple cores in parallel.</p>
-          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8: Summary Matrix -->
+      <div id="scene-8" class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="w-full max-w-3xl overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse border border-slate-200 dark:border-slate-800">
+            <thead>
+              <tr class="bg-slate-100 dark:bg-slate-900/60 font-bold font-mono">
+                <th class="border border-slate-200 dark:border-slate-800 p-2.5">Model</th>
+                <th class="border border-slate-200 dark:border-slate-800 p-2.5">Concurrency Type</th>
+                <th class="border border-slate-200 dark:border-slate-800 p-2.5">GIL Restriction</th>
+                <th class="border border-slate-200 dark:border-slate-800 p-2.5">Ideal For</th>
+              </tr>
+            </thead>
+            <tbody class="font-mono">
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/20">
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 font-bold text-orange-600">Synchronous</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-slate-500">None (Sequential)</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-slate-500">No</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5">Simple scripts, no execution block concerns</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/20">
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 font-bold text-blue-500">Threading</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-blue-600">Preemptive Context Switch</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-red-500">Yes (CPython restricted)</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5">I/O bound apps, scraping, socket listening</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/20">
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 font-bold text-green-500">Asyncio</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-green-600">Cooperative Event Loop</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-slate-500">No (Single-Threaded)</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5">High concurrent network connections, chat API</td>
+              </tr>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/20">
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 font-bold text-purple-500">Multiprocess</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-purple-600">Parallel Execution</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5 text-green-500">No (Multiple GILs)</td>
+                <td class="border border-slate-200 dark:border-slate-800 p-2.5">CPU bound tasks, matrix math, raw computations</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
     </div>
 
-    <!-- Controls -->
-    <div class="w-full mt-6 space-y-3" id="controls-wrapper">
-      <div class="w-full cursor-pointer py-1" id="timeline-bar">
-        <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full relative overflow-hidden timeline-track">
-          <div class="absolute inset-y-0 left-0 bg-orange-600 dark:bg-orange-400 rounded-full w-0 transition-all duration-300" id="timeline-progress"></div>
-        </div>
+    <!-- Timeline Scrubber & Controller -->
+    <div class="w-full mt-6 space-y-4" id="controls-wrapper">
+      <!-- Scrubber track -->
+      <div class="flex items-center gap-3">
+        <input type="range" id="timeline-scrubber" min="0" max="7" value="0" class="flex-grow h-1 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-orange-600" />
+        <span id="progress-percent" class="text-xs font-mono font-bold text-orange-600">12%</span>
       </div>
 
+      <!-- Action buttons row -->
       <div class="flex items-center justify-between gap-3">
-        <!-- Title + player controls on the left -->
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button id="prev-btn" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Previous scene" title="Previous scene">
-              <span class="material-symbols-outlined text-lg">navigate_before</span>
-            </button>
-            <button id="play-btn" class="w-9 h-9 rounded-lg bg-orange-600 hover:bg-orange-700 dark:bg-orange-50 dark:hover:bg-orange-600 flex items-center justify-center text-white transition-all" aria-label="Play/Pause" title="Play/Pause">
-              <span class="material-symbols-outlined text-xl" id="play-icon">play_arrow</span>
-            </button>
-            <button id="next-btn" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all" aria-label="Next scene" title="Next scene">
-              <span class="material-symbols-outlined text-lg">navigate_next</span>
-            </button>
-          </div>
-          <!-- Scene subtitle inline with controls -->
-          <div class="min-w-0 flex flex-col justify-center">
-            <p id="scene-subtitle" class="text-[11px] text-inkMuted dark:text-gray-400 truncate transition-all duration-700 ease-physics opacity-0"></p>
-          </div>
+        <div class="flex items-center gap-1.5">
+          <button id="btn-prev" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all" aria-label="Previous step" title="Previous step">
+            <span class="material-symbols-outlined text-sm">navigate_before</span>
+          </button>
+          <button id="btn-play" class="w-8 h-8 rounded-lg bg-orange-600 text-white flex items-center justify-center hover:bg-orange-700 transition-all" aria-label="Play/Pause" title="Play/Pause">
+            <span class="material-symbols-outlined text-sm" id="icon-play">play_arrow</span>
+          </button>
+          <button id="btn-next" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all" aria-label="Next step" title="Next step">
+            <span class="material-symbols-outlined text-sm">navigate_next</span>
+          </button>
+          <button id="btn-replay" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all" aria-label="Replay" title="Replay">
+            <span class="material-symbols-outlined text-sm">replay</span>
+          </button>
         </div>
 
-        <button id="fullscreen-btn" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-all shrink-0" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
-          <span class="material-symbols-outlined text-lg">fullscreen</span>
-        </button>
+        <!-- Speed control and Fullscreen -->
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-mono font-bold text-slate-400 uppercase">Speed:</span>
+            <select id="select-speed" class="text-[10px] font-mono font-semibold bg-slate-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 text-slate-600 dark:text-slate-300 focus:outline-none">
+              <option value="2000">0.5x</option>
+              <option value="1200" selected>1.0x</option>
+              <option value="600">2.0x</option>
+            </select>
+          </div>
+          <button id="btn-fullscreen" class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-orange-500 transition-all" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
+            <span class="material-symbols-outlined text-sm">fullscreen</span>
+          </button>
+        </div>
       </div>
+    </div>
 
+    <!-- Explanation Panel -->
+    <div id="explanation-panel" class="w-full mt-6 bg-brand-50 border border-brand-100 dark:border-brand-500/20 dark:bg-slate-900/40 rounded-xl p-5 text-sm leading-relaxed transition-all duration-300">
+      <h3 id="step-title" class="font-bold text-slate-900 dark:text-white mb-2 text-base">Step 1 of 8: Spawning Threads</h3>
+      <p id="step-desc" class="text-slate-600 dark:text-slate-300">Description loading...</p>
     </div>
 
   </main>
@@ -275,294 +406,420 @@
     </div>
   </footer>
 
-  <!-- ==================== LOGIC & ANIMATIONS CONTROLLER ==================== -->
-  <script src="js/animation-core.js"></script>
+  <!-- ==================== CONTROLLER SCRIPT ==================== -->
   <script>
-    var data;
-
-    function snapWidth(el) {
-      if (!el) return;
-      el.style.transition = 'none';
-      el.style.width = '0%';
-      void el.offsetHeight;
-      el.style.transition = '';
-    }
-
-    function snapHidden(el) {
-      if (!el) return;
-      el.style.transition = 'none';
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(16px)';
-      void el.offsetHeight;
-      el.style.transition = '';
-    }
-
-    function revealEl(el) {
-      if (!el) return;
-      el.style.opacity = '1';
-      el.style.transform = 'translateY(0)';
-    }
-
-    function highlightLine(sceneId, lineIdx) {
-      var lines = document.querySelectorAll(sceneId + ' .code-line');
-      lines.forEach(function(l) {
-        l.classList.remove('code-line-active');
-      });
-      if (lineIdx !== null) {
-        var activeLine = document.querySelector(sceneId + ' [data-line="' + lineIdx + '"]');
-        if (activeLine) activeLine.classList.add('code-line-active');
+    // Step Definitions
+    const stepsData = [
+      {
+        title: "Spawning Threads",
+        subtitle: "Thread-1, Thread-2, and Thread-3 emerge from the main process.",
+        desc: "When a Python process starts, it launches a single thread. To achieve concurrent execution, we can spawn sub-threads (Thread-1, Thread-2, Thread-3) which inherit the same memory resources. Here we see them spinning up with pulse signals."
+      },
+      {
+        title: "Shared Task Queue",
+        subtitle: "Threads pull independent tasks from a central queue.",
+        desc: "Since threads share the same process memory space, they can share access to standard data structures. The threads pick up Task A, Task B, and Task C from the central Task Queue, feeding them into execution lanes."
+      },
+      {
+        title: "Context Switching",
+        subtitle: "The OS CPU Core rapidly rotates execution focus between threads.",
+        desc: "On a single CPU core, threads do not execute simultaneously. The Operating System scheduler performs context switching—rapidly saving and loading execution states so that only one thread runs at any microsecond slice, while others wait."
+      },
+      {
+        title: "Global Interpreter Lock (GIL)",
+        subtitle: "CPython restricts byte code execution to one thread at a time.",
+        desc: "CPython (the default implementation of Python) uses a Global Interpreter Lock (GIL) to protect thread memory access. Only one thread can acquire the lock and execute Python bytecode at a time, forcing other threads to queue up."
+      },
+      {
+        title: "I/O Bound Efficiency",
+        subtitle: "Threads release the GIL lock when blocking on I/O operations.",
+        desc: "When a thread is waiting for external I/O (such as standard database queries or network HTTP calls), it releases the GIL. This allows another thread to run immediately, dramatically increasing throughput for I/O-bound tasks."
+      },
+      {
+        title: "CPU Bound GIL Contention",
+        subtitle: "Heavy mathematical calculations compete constantly for the GIL.",
+        desc: "For CPU-bound tasks (calculations, mathematical operations), threads cannot yield control during wait states. They constantly compete for the GIL, resulting in high lock contention overhead and no execution speed benefits."
+      },
+      {
+        title: "Multiprocessing Parallelism",
+        subtitle: "Separate OS Processes run in parallel across separate CPU cores.",
+        desc: "To bypass the GIL and utilize multiple cores for CPU-heavy tasks, use Multiprocessing. Each process gets its own independent CPython interpreter and memory GIL, allowing true simultaneous execution on Cores 1 and 2."
+      },
+      {
+        title: "Concurrency Matrix Summary",
+        subtitle: "Review guidelines to choose between Threading, Asyncio, and Multiprocessing.",
+        desc: "Choose Threading/Asyncio for network I/O-bound workloads (web APIs, chat clients). Choose Multiprocessing for heavy math operations, data conversions, or multi-core parallel scaling."
       }
+    ];
+
+    let currentStep = 0;
+    let isPlaying = false;
+    let autoPlayTimer = null;
+
+    // Elements
+    const scrubber = document.getElementById("timeline-scrubber");
+    const progressPercent = document.getElementById("progress-percent");
+    const playBtn = document.getElementById("btn-play");
+    const playIcon = document.getElementById("icon-play");
+    const prevBtn = document.getElementById("btn-prev");
+    const nextBtn = document.getElementById("btn-next");
+    const replayBtn = document.getElementById("btn-replay");
+    const speedSelect = document.getElementById("select-speed");
+    const fullscreenBtn = document.getElementById("btn-fullscreen");
+    const canvas = document.getElementById("fullscreen-canvas");
+    const expTitle = document.getElementById("step-title");
+    const expDesc = document.getElementById("step-desc");
+
+    // Initialize from local storage if present
+    const persistedStep = localStorage.getItem("quick-bytes-concurrency-step");
+    if (persistedStep !== null) {
+      currentStep = parseInt(persistedStep, 10);
+      if (currentStep < 0 || currentStep > 7) currentStep = 0;
     }
 
-    function triggerSceneAnimation(index, state) {
-      if (index === 1) {
-        var h1 = document.querySelector('#vis-scene-1 h1');
-        var subtitle = document.querySelector('#vis-scene-1 span');
+    // Render Step Frame
+    function updateStepView() {
+      // Save current position
+      localStorage.setItem("quick-bytes-concurrency-step", currentStep);
+
+      // Hide all scenes
+      for (let i = 1; i <= 8; i++) {
+        const el = document.getElementById("scene-" + i);
+        if (el) {
+          el.classList.add("opacity-0", "pointer-events-none");
+        }
+      }
+
+      // Show active scene
+      const activeEl = document.getElementById("scene-" + (currentStep + 1));
+      if (activeEl) {
+        activeEl.classList.remove("opacity-0", "pointer-events-none");
+      }
+
+      // Update Controls
+      scrubber.value = currentStep;
+      progressPercent.textContent = Math.round((currentStep / 7) * 100) + "%";
+      expTitle.textContent = `Step ${currentStep + 1} of 8: ${stepsData[currentStep].title}`;
+      expDesc.innerHTML = `<span class="font-semibold block text-slate-800 dark:text-white text-xs mb-1.5">${stepsData[currentStep].subtitle}</span>` + stepsData[currentStep].desc;
+
+      // Auto scroll panel
+      document.getElementById("explanation-panel").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Reset specific scene animation variables
+      resetAnimations(currentStep);
+    }
+
+    function resetAnimations(step) {
+      if (step === 0) {
+        // Step 1: Thread Spawning
+        const t1 = document.getElementById("s1-t1");
+        const t2 = document.getElementById("s1-t2");
+        const t3 = document.getElementById("s1-t3");
         
-        [h1, subtitle].forEach(el => {
-          if (!el) return;
-          el.style.transition = 'none';
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(10px)';
-          void el.offsetHeight;
-          el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        });
+        t1.className = "flex-1 bg-blue-500/10 border border-blue-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700";
+        t2.className = "flex-1 bg-green-500/10 border border-green-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700";
+        t3.className = "flex-1 bg-purple-500/10 border border-purple-400 rounded-xl p-3 text-center opacity-0 translate-y-6 transition-all duration-700";
 
-        var steps = [];
-        steps.push(function() {
-          h1.style.opacity = '1';
-          h1.style.transform = 'translateY(0)';
-        });
-        steps.push(function() {
-          subtitle.style.opacity = '1';
-          subtitle.style.transform = 'translateY(0)';
-        });
-        steps.push(function() {});
-        state.setSteps(steps);
+        setTimeout(() => {
+          t1.className = "flex-1 bg-blue-500/10 border border-blue-400 rounded-xl p-3 text-center opacity-100 translate-y-0 transition-all duration-700 pulse-glow-blue";
+        }, 100);
+        setTimeout(() => {
+          t2.className = "flex-1 bg-green-500/10 border border-green-400 rounded-xl p-3 text-center opacity-100 translate-y-0 transition-all duration-700 pulse-glow-green";
+        }, 300);
+        setTimeout(() => {
+          t3.className = "flex-1 bg-purple-500/10 border border-purple-400 rounded-xl p-3 text-center opacity-100 translate-y-0 transition-all duration-700 pulse-glow-orange";
+        }, 500);
       }
 
-      else if (index === 2) {
-        var t1 = document.getElementById('sync-task1-progress');
-        var t2 = document.getElementById('sync-task2-progress');
-        var card1 = document.getElementById('sync-task1');
-        var card2 = document.getElementById('sync-task2');
+      else if (step === 1) {
+        // Step 2: Queue timeline animation
+        const l1 = document.getElementById("s2-lane-1-task");
+        const l2 = document.getElementById("s2-lane-2-task");
+        const l3 = document.getElementById("s2-lane-3-task");
+        const q1 = document.getElementById("s2-q1");
+        const q2 = document.getElementById("s2-q2");
+        const q3 = document.getElementById("s2-q3");
 
-        snapWidth(t1);
-        snapWidth(t2);
-        card1.classList.remove('border-orange-500', 'dark:border-orange-500');
-        card2.classList.remove('border-orange-500', 'dark:border-orange-500');
-        highlightLine('#vis-scene-2', null);
+        l1.style.width = "0%";
+        l2.style.width = "0%";
+        l3.style.width = "0%";
+        q1.style.opacity = "1";
+        q2.style.opacity = "1";
+        q3.style.opacity = "1";
 
-        var steps = [];
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 6);
-          card1.classList.add('border-orange-500', 'dark:border-orange-500');
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 0);
-          t1.style.width = '50%';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 1);
-          t1.style.width = '100%';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 7);
-          card1.classList.remove('border-orange-500', 'dark:border-orange-500');
-          card2.classList.add('border-orange-500', 'dark:border-orange-500');
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 3);
-          t2.style.width = '50%';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', 4);
-          t2.style.width = '100%';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-2', null);
-          card2.classList.remove('border-orange-500', 'dark:border-orange-500');
-        });
-        state.setSteps(steps);
+        setTimeout(() => {
+          q1.style.opacity = "0.3";
+          l1.style.width = "100%";
+        }, 300);
+        setTimeout(() => {
+          q2.style.opacity = "0.3";
+          l2.style.width = "100%";
+        }, 600);
+        setTimeout(() => {
+          q3.style.opacity = "0.3";
+          l3.style.width = "100%";
+        }, 900);
       }
 
-      else if (index === 3) {
-        var ta = document.getElementById('t-thread-a');
-        var tb = document.getElementById('t-thread-b');
-        var sa = document.getElementById('t-thread-a-state');
-        var sb = document.getElementById('t-thread-b-state');
-        var gil = document.getElementById('t-gil-badge');
+      else if (step === 2) {
+        // Step 3: Context Switch arrow pointer & status cards
+        const arrow = document.getElementById("s3-arrow");
+        const t1 = document.getElementById("s3-t1");
+        const t2 = document.getElementById("s3-t2");
+        const t3 = document.getElementById("s3-t3");
+        const s1 = document.getElementById("s3-t1-status");
+        const s2 = document.getElementById("s3-t2-status");
+        const s3 = document.getElementById("s3-t3-status");
 
-        [ta, tb].forEach(el => el.classList.remove('border-[#B38CFF]', 'border-[#57D38C]', 'scale-105'));
-        sa.textContent = 'pause_circle';
-        sb.textContent = 'pause_circle';
-        gil.style.transform = 'scale(1)';
-        highlightLine('#vis-scene-3', null);
+        // Clear states
+        t1.className = "border border-gray-200 dark:border-gray-800 p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30";
+        t2.className = "border border-gray-200 dark:border-gray-800 p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30";
+        t3.className = "border border-gray-200 dark:border-gray-800 p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30";
+        
+        s1.textContent = "Sleeping"; s1.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800";
+        s2.textContent = "Sleeping"; s2.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800";
+        s3.textContent = "Sleeping"; s3.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800";
 
-        var steps = [];
-        steps.push(function() {
-          highlightLine('#vis-scene-3', 3);
-          sa.textContent = 'hourglass_empty';
-          sb.textContent = 'hourglass_empty';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-3', 6);
-          ta.classList.add('border-[#B38CFF]', 'scale-105');
-          sa.textContent = 'play_circle';
-          gil.style.transform = 'translate(-20px, 15px)';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-3', 7);
-          ta.classList.remove('border-[#B38CFF]', 'scale-105');
-          sa.textContent = 'pause_circle';
-          tb.classList.add('border-[#57D38C]', 'scale-105');
-          sb.textContent = 'play_circle';
-          gil.style.transform = 'translate(-20px, 45px)';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-3', 3);
-          tb.classList.remove('border-[#57D38C]', 'scale-105');
-          sb.textContent = 'pause_circle';
-          ta.classList.add('border-[#B38CFF]', 'scale-105');
-          sa.textContent = 'play_circle';
-          gil.style.transform = 'translate(-20px, 15px)';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-3', 4);
-          ta.classList.remove('border-[#B38CFF]', 'scale-105');
-          sa.textContent = 'check_circle';
-          tb.classList.add('border-[#57D38C]', 'scale-105');
-          sb.textContent = 'play_circle';
-          gil.style.transform = 'translate(-20px, 45px)';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-3', null);
-          tb.classList.remove('border-[#57D38C]', 'scale-105');
-          sb.textContent = 'check_circle';
-          gil.style.transform = 'scale(1)';
-        });
-        state.setSteps(steps);
+        // Spin arrow pointer
+        arrow.style.transform = "rotate(0deg) translate(0px)";
+
+        setTimeout(() => {
+          arrow.style.transform = "rotate(-25deg) translate(10px, -20px)";
+          t1.className = "border border-blue-400 bg-blue-500/5 p-3 rounded-xl flex justify-between items-center scale-105 spring-effect";
+          s1.textContent = "Running"; s1.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-blue-500 text-white animate-pulse";
+        }, 300);
+
+        setTimeout(() => {
+          t1.className = "border border-gray-200 dark:border-gray-800 p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30 transition-all duration-300";
+          s1.textContent = "Waiting"; s1.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-950/20";
+          
+          arrow.style.transform = "rotate(0deg) translate(10px, 0px)";
+          t2.className = "border border-green-400 bg-green-500/5 p-3 rounded-xl flex justify-between items-center scale-105 spring-effect";
+          s2.textContent = "Running"; s2.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-green-500 text-white animate-pulse";
+        }, 1200);
+
+        setTimeout(() => {
+          t2.className = "border border-gray-200 dark:border-gray-800 p-3 rounded-xl flex justify-between items-center bg-white dark:bg-slate-900/30 transition-all duration-300";
+          s2.textContent = "Waiting"; s2.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-950/20";
+
+          arrow.style.transform = "rotate(25deg) translate(10px, 20px)";
+          t3.className = "border border-purple-400 bg-purple-500/5 p-3 rounded-xl flex justify-between items-center scale-105 spring-effect";
+          s3.textContent = "Running"; s3.className = "px-2.5 py-0.5 rounded font-mono text-[9px] font-bold bg-purple-500 text-white animate-pulse";
+        }, 2100);
       }
 
-      else if (index === 4) {
-        var t1 = document.getElementById('async-task1');
-        var t2 = document.getElementById('async-task2');
-        var s1 = document.getElementById('async-t1-status');
-        var s2 = document.getElementById('async-t2-status');
-        var wheel = document.getElementById('async-loop-wheel');
+      else if (step === 3) {
+        // Step 4: GIL lock transfers
+        const lock = document.getElementById("s4-gil-lock");
+        const t1 = document.getElementById("s4-t1");
+        const t2 = document.getElementById("s4-t2");
+        const t3 = document.getElementById("s4-t3");
+        const s1 = document.getElementById("s4-t1-status");
+        const s2 = document.getElementById("s4-t2-status");
+        const s3 = document.getElementById("s4-t3-status");
 
-        [t1, t2].forEach(el => el.classList.remove('border-orange-500', 'dark:border-orange-500'));
-        s1.textContent = 'pending';
-        s2.textContent = 'pending';
-        highlightLine('#vis-scene-4', null);
+        // Clear states
+        t1.className = "flex-1 border border-gray-200 dark:border-gray-800 p-4 rounded-xl text-center bg-white dark:bg-slate-900/20";
+        t2.className = "flex-1 border border-gray-200 dark:border-gray-800 p-4 rounded-xl text-center bg-white dark:bg-slate-900/20";
+        t3.className = "flex-1 border border-gray-200 dark:border-gray-800 p-4 rounded-xl text-center bg-white dark:bg-slate-900/20";
+        s1.textContent = "Waiting for GIL"; s1.className = "text-[9px] font-mono mt-2 font-bold text-slate-400";
+        s2.textContent = "Waiting for GIL"; s2.className = "text-[9px] font-mono mt-2 font-bold text-slate-400";
+        s3.textContent = "Waiting for GIL"; s3.className = "text-[9px] font-mono mt-2 font-bold text-slate-400";
 
-        var steps = [];
-        steps.push(function() {
-          highlightLine('#vis-scene-4', 4);
-          s1.textContent = 'queued';
-          s2.textContent = 'queued';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-4', 0);
-          t1.classList.add('border-orange-500', 'dark:border-orange-500');
-          s1.textContent = 'running';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-4', 1);
-          t1.classList.remove('border-orange-500', 'dark:border-orange-500');
-          s1.textContent = 'awaiting';
-          t2.classList.add('border-orange-500', 'dark:border-orange-500');
-          s2.textContent = 'running';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-4', 1);
-          t2.classList.remove('border-orange-500', 'dark:border-orange-500');
-          s2.textContent = 'awaiting';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-4', 6);
-          t1.classList.add('border-orange-500', 'dark:border-orange-500');
-          s1.textContent = 'done';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-4', null);
-          t1.classList.remove('border-orange-500', 'dark:border-orange-500');
-          t2.classList.add('border-orange-500', 'dark:border-orange-500');
-          s2.textContent = 'done';
-        });
-        state.setSteps(steps);
+        setTimeout(() => {
+          t1.className = "flex-1 border-2 border-blue-400 bg-blue-500/5 p-4 rounded-xl text-center scale-105 spring-effect";
+          s1.textContent = "Acquired GIL (Running)"; s1.className = "text-[9px] font-mono mt-2 font-bold text-blue-500 animate-pulse";
+        }, 400);
+
+        setTimeout(() => {
+          t1.className = "flex-1 border border-gray-200 dark:border-gray-800 p-4 rounded-xl text-center bg-white dark:bg-slate-900/20 transition-all duration-300";
+          s1.textContent = "Waiting for GIL"; s1.className = "text-[9px] font-mono mt-2 font-bold text-slate-400";
+
+          t2.className = "flex-1 border-2 border-green-400 bg-green-500/5 p-4 rounded-xl text-center scale-105 spring-effect";
+          s2.textContent = "Acquired GIL (Running)"; s2.className = "text-[9px] font-mono mt-2 font-bold text-green-500 animate-pulse";
+        }, 1600);
       }
 
-      else if (index === 5) {
-        var ap = document.getElementById('mp-a-progress');
-        var bp = document.getElementById('mp-b-progress');
-        var al = document.getElementById('mp-a-label');
-        var bl = document.getElementById('mp-b-label');
+      else if (step === 4) {
+        // Step 5: I/O Bound flying network packet
+        const packet = document.getElementById("s5-packet");
+        packet.style.left = "40px";
+        packet.style.opacity = "0";
 
-        snapWidth(ap);
-        snapWidth(bp);
-        al.textContent = 'Waiting';
-        bl.textContent = 'Waiting';
-        highlightLine('#vis-scene-5', null);
+        setTimeout(() => {
+          packet.style.opacity = "1";
+          packet.style.left = "230px";
+        }, 200);
 
-        var steps = [];
-        steps.push(function() {
-          highlightLine('#vis-scene-5', 3);
-          al.textContent = 'Starting';
-          bl.textContent = 'Starting';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-5', 6);
-          al.textContent = 'Running';
-          bl.textContent = 'Running';
-          ap.style.width = '33%';
-          bp.style.width = '33%';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-5', 7);
-          ap.style.width = '66%';
-          bp.style.width = '66%';
-        });
-        steps.push(function() {
-          ap.style.width = '100%';
-          bp.style.width = '100%';
-        });
-        steps.push(function() {
-          al.textContent = 'Complete';
-          bl.textContent = 'Complete';
-        });
-        steps.push(function() {
-          highlightLine('#vis-scene-5', null);
-        });
-        state.setSteps(steps);
+        setTimeout(() => {
+          packet.style.opacity = "0";
+        }, 1200);
       }
 
-      else if (index === 6) {
-        var cards = ['s6-card-1', 's6-card-2', 's6-card-3', 's6-card-4'].map(id => document.getElementById(id));
-        cards.forEach(c => snapHidden(c));
+      else if (step === 5) {
+        // Step 6: CPU bound gears spinning
+        const g1 = document.getElementById("s6-gear-1");
+        const g2 = document.getElementById("s6-gear-2");
+        const s1 = document.getElementById("s6-t1-status");
+        const s2 = document.getElementById("s6-t2-status");
+        const t1 = document.getElementById("s6-t1");
+        const t2 = document.getElementById("s6-t2");
 
-        var steps = cards.map(function(card) {
-          return function() {
-            if (state.currentScene !== 6) return;
-            revealEl(card);
-          }
-        });
-        steps.push(function() { /* completion */ });
-        state.setSteps(steps);
+        g1.style.transform = "rotate(0deg)";
+        g2.style.transform = "rotate(0deg)";
+
+        setTimeout(() => {
+          g1.style.transform = "rotate(720deg)";
+          g1.classList.add("spin-slow");
+          t1.className = "flex-1 border-2 border-blue-400 bg-blue-500/5 p-4 rounded-xl text-center scale-105 spring-effect";
+          s1.textContent = "Acquired GIL (Calculating)"; s1.className = "text-[9px] font-mono font-bold text-blue-600";
+        }, 200);
+
+        setTimeout(() => {
+          g1.classList.remove("spin-slow");
+          t1.className = "flex-1 border border-gray-200 p-4 rounded-xl text-center bg-white dark:bg-slate-900/20";
+          s1.textContent = "Blocked (Contention)"; s1.className = "text-[9px] font-mono font-bold text-red-500";
+
+          g2.style.transform = "rotate(720deg)";
+          g2.classList.add("spin-slow");
+          t2.className = "flex-1 border-2 border-green-400 bg-green-500/5 p-4 rounded-xl text-center scale-105 spring-effect";
+          s2.textContent = "Acquired GIL (Calculating)"; s2.className = "text-[9px] font-mono font-bold text-green-600";
+        }, 1500);
+      }
+
+      else if (step === 6) {
+        // Step 7: Multiprocessing simultaneous progress bars
+        const p1 = document.getElementById("s7-p1-progress");
+        const p2 = document.getElementById("s7-p2-progress");
+        p1.style.width = "0%";
+        p2.style.width = "0%";
+
+        setTimeout(() => {
+          p1.style.width = "100%";
+          p2.style.width = "100%";
+        }, 200);
       }
     }
 
-    fetch('content/interactive/concurrency.json').then(r => r.json()).then(json => {
-      data = json;
-      initAnimationPlayer({
-        totalScenes: 6,
-        sceneData: data.scenes,
-        stepIntervalMs: 1600,
-        scenePauseMs: 1200,
-        scene2HideClass: 'translate-x-10',
-        onSceneAnimation: triggerSceneAnimation
-      });
+    // Auto Play loop
+    function startLoop() {
+      isPlaying = true;
+      playIcon.textContent = "pause";
+      runTimer();
+    }
+
+    function runTimer() {
+      const interval = parseInt(speedSelect.value, 10);
+      autoPlayTimer = setTimeout(() => {
+        if (!isPlaying) return;
+        if (currentStep < 7) {
+          currentStep++;
+        } else {
+          currentStep = 0;
+        }
+        updateStepView();
+        runTimer();
+      }, interval);
+    }
+
+    function stopLoop() {
+      isPlaying = false;
+      playIcon.textContent = "play_arrow";
+      clearTimeout(autoPlayTimer);
+    }
+
+    // Event Bindings
+    playBtn.addEventListener("click", () => {
+      if (isPlaying) stopLoop(); else startLoop();
     });
+
+    prevBtn.addEventListener("click", () => {
+      stopLoop();
+      if (currentStep > 0) {
+        currentStep--;
+        updateStepView();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      stopLoop();
+      if (currentStep < 7) {
+        currentStep++;
+        updateStepView();
+      }
+    });
+
+    replayBtn.addEventListener("click", () => {
+      stopLoop();
+      currentStep = 0;
+      updateStepView();
+    });
+
+    scrubber.addEventListener("input", (e) => {
+      stopLoop();
+      currentStep = parseInt(e.target.value, 10);
+      updateStepView();
+    });
+
+    speedSelect.addEventListener("change", () => {
+      if (isPlaying) {
+        stopLoop();
+        startLoop();
+      }
+    });
+
+    // Keyboard support
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        stopLoop();
+        if (currentStep > 0) { currentStep--; updateStepView(); }
+      } else if (e.key === "ArrowRight") {
+        stopLoop();
+        if (currentStep < 7) { currentStep++; updateStepView(); }
+      } else if (e.key === " ") {
+        e.preventDefault();
+        if (isPlaying) stopLoop(); else startLoop();
+      }
+    });
+
+    // Fullscreen support
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        canvas.requestFullscreen().catch(err => {
+          console.error(err);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      const icon = fullscreenBtn.querySelector("span");
+      if (document.fullscreenElement) {
+        icon.textContent = "fullscreen_exit";
+      } else {
+        icon.textContent = "fullscreen";
+      }
+    });
+
+    // Iframe responsive styling adjustment
+    if (window.self !== window.top) {
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      if (header) header.classList.add('hidden');
+      if (footer) footer.classList.add('hidden');
+      document.body.classList.remove('justify-between');
+      document.body.classList.add('justify-center', 'p-0', 'overflow-hidden');
+      const main = document.querySelector('main');
+      if (main) {
+        main.classList.remove('md:py-16', 'py-8', 'px-6');
+        main.classList.add('py-0', 'px-2', 'max-w-full');
+      }
+    }
+
+    // Init Page Load
+    updateStepView();
+
   </script>
 </body>
 </html>
