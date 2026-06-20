@@ -66,9 +66,12 @@ async function loadContent(hash) {
         '</div>';
       }
       embedCode = '<div id="section-syntax" class="scroll-mt-24">' +
-        '<div class="timeline-container">' + items + '</div>' +
-        '<div class="mt-4 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 text-sm leading-relaxed overflow-x-auto">' +
-        '<pre><code class="' + langClass + '">' + escapeHtml(data.codeBlock) + '</code></pre></div></div>';
+        '<div class="timeline-container">' + items + '</div>';
+      if (data.codeBlock) {
+        embedCode += '<div class="mt-4 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 text-sm leading-relaxed overflow-x-auto">' +
+          '<pre><code class="' + langClass + '">' + escapeHtml(data.codeBlock) + '</code></pre></div>';
+      }
+      embedCode += '</div>';
     } else {
       embedCode = `
         <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
