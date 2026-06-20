@@ -231,7 +231,7 @@ html.dark pre[class*="language-"] {
   padding: 0 !important;
   border-radius: 0 !important;
 }
-code[class*="language-"] { text-shadow: none !important; color: inherit !important; }
+code[class*="language-"] { text-shadow: none !important; color: inherit !important; font-family: inherit !important; font-size: inherit !important; }
 :not(pre) > code[class*="language-"] { background: transparent !important; padding: 0 !important; }
 
 html.dark .token.operator { color: #E8E8E8; }
