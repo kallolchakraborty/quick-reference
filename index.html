@@ -55,28 +55,16 @@
       </a>
 
       <!-- Navigation & Controls -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <!-- Theme toggle -->
+        <button class="theme-toggle-btn w-9 h-9 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
+          <span class="material-symbols-outlined text-xl">light_mode</span>
+        </button>
 
-        <!-- Utility Buttons -->
-        <div class="flex items-center gap-3">
-          <!-- Theme toggle -->
-          <button class="theme-toggle-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
-            <span class="material-symbols-outlined text-lg">light_mode</span>
-          </button>
-
-          <!-- Share button -->
-          <button class="open-share-btn w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
-            <span class="material-symbols-outlined text-lg">share</span>
-          </button>
-
-          <!-- Search trigger button -->
-          <button class="open-search-btn flex items-center gap-2 px-3 py-1.5 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 bg-slate-50 dark:bg-slate-800/40 rounded-lg text-slate-400 hover:text-brand-500 font-medium text-xs transition-all">
-            <span class="material-symbols-outlined text-lg">search</span>
-            <span>Search</span>
-            <kbd class="hidden sm:inline-block font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-1 rounded">⌘K</kbd>
-          </button>
-
-        </div>
+        <!-- Share button -->
+        <button class="open-share-btn w-9 h-9 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+          <span class="material-symbols-outlined text-xl">share</span>
+        </button>
       </div>
     </div>
   </header>
