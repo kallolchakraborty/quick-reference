@@ -43,7 +43,23 @@ async function loadContent(hash) {
           <iframe src="${data.id}.html" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
         </div>
       `;
-      if (data.codeBlock) {
+      if (data.sections) {
+        embedCode += `<div class="flex flex-col gap-8 mt-8">` + data.sections.map((section, idx) => {
+          const sectionId = `section-${data.id}-${idx}`;
+          return `
+            <div id="${sectionId}" class="scroll-mt-24 flex flex-col gap-3">
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${section.title}</h3>
+              ${section.description ? `<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">${section.description}</p>` : ''}
+              <div class="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
+                <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+                </button>
+                <pre><code class="${langClass}">${escapeHtml(section.codeBlock)}</code></pre>
+              </div>
+            </div>
+          `;
+        }).join('\n') + `</div>`;
+      } else if (data.codeBlock) {
         embedCode += `
           <div class="mt-6 text-xs font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Sample Code / Syntax</div>
           <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
