@@ -22,44 +22,6 @@
       "codeBlock": "import asyncio\n\nasync def fetch_async(service_id):\n    print(f\"[Async] Call start to service {service_id}\")\n    await asyncio.sleep(1.5)  # Cooperative sleep yields execution back to Event Loop\n    print(f\"[Async] Call finish for service {service_id}\")\n    return f\"result_{service_id}\"\n\nasync def main():\n    results = await asyncio.gather(\n        fetch_async(1),\n        fetch_async(2),\n        fetch_async(3)\n    )\n    print(\"All API calls finished successfully:\", results)\n\nasyncio.run(main())"
     }
   ],
-  "comparisonTable": [
-    {
-      "model": "Synchronous",
-      "paradigm": "Sequential execution",
-      "gil": "No GIL Issue",
-      "colorClass": "text-orange-600",
-      "gilColorClass": "text-slate-400",
-      "memory": "Minimal",
-      "suitability": "Simple sequential script logic"
-    },
-    {
-      "model": "Threading",
-      "paradigm": "Preemptive context switch",
-      "gil": "Yes (CPython Lock)",
-      "colorClass": "text-blue-500",
-      "gilColorClass": "text-red-500",
-      "memory": "Low (Shared memory)",
-      "suitability": "I/O bound apps, scraping, sockets"
-    },
-    {
-      "model": "Asyncio",
-      "paradigm": "Cooperative event loop",
-      "gil": "No (Single thread)",
-      "colorClass": "text-green-500",
-      "gilColorClass": "text-slate-400",
-      "memory": "Very Low (Single Stack)",
-      "suitability": "High concurrent network connections"
-    },
-    {
-      "model": "Multiprocess",
-      "paradigm": "Parallel cores",
-      "gil": "No (Multiple GILs)",
-      "colorClass": "text-purple-500",
-      "gilColorClass": "text-green-500",
-      "memory": "High (Copied stack)",
-      "suitability": "CPU bound math, processing, ML"
-    }
-  ],
   "diffTable": [
     {
       "dimension": "Definition",
