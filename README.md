@@ -100,7 +100,6 @@ The codebase follows several best practices for a static site without a build st
 │   └── animation-core.js   Shared animation player (scenes, fullscreen, keyboard)
 ├── content/
 │   ├── python/             Python content (history + 6 basics pages)
-│   ├── devops/             Developer tools content
 │   ├── programming/        Programming concept content
 │   └── interactive/        Animation scene data (JSON)
 ├── assets/
@@ -166,7 +165,6 @@ The search index contains:
 - **Python** — History of Python
 - **Python Basics** — Data Types, Loops, I/O, Data Structures, File Handling, API Handling
 - **System Internals** — GIL, Compiler, Interpreter
-- **Developer Tools** — Git Commands
 
 ## Accessibility
 
