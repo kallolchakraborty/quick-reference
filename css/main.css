@@ -251,72 +251,80 @@ html.dark {
 }
 
 /* ========== Timeline Animation ========== */
-.timeline-container {
+/* ========== Timeline Layout ========== */
+.timeline-track {
   position: relative;
+  padding-left: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 1.5rem;
 }
 
-.timeline-container::before {
+.timeline-track::before {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
+  left: 0.625rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
   width: 2px;
-  background: #E95420;
-  transform: translateX(-50%);
+  background: linear-gradient(to bottom, #E95420, #F97316, #F59E0B);
 }
 
-html.dark .timeline-container::before {
-  background: rgba(233, 84, 32, 0.5);
+html.dark .timeline-track::before {
+  background: linear-gradient(to bottom, #E95420, rgba(249, 115, 22, 0.4), rgba(245, 158, 11, 0.15));
 }
 
-.timeline-item {
+.timeline-card {
   position: relative;
-  width: 50%;
-  padding: 16px 24px;
-  align-self: flex-start;
   opacity: 0;
-  transform: translateX(-20px);
-  animation: timelineFadeIn 0.6s ease forwards;
+  transform: translateY(20px);
+  animation: timelineCardSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.timeline-item-right {
-  align-self: flex-end;
-  transform: translateX(20px);
+@keyframes timelineCardSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes timelineFadeIn {
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.timeline-year {
-  display: inline-block;
-  background: #E95420;
-  color: #FFFFFF;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 10px;
+.timeline-bullet {
+  position: absolute;
+  left: -2.375rem;
+  top: 0.625rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 9999px;
-  margin-bottom: 6px;
+  background: #FFFFFF;
+  border: 2px solid #E95420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-html.dark .timeline-year {
-  background: rgba(233, 84, 32, 0.8);
+html.dark .timeline-bullet {
+  background: #0F1115;
 }
 
-.timeline-event {
-  display: block;
-  color: #374151;
-  font-size: 14px;
-  line-height: 1.5;
+.timeline-bullet-inner {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #E95420;
+  transition: background-color 0.3s ease;
 }
 
-html.dark .timeline-event {
-  color: #D1D5DB;
+.timeline-card:hover .timeline-bullet {
+  transform: scale(1.2);
+  border-color: #F97316;
+  box-shadow: 0 0 12px rgba(233, 84, 32, 0.4);
+}
+
+.timeline-card:hover .timeline-bullet-inner {
+  background: #F97316;
 }
 
 /* ========== Syntax Highlighting (Prism overrides) ========== */

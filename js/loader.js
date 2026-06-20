@@ -51,7 +51,7 @@ async function loadContent(hash) {
               <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${section.title}</h3>
               ${section.description ? `<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">${section.description}</p>` : ''}
               <div class="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
-                <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+                <button onclick="copyCode(this)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-sm">content_copy</span> Copy
                 </button>
                 <pre><code class="${langClass}">${escapeHtml(section.codeBlock)}</code></pre>
@@ -63,7 +63,7 @@ async function loadContent(hash) {
         embedCode += `
           <div class="mt-6 text-xs font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Sample Code / Syntax</div>
           <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
-            <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+            <button onclick="copyCode(this)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
               <span class="material-symbols-outlined text-sm">content_copy</span> Copy
             </button>
             <pre><code class="${langClass}">${escapeHtml(data.codeBlock)}</code></pre>
@@ -78,7 +78,7 @@ async function loadContent(hash) {
             <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${section.title}</h3>
             ${section.description ? `<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">${section.description}</p>` : ''}
             <div class="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
-              <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+              <button onclick="copyCode(this)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm">content_copy</span> Copy
               </button>
               <pre><code class="${langClass}">${escapeHtml(section.codeBlock)}</code></pre>
@@ -90,24 +90,36 @@ async function loadContent(hash) {
       let items = '';
       for (let ti = 0; ti < data.timeline.length; ti++) {
         const t = data.timeline[ti];
-        const cls = ti % 2 === 0 ? 'timeline-item' : 'timeline-item timeline-item-right';
-        const delay = ti * 120;
-        items += '<div class="' + cls + '" style="animation-delay:' + delay + 'ms">' +
-          '<span class="timeline-year">' + t.year + '</span>' +
-          '<span class="timeline-event">' + t.event + '</span>' +
-        '</div>';
+        const delay = ti * 80;
+        items += `
+          <div class="timeline-card group" style="animation-delay: ${delay}ms">
+            <div class="timeline-bullet">
+              <div class="timeline-bullet-inner"></div>
+            </div>
+            <div class="p-5 bg-white dark:bg-[#0F1115] border border-slate-200 dark:border-slate-800/85 rounded-2xl shadow-sm hover:shadow-md hover:border-brand-500/30 dark:hover:border-brand-500/20 transition-all duration-300 transform hover:-translate-y-0.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-mono font-bold text-brand-500 bg-brand-50 dark:bg-brand-500/10 px-2.5 py-1 rounded-full">${t.year}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">${t.tag || 'Release'}</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1.5 group-hover:text-brand-500 transition-colors duration-300">${t.title || ''}</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">${t.event}</p>
+            </div>
+          </div>
+        `;
       }
-      embedCode = '<div id="section-syntax" class="scroll-mt-24">' +
-        '<div class="timeline-container">' + items + '</div>';
+      embedCode = `
+        <div id="section-syntax" class="scroll-mt-24 mt-4">
+          <div class="timeline-track">${items}</div>
+        </div>
+      `;
       if (data.codeBlock) {
-        embedCode += '<div class="mt-4 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 text-sm leading-relaxed overflow-x-auto">' +
+        embedCode += '<div class="mt-6 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-4 text-sm leading-relaxed overflow-x-auto relative group">' +
           '<pre><code class="' + langClass + '">' + escapeHtml(data.codeBlock) + '</code></pre></div>';
       }
-      embedCode += '</div>';
     } else {
       embedCode = `
         <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
-          <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+          <button onclick="copyCode(this)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
             <span class="material-symbols-outlined text-sm">content_copy</span> Copy
           </button>
           <pre><code class="${langClass}">${escapeHtml(data.codeBlock)}</code></pre>
@@ -355,6 +367,23 @@ function escapeHtml(text) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+function copyCode(btn) {
+  const codeEl = btn.parentElement.querySelector('code');
+  if (!codeEl) return;
+  navigator.clipboard.writeText(codeEl.textContent).then(function() {
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm text-emerald-500">check</span> Copied!';
+    btn.disabled = true;
+    setTimeout(function() {
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    }, 2000);
+  }).catch(function(err) {
+    console.error('Failed to copy: ', err);
+  });
+}
+window.copyCode = copyCode;
 
 window.addEventListener('DOMContentLoaded', () => {
   const initialHash = window.location.hash || '#python-history';
