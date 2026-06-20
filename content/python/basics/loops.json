@@ -9,7 +9,7 @@
     {
       "title": "Conditional Branching (if/elif/else)",
       "description": "Evaluate conditions sequentially and execute the first matching block. Python also supports inline ternary conditionals.",
-      "codeBlock": "# Standard if-elif-else chain\nscore = 85\nif score >= 90:\n    grade = \"A\"\nelif score >= 80:\n    grade = \"B\"\nelse:\n    grade = \"C\"\n\n# Inline Ternary expression\nstatus = \"pass\" if score >= 60 else \"fail\""
+      "codeBlock": "# Standard if-elif-else chain\nscore = 85\nif score >= 90:\n    grade = \"A\"\nelif score >= 80:\n    grade = \"B\"\nelse:\n    grade = \"C\"\nprint(grade)         # B\n\n# Inline Ternary expression (Ternary Operator)\nstatus = \"pass\" if score >= 60 else \"fail\"\nprint(status)        # pass"
     },
     {
       "title": "Sequence Iteration (for, range)",
