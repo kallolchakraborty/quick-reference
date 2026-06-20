@@ -13,7 +13,13 @@ const routeMap = {
   '#interpreter': 'content/programming/interpreter.json'
 };
 
+let scrollSpyCleanup = null;
+
 async function loadContent(hash) {
+  if (scrollSpyCleanup) {
+    scrollSpyCleanup();
+    scrollSpyCleanup = null;
+  }
   const path = routeMap[hash] || routeMap['#python-history'];
   const contentArea = document.getElementById('docs-dynamic-content');
   if (!contentArea) return;
@@ -243,6 +249,7 @@ async function loadContent(hash) {
         outlineArea.innerHTML = outlineHtml;
       }
       setupOutlineSmoothScroll();
+      scrollSpyCleanup = setupOutlineScrollSpy();
     }
 
     if (typeof Prism !== 'undefined') Prism.highlightAll();
@@ -302,16 +309,90 @@ function setupOutlineSmoothScroll() {
         // Highlight active right outline
         document.querySelectorAll('.outline-link').forEach(link => {
           if (link.getAttribute('href') === targetId) {
-            link.classList.add('text-brand-500');
+            link.classList.add('text-brand-500', 'font-semibold');
             link.classList.remove('text-slate-500');
           } else {
-            link.classList.remove('text-brand-500');
+            link.classList.remove('text-brand-500', 'font-semibold');
             link.classList.add('text-slate-500');
           }
         });
       }
     });
   });
+}
+
+function setupOutlineScrollSpy() {
+  const links = document.querySelectorAll('.outline-link');
+  if (links.length === 0) return null;
+
+  const sections = Array.from(links).map(link => {
+    return document.querySelector(link.getAttribute('href'));
+  }).filter(Boolean);
+
+  if (sections.length === 0) return null;
+
+  function updateActiveLink() {
+    const scrollPosition = window.scrollY + 120; // Offset for top header and layout spacing
+    
+    // Fallback: If we've scrolled to the very bottom of the document, highlight the last section
+    if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
+      links.forEach((link, idx) => {
+        if (idx === links.length - 1) {
+          link.classList.add('text-brand-500', 'font-semibold');
+          link.classList.remove('text-slate-500');
+        } else {
+          link.classList.remove('text-brand-500', 'font-semibold');
+          link.classList.add('text-slate-500');
+        }
+      });
+      return;
+    }
+
+    let activeSection = null;
+    for (let i = 0; i < sections.length; i++) {
+      const section = sections[i];
+      if (section.offsetTop <= scrollPosition) {
+        activeSection = section;
+      } else {
+        break;
+      }
+    }
+
+    if (!activeSection && sections.length > 0) {
+      activeSection = sections[0];
+    }
+
+    if (activeSection) {
+      const activeId = activeSection.getAttribute('id');
+      links.forEach(link => {
+        if (link.getAttribute('href') === `#${activeId}`) {
+          link.classList.add('text-brand-500', 'font-semibold');
+          link.classList.remove('text-slate-500');
+        } else {
+          link.classList.remove('text-brand-500', 'font-semibold');
+          link.classList.add('text-slate-500');
+        }
+      });
+    }
+  }
+
+  let tick = false;
+  const onScroll = () => {
+    if (!tick) {
+      requestAnimationFrame(() => {
+        updateActiveLink();
+        tick = false;
+      });
+      tick = true;
+    }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  updateActiveLink();
+
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+  };
 }
 
 // Sidebar toggle: click handler for expand/collapse
