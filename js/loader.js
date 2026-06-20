@@ -54,6 +54,22 @@ async function loadContent(hash) {
           </div>
         `;
       }
+    } else if (data.sections) {
+      embedCode = `<div class="flex flex-col gap-8">` + data.sections.map((section, idx) => {
+        const sectionId = `section-${data.id}-${idx}`;
+        return `
+          <div id="${sectionId}" class="scroll-mt-24 flex flex-col gap-3">
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${section.title}</h3>
+            ${section.description ? `<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">${section.description}</p>` : ''}
+            <div class="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
+              <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+              </button>
+              <pre><code class="${langClass}">${escapeHtml(section.codeBlock)}</code></pre>
+            </div>
+          </div>
+        `;
+      }).join('\n') + `</div>`;
     } else if (data.timeline) {
       let items = '';
       for (let ti = 0; ti < data.timeline.length; ti++) {
@@ -117,11 +133,20 @@ async function loadContent(hash) {
     // Populate right outline dynamically
     const outlineArea = document.getElementById('docs-right-outline');
     if (outlineArea) {
-      const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
-      outlineArea.innerHTML = `
-        <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>
-        <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
-      `;
+      if (data.sections) {
+        let outlineHtml = data.sections.map((section, idx) => {
+          const sectionId = `section-${data.id}-${idx}`;
+          return `<a href="#${sectionId}" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${section.title}</a>`;
+        }).join('\n');
+        outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
+        outlineArea.innerHTML = outlineHtml;
+      } else {
+        const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
+        outlineArea.innerHTML = `
+          <a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>
+          <a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>
+        `;
+      }
       setupOutlineSmoothScroll();
     }
 
@@ -132,6 +157,12 @@ async function loadContent(hash) {
       requestAnimationFrame(function() {
         const section = contentArea.querySelector('section');
         if (section) section.classList.add('anim-ready');
+        if (data.sections) {
+          data.sections.forEach((_, idx) => {
+            const sec = document.getElementById(`section-${data.id}-${idx}`);
+            if (sec) sec.classList.add('anim-ready');
+          });
+        }
         const syntax = document.getElementById('section-syntax');
         if (syntax) syntax.classList.add('anim-ready');
         const dive = document.getElementById('section-dive');
