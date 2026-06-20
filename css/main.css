@@ -77,6 +77,11 @@ html.dark .bg-white, html.dark .bg-slate-50, html.dark .dark\:bg-slate-900, html
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #FFFFFF;
+}
+
+html.dark #fullscreen-canvas:fullscreen,
+html.dark #fullscreen-canvas:-webkit-full-screen {
   background-color: #0F1115;
 }
 
