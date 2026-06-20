@@ -1,6 +1,6 @@
 {
   "id": "concurrency",
-  "title": "Python Multithreading & Concurrency",
+  "title": "Multithreading & Concurrency",
   "category": "Python",
   "subcategory": "Basics",
   "description": "An interactive guide to Python concurrency models, comparing synchronous execution, multithreading, asynchronous programming (asyncio), and multiprocessing.",

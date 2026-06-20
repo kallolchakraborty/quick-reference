@@ -56,7 +56,7 @@
       <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-inkMuted hover:text-ink dark:hover:text-gray-200 transition-all" aria-label="Toggle theme">
         <span class="material-symbols-outlined text-sm">light_mode</span>
       </button>
-      <a href="docs.html" class="text-[10px] font-semibold text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Back to Docs</a>
+      <a href="docs.html" onclick="if(window.history.length > 1) { window.history.back(); return false; }" class="text-[10px] font-semibold text-inkMuted hover:text-ink dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Back to Docs</a>
     </div>
   </header>
 
@@ -66,7 +66,7 @@
 
 
     <!-- Central Sandbox/Canvas Screen -->
-    <div id="fullscreen-canvas" class="w-full aspect-[16/9] border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-3 relative overflow-hidden flex items-center justify-center">
+    <div id="fullscreen-canvas" class="w-full aspect-auto min-h-[500px] md:aspect-[16/9] md:min-h-0 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#0F1115] p-3 relative overflow-hidden flex items-center justify-center">
 
       <!-- ==================== SCENE 1: TITLE SCREEN ==================== -->
       <div id="vis-scene-1" class="absolute inset-0 flex flex-col items-center justify-center gap-4 transition-all duration-1000">

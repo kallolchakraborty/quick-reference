@@ -39,10 +39,21 @@ async function loadContent(hash) {
     if (data.id === 'compiler' || data.id === 'interpreter' || data.id === 'gil' || data.id === 'concurrency') {
       const pageTitles = { compiler: 'How a Compiler Works', interpreter: 'How an Interpreter Works', gil: "How Python's GIL Works", concurrency: 'Python Concurrency Visualizer' };
       embedCode = `
-        <div class="w-full aspect-[16/12] border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
+        <div class="w-full aspect-auto h-[530px] md:aspect-[16/12] md:h-auto border border-blue-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg bg-white dark:bg-[#0F1115]">
           <iframe src="${data.id}.html" class="w-full h-full border-none" allowfullscreen aria-label="${pageTitles[data.id] || 'Interactive visualization'}"></iframe>
         </div>
       `;
+      if (data.codeBlock) {
+        embedCode += `
+          <div class="mt-6 text-xs font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Sample Code / Syntax</div>
+          <div id="section-syntax" class="scroll-mt-24 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group">
+            <button onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+            </button>
+            <pre><code class="${langClass}">${escapeHtml(data.codeBlock)}</code></pre>
+          </div>
+        `;
+      }
     } else if (data.timeline) {
       let items = '';
       for (let ti = 0; ti < data.timeline.length; ti++) {

@@ -54,7 +54,7 @@
       <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Share this page">
         <span class="material-symbols-outlined text-sm">share</span>
       </button>
-      <a href="docs.html" class="text-[10px] font-semibold gil-muted hover:text-[#E95420] transition-colors">Back to Docs</a>
+      <a href="docs.html" onclick="if(window.history.length > 1) { window.history.back(); return false; }" class="text-[10px] font-semibold gil-muted hover:text-[#E95420] transition-colors">Back to Docs</a>
       <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-white/5 flex items-center justify-center gil-muted hover:text-[#E95420] transition-all" aria-label="Toggle theme">
         <span class="material-symbols-outlined text-sm">light_mode</span>
       </button>
@@ -67,7 +67,7 @@
 
 
     <!-- Central Sandbox/Canvas Screen -->
-    <div id="fullscreen-canvas" class="w-full aspect-[16/9] border gil-border rounded-xl p-3 relative overflow-hidden flex items-center justify-center">
+    <div id="fullscreen-canvas" class="w-full aspect-auto min-h-[500px] md:aspect-[16/9] md:min-h-0 border gil-border rounded-xl p-3 relative overflow-hidden flex items-center justify-center">
 
       <!-- ==================== SCENE 1: TITLE ==================== -->
       <div id="vis-scene-1" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none transition-all duration-1000">
