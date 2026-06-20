@@ -70,7 +70,7 @@ async function loadContent(hash) {
     }
 
     contentArea.innerHTML = `
-      <section class="flex flex-col gap-6">
+      <section class="flex flex-col gap-6 docs-section">
         <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider">
           <span>${data.category}</span>
           <span>&bull;</span>
@@ -111,6 +111,33 @@ async function loadContent(hash) {
     }
 
     if (typeof Prism !== 'undefined') Prism.highlightAll();
+
+    // Trigger entrance animations
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var section = contentArea.querySelector('section');
+        if (section) section.classList.add('anim-ready');
+        var syntax = document.getElementById('section-syntax');
+        if (syntax) syntax.classList.add('anim-ready');
+        var dive = document.getElementById('section-dive');
+        if (dive) {
+          // Animate deep dive when it enters viewport
+          if (dive.getBoundingClientRect().top < window.innerHeight) {
+            dive.classList.add('anim-ready');
+          } else {
+            var obs = new IntersectionObserver(function(entries) {
+              entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('anim-ready');
+                  obs.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.15 });
+            obs.observe(dive);
+          }
+        }
+      });
+    });
 
   } catch (error) {
     contentArea.innerHTML = `
