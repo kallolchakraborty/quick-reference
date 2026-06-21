@@ -157,29 +157,256 @@
 
       </div>
 
-      <!-- Feature Grid Section -->
-      <section class="w-full grid sm:grid-cols-2 gap-6 mt-16 text-left">
-        <!-- Python Card -->
-        <a href="docs.html#py-basics-datatypes" class="p-6 bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-xl hover:shadow-brand-500/5 hover:-translate-y-1 transition-all duration-300 rounded-2xl flex flex-col gap-3 group backdrop-blur-md">
-          <div class="w-10 h-10 bg-brand-50 dark:bg-brand-500/10 rounded-lg flex items-center justify-center text-brand-500">
-            <span class="material-symbols-outlined">code</span>
-          </div>
-          <h2 class="font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors">Python</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Python basics reference — variables, data types, control flow, functions, and built-in data structures with syntax-highlighted examples.
-          </p>
-        </a>
+      <!-- Learning Path Timeline -->
+      <section id="learning-path" class="w-full mt-14 text-left" aria-label="FAANG learning path timeline">
+        <div class="flex items-center gap-3 mb-8">
+          <span class="lp-phase-badge">Learning Path</span>
+          <p class="text-xs text-slate-400 dark:text-slate-500 font-medium tracking-wide uppercase">FAANG Interview Prep · Structured from foundations to Gen AI</p>
+        </div>
 
-        <!-- System Internals Card -->
-        <a href="docs.html#gil" class="p-6 bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-xl hover:shadow-brand-500/5 hover:-translate-y-1 transition-all duration-300 rounded-2xl flex flex-col gap-3 group backdrop-blur-md">
-          <div class="w-10 h-10 bg-brand-50 dark:bg-brand-500/10 rounded-lg flex items-center justify-center text-brand-500">
-            <span class="material-symbols-outlined">psychology</span>
+        <div class="lp-track">
+
+          <!-- PHASE 1: Foundations -->
+          <div class="lp-phase-group">
+            <div class="lp-phase-label">
+              <span class="lp-phase-icon" aria-hidden="true">01</span>
+              <span>Foundations</span>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#py-basics-datatypes" class="lp-item" id="lp-datatypes">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Data Types &amp; Operations</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">Mutability, hash contract, <code>is</code> vs <code>==</code>, int/float/str/bytes internals — questions asked at every FAANG screen.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-basics-loops" class="lp-item" id="lp-loops">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Loops &amp; Control Flow</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">Iterator protocol, generator expressions, <code>itertools</code> patterns — the backbone of every algorithm implementation.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-basics-io" class="lp-item" id="lp-io">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Input &amp; Output</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">Fast stdin reading, <code>sys.stdin</code>, formatted output — essential for competitive-style FAANG coding platforms.</p>
+                </div>
+              </a>
+            </div>
           </div>
-          <h2 class="font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors">System Internals</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Interactive visual guides to Python's GIL, compiler pipelines, and how interpreters execute code.
-          </p>
-        </a>
+
+          <!-- PHASE 2: Data Structures -->
+          <div class="lp-phase-group">
+            <div class="lp-phase-label">
+              <span class="lp-phase-icon" aria-hidden="true">02</span>
+              <span>Data Structures</span>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#py-ds-builtins" class="lp-item" id="lp-builtins">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Built-in Collections</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">Amortized ops, LRU Cache, Counter patterns — the tools you reach for in every interview before reinventing the wheel.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-ds-linkedlist" class="lp-item" id="lp-linkedlist">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Linked Lists</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">Floyd's cycle detection, slow/fast pointer, merge K sorted lists — classic problems that appear in Google and Meta loops.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-ds-stackqueue" class="lp-item" id="lp-stackqueue">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Stacks &amp; Queues</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">Monotonic stack, min-stack O(1), sliding window max — patterns behind ~30% of FAANG array/string problems.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-ds-heap" class="lp-item" id="lp-heap">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Priority Queues &amp; Heaps</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">K-way merge, median of data stream, Dijkstra's shortest path — heap is the correct data structure for ~20% of hard problems.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-ds-tree" class="lp-item" id="lp-tree">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Trees &amp; BSTs</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">LCA, serialize/deserialize, diameter, BST validation — trees appear in every FAANG loop. Know iterative traversals cold.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-ds-graph" class="lp-item" id="lp-graph">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Graphs &amp; Networks</span>
+                    <span class="lp-tag">DS</span>
+                  </div>
+                  <p class="lp-desc">Kahn's topological sort, Union-Find, Bellman-Ford — graph algorithms form the hardest tier of FAANG system design interviews.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- PHASE 3: Algorithms -->
+          <div class="lp-phase-group">
+            <div class="lp-phase-label">
+              <span class="lp-phase-icon" aria-hidden="true">03</span>
+              <span>Algorithms</span>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#py-complexity" class="lp-item" id="lp-complexity">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Time &amp; Space Complexity</span>
+                    <span class="lp-tag">Theory</span>
+                  </div>
+                  <p class="lp-desc">Big-O analysis, amortized complexity, space trade-offs — every FAANG interviewer will ask you to justify your complexity claim.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-algorithms" class="lp-item" id="lp-algorithms">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Algorithms &amp; Patterns</span>
+                    <span class="lp-tag">Core</span>
+                  </div>
+                  <p class="lp-desc">Two pointers, binary search, DP, backtracking, divide &amp; conquer — the canonical patterns that unlock 80% of LeetCode hard.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- PHASE 4: Advanced Python -->
+          <div class="lp-phase-group">
+            <div class="lp-phase-label">
+              <span class="lp-phase-icon" aria-hidden="true">04</span>
+              <span>Advanced Python</span>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#py-oop" class="lp-item" id="lp-oop">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">OOP &amp; Design Patterns</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">SOLID, decorators, metaclasses, singleton/observer/factory — system design rounds at Amazon and Google require this cold.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-basics-files" class="lp-item" id="lp-files">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">File Handling</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">Context managers, <code>mmap</code>, <code>pathlib</code> — production-quality file I/O patterns tested in backend engineering interviews.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-basics-api" class="lp-item" id="lp-api">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">API Handling</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">Session pooling, async HTTP, circuit breaker, JWT — the patterns that distinguish a senior engineer in a system design interview.</p>
+                </div>
+              </a>
+              <a href="docs.html#py-basics-concurrency" class="lp-item" id="lp-concurrency">
+                <div class="lp-dot"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Concurrency &amp; Async</span>
+                    <span class="lp-tag">Python</span>
+                  </div>
+                  <p class="lp-desc">GIL internals, <code>asyncio</code>, thread pools, <code>multiprocessing</code> — critical for infra and ML platform roles at every top tech company.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- PHASE 5: Gen AI -->
+          <div class="lp-phase-group lp-phase-group--last">
+            <div class="lp-phase-label">
+              <span class="lp-phase-icon lp-phase-icon--ai" aria-hidden="true">05</span>
+              <span>Generative AI</span>
+            </div>
+            <div class="lp-items">
+              <a href="docs.html#genai-what-is-llm" class="lp-item" id="lp-llm">
+                <div class="lp-dot lp-dot--ai"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">What is an LLM?</span>
+                    <span class="lp-tag lp-tag--ai">Gen AI</span>
+                  </div>
+                  <p class="lp-desc">Transformer architecture, scaling laws, GQA, quantization, DPO — now a required topic at Google DeepMind, Meta AI, and OpenAI.</p>
+                </div>
+              </a>
+              <a href="docs.html#genai-kvcache" class="lp-item" id="lp-kvcache">
+                <div class="lp-dot lp-dot--ai"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">KV Cache</span>
+                    <span class="lp-tag lp-tag--ai">Gen AI</span>
+                  </div>
+                  <p class="lp-desc">Memory formula, FlashAttention, PagedAttention — inference optimization questions asked in ML infrastructure interviews.</p>
+                </div>
+              </a>
+              <a href="docs.html#genai-rag" class="lp-item" id="lp-rag">
+                <div class="lp-dot lp-dot--ai"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">RAG</span>
+                    <span class="lp-tag lp-tag--ai">Gen AI</span>
+                  </div>
+                  <p class="lp-desc">Retrieval-Augmented Generation, vector search, chunking strategies — the standard architecture for production LLM applications.</p>
+                </div>
+              </a>
+              <a href="docs.html#genai-finetuning" class="lp-item" id="lp-finetuning">
+                <div class="lp-dot lp-dot--ai"></div>
+                <div class="lp-content">
+                  <div class="lp-item-header">
+                    <span class="lp-title">Fine-Tuning &amp; PEFT</span>
+                    <span class="lp-tag lp-tag--ai">Gen AI</span>
+                  </div>
+                  <p class="lp-desc">LoRA, QLoRA, adapter layers, full fine-tuning trade-offs — the depth that separates ML engineers from ML scientists at FAANG.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </div><!-- /lp-track -->
       </section>
 
     </div>

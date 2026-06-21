@@ -384,6 +384,217 @@ html.dark .timeline-tag {
 
 html.dark .timeline-event { color: #94a3b8; }
 
+/* ========== Home: Learning Path Timeline ========== */
+.lp-phase-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #E95420;
+  background: rgba(233, 84, 32, 0.08);
+  border: 1px solid rgba(233, 84, 32, 0.2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.lp-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.lp-phase-group {
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+/* Vertical line connecting phases */
+.lp-phase-group::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(233,84,32,0.3) 0%, rgba(233,84,32,0.08) 100%);
+}
+.lp-phase-group--last::before { display: none; }
+
+.lp-phase-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 36px;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.lp-phase-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #E95420;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(233,84,32,0.3);
+  position: relative;
+  z-index: 1;
+}
+.lp-phase-icon--ai {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  box-shadow: 0 2px 8px rgba(124,58,237,0.35);
+}
+
+/* Phase name text — vertical, rotated for compactness on wide screens */
+.lp-phase-label > span:not(.lp-phase-icon) {
+  writing-mode: horizontal-tb;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  white-space: nowrap;
+  display: none; /* hidden on mobile; shown md+ via padding */
+}
+
+.lp-items {
+  flex: 1;
+  padding: 0 0 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lp-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateX(-8px);
+  animation: lpItemIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.lp-item:hover {
+  background: rgba(233, 84, 32, 0.04);
+  border-color: rgba(233, 84, 32, 0.18);
+  transform: translateX(3px);
+}
+
+/* stagger animation via nth-child */
+.lp-item:nth-child(1)  { animation-delay: 0.05s; }
+.lp-item:nth-child(2)  { animation-delay: 0.10s; }
+.lp-item:nth-child(3)  { animation-delay: 0.15s; }
+.lp-item:nth-child(4)  { animation-delay: 0.20s; }
+.lp-item:nth-child(5)  { animation-delay: 0.25s; }
+.lp-item:nth-child(6)  { animation-delay: 0.30s; }
+
+@keyframes lpItemIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.lp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E95420;
+  flex-shrink: 0;
+  margin-top: 5px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 0 2px rgba(233,84,32,0.15);
+}
+.lp-dot--ai {
+  background: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168,85,247,0.15);
+}
+.lp-item:hover .lp-dot {
+  transform: scale(1.5);
+  box-shadow: 0 0 10px rgba(233,84,32,0.4);
+}
+.lp-item:hover .lp-dot--ai {
+  box-shadow: 0 0 10px rgba(168,85,247,0.4);
+}
+
+.lp-content { flex: 1; min-width: 0; }
+
+.lp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.lp-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
+  transition: color 0.15s;
+}
+html.dark .lp-title { color: #e2e8f0; }
+.lp-item:hover .lp-title { color: #E95420; }
+
+.lp-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+html.dark .lp-tag {
+  background: rgba(148,163,184,0.1);
+  color: #64748b;
+}
+.lp-tag--ai {
+  color: #a855f7;
+  background: rgba(168,85,247,0.08);
+}
+html.dark .lp-tag--ai {
+  background: rgba(168,85,247,0.12);
+  color: #c084fc;
+}
+
+.lp-desc {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.55;
+}
+html.dark .lp-desc { color: #64748b; }
+.lp-desc code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  background: rgba(0,0,0,0.04);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #E95420;
+}
+html.dark .lp-desc code {
+  background: rgba(255,255,255,0.06);
+  color: #f97316;
+}
+
 /* ========== README Page ========== */
 .readme-content {
   font-size: 15px;
