@@ -3,28 +3,28 @@
   "title": "Built-in Collections",
   "category": "Python",
   "subcategory": "Data Structures",
-  "description": "Python's optimized built-in collections: lists, tuples, sets, and dictionaries — with syntax, dynamic operations, and comprehensions.",
+  "description": "Python's optimized built-in collections: lists, tuples, sets, and dictionaries — featuring all operations, helper methods, time complexities, and comprehensions.",
   "language": "python",
   "sections": [
     {
-      "title": "Lists (Mutable Arrays)",
-      "description": "Lists represent ordered sequence collections. They are highly flexible and support slicing, indexing, modifications, and list comprehensions.",
-      "codeBlock": "nums = [1, 2, 3, 4, 5]\n\n# Accessing elements\nprint(nums[0])         # 1\nprint(nums[-1])        # 5\nprint(nums[1:4])       # [2, 3, 4]\n\n# Manipulation Methods\nnums.append(6)\nnums.extend([7, 8])\nnums.insert(0, 0)\nprint(nums)            # [0, 1, 2, 3, 4, 5, 6, 7, 8]\n\n# Comprehensions\nsquares = [x**2 for x in range(5)]\nprint(squares)         # [0, 1, 4, 9, 16]"
+      "title": "List Operations & Complexity",
+      "description": "Lists are mutable, dynamic arrays. Essential operations include Indexing, Slicing, Insertion (append/insert), Deletion (pop/remove), Searching (index/in), and Sorting.",
+      "codeBlock": "lst = [10, 20, 30]\n\n# 1. Access & Indexing - O(1)\nprint(lst[0])          # 10\n\n# 2. Insertion\nlst.append(40)         # O(1) amortized - Adds at end: [10, 20, 30, 40]\nlst.insert(1, 15)      # O(N) - Shifts elements: [10, 15, 20, 30, 40]\n\n# 3. Deletion\nlast_val = lst.pop()   # O(1) - Removes from end: 40\nmid_val = lst.pop(1)   # O(N) - Removes index 1 and shifts: 15\nlst.remove(20)         # O(N) - Searches and removes value 20\n\n# 4. Searching & Membership\npresent = 30 in lst    # O(N) linear search\nidx = lst.index(30)    # O(N) returns index of value 30\n\n# 5. Sorting & Reversal\nlst.sort()             # O(N log N) - Timsort algorithm in-place\nlst.reverse()          # O(N) - Inverts order in-place\nprint(lst)             # [30, 10]"
     },
     {
-      "title": "Tuples (Immutable Records)",
-      "description": "Tuples are immutable sequence records. Once created, their values cannot be changed, making them safe for fixed structures and hashable dictionary keys.",
-      "codeBlock": "point = (3, 4)\nx, y = point\nprint(x, y)            # 3 4\n\n# Single-element tuple requires a trailing comma\nsingle = (42,)\nprint(single)          # (42,)"
+      "title": "Tuple Operations & Complexity",
+      "description": "Tuples are immutable ordered records. Because they are immutable, they do not support insertion or deletion operations, but support O(1) indexing, unpacking, and hashing.",
+      "codeBlock": "tup = (1, 2, 3)\n\n# 1. Indexing & Slicing - O(1)\nprint(tup[1])          # 2\nprint(tup[0:2])        # (1, 2)\n\n# 2. Unpacking - O(N)\nx, y, z = tup\nprint(x, y, z)         # 1 2 3\n\n# 3. Membership & Counting\nprint(2 in tup)        # O(N) - True\nprint(tup.count(3))    # O(N) - 1 (occurrences of 3)\nprint(tup.index(2))    # O(N) - 1 (index of value 2)"
     },
     {
-      "title": "Sets (Unique Collections)",
-      "description": "Sets store unique, unordered elements. They support O(1) membership tests and mathematical set operations like union, intersection, and difference.",
-      "codeBlock": "s = {1, 2, 3, 3}\nprint(s)               # {1, 2, 3}\n\n# Set operations\na = {1, 2, 3}\nb = {3, 4, 5}\nprint(a | b)           # {1, 2, 3, 4, 5} (Union)\nprint(a & b)           # {3}             (Intersection)\nprint(a - b)           # {1, 2}          (Difference)"
+      "title": "Set Operations & Complexity",
+      "description": "Sets represent unordered collections of unique elements. They are built on hash tables, providing O(1) average time complexities for insertion, deletion, and membership checks.",
+      "codeBlock": "s = {1, 2, 3}\n\n# 1. Insertion - O(1) average\ns.add(4)\nprint(s)               # {1, 2, 3, 4}\n\n# 2. Deletion - O(1) average\ns.remove(3)            # Raises KeyError if 3 is missing\ns.discard(10)          # O(1) - Safe deletion, no error if missing\n\n# 3. Membership Check - O(1) average\nprint(2 in s)          # True (incredibly fast due to hashing)\n\n# 4. Mathematical Set Operations\na = {1, 2, 3}\nb = {3, 4, 5}\nprint(a | b)           # O(len(a) + len(b)) - Union: {1, 2, 3, 4, 5}\nprint(a & b)           # O(min(len(a), len(b))) - Intersection: {3}\nprint(a - b)           # O(len(a)) - Difference: {1, 2}\nprint(a ^ b)           # O(len(a)) - Symmetric Difference: {1, 2, 4, 5}"
     },
     {
-      "title": "Dictionaries (Key-Value Mappings)",
-      "description": "Dictionaries store key-value associations. Keys must be immutable and unique. Dicts preserve insertion order in Python 3.7+.",
-      "codeBlock": "user = {\"name\": \"Alice\", \"role\": \"admin\"}\nprint(user[\"name\"])    # \"Alice\"\nprint(user.get(\"age\", 25)) # 25 (safe access with default fallback)\n\n# Insertion & Merging (Python 3.9+)\nmerged = user | {\"active\": True}\nprint(merged)          # {'name': 'Alice', 'role': 'admin', 'active': True}"
+      "title": "Dictionary Operations & Complexity",
+      "description": "Dictionaries store key-value pairs. They provide O(1) average time complexities for key lookup, insertion, updating, and deletion.",
+      "codeBlock": "d = {\"name\": \"Alice\", \"role\": \"admin\"}\n\n# 1. Insertion & Update - O(1) average\nd[\"email\"] = \"alice@example.com\"\nd[\"role\"] = \"superuser\"\n\n# 2. Safe Access - O(1) average\nprint(d.get(\"age\", 25))# 25 (returns fallback if key is missing)\n\n# 3. Deletion - O(1) average\nval = d.pop(\"role\")    # Removes and returns \"superuser\"\nprint(d)               # {'name': 'Alice', 'email': 'alice@example.com'}\n\n# 4. Iteration\nfor k, v in d.items(): # O(N) traversal\n    print(k, v)"
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Memory Management:</strong> Python lists are implemented as variable-length arrays of pointers to objects (equivalent to <code>std::vector&lt;PyObject*&gt;</code> in C++). Resizing follows an over-allocation pattern to achieve amortized O(1) appends, but inserting at the beginning forces a shift of all subsequent elements, taking O(N) time. Tuples are immutable and are allocated in a single block of memory, which makes them lighter and faster to construct than lists.</p><p class=\"mb-3\"><strong>Hash Table Implementations:</strong> Both <code>set</code> and <code>dict</code> are built on highly optimized hash tables. Dictionaries use a dense array of entries and an index table to preserve insertion order (since Python 3.6/3.7) while maintaining O(1) average lookup times. Keys must be hashable (immutable objects like strings, numbers, or tuples containing only immutable types). Sets are essentially dictionaries without values, utilizing identical open addressing hashing mechanics to ensure quick element checking.</p>"

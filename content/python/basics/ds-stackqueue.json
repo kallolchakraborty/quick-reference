@@ -7,14 +7,14 @@
   "language": "python",
   "sections": [
     {
-      "title": "Stacks (LIFO)",
-      "description": "A Stack is a Last-In-First-Out data structure. It is easily simulated using Python's standard list, using append() to push and pop() to remove the last element in O(1) time.",
-      "codeBlock": "stack = []\n\n# Push elements\nstack.append(\"Page A\")\nstack.append(\"Page B\")\nstack.append(\"Page C\")\n\n# Pop elements\nprint(stack.pop())     # \"Page C\"\nprint(stack.pop())     # \"Page B\"\nprint(stack)           # [\"Page A\"]"
+      "title": "Stack Operations & Complexity",
+      "description": "A Stack is a Last-In-First-Out (LIFO) container. Push, Pop, and Peek operations all execute in O(1) time complexity.",
+      "codeBlock": "stack = []\n\n# 1. Push - O(1) time\nstack.append(\"Page A\")\nstack.append(\"Page B\")\nstack.append(\"Page C\")\n\n# 2. Peek - O(1) time (view top element without removing)\ntop_element = stack[-1] if stack else None\nprint(top_element)     # \"Page C\"\n\n# 3. Pop - O(1) time\nprint(stack.pop())     # \"Page C\"\nprint(stack.pop())     # \"Page B\"\nprint(stack)           # [\"Page A\"]"
     },
     {
-      "title": "Queues (FIFO)",
-      "description": "A Queue is a First-In-First-Out data structure. Implementing a queue using list.pop(0) is inefficient because it shifts all remaining elements in memory. Instead, use collections.deque for O(1) pops.",
-      "codeBlock": "from collections import deque\nqueue = deque()\n\n# Enqueue elements\nqueue.append(\"Request 1\")\nqueue.append(\"Request 2\")\nqueue.append(\"Request 3\")\n\n# Dequeue elements\nprint(queue.popleft())  # \"Request 1\" (O(1) pop operation)\nprint(queue.popleft())  # \"Request 2\"\nprint(list(queue))     # [\"Request 3\"]"
+      "title": "Queue Operations & Complexity",
+      "description": "A Queue is a First-In-First-Out (FIFO) container. Using collections.deque ensures that Enqueue, Dequeue, and Peek operations all execute in O(1) time complexity.",
+      "codeBlock": "from collections import deque\nqueue = deque()\n\n# 1. Enqueue - O(1) time (append to right)\nqueue.append(\"Request 1\")\nqueue.append(\"Request 2\")\nqueue.append(\"Request 3\")\n\n# 2. Peek - O(1) time (view front element)\nfront_element = queue[0] if queue else None\nprint(front_element)    # \"Request 1\"\n\n# 3. Dequeue - O(1) time (pop from left)\nprint(queue.popleft())  # \"Request 1\"\nprint(queue.popleft())  # \"Request 2\"\nprint(list(queue))     # [\"Request 3\"]"
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Stack Complexity:</strong> Stacks are fundamental to backtracking algorithms and recursion simulation. Since Python lists are dynamic arrays, appending and popping from the end are amortized O(1) operations, making lists highly efficient stack structures. If fixed size is required, use <code>collections.deque</code> with the optional <code>maxlen</code> argument.</p><p class=\"mb-3\"><strong>Queue Gotchas:</strong> A naive implementation of a queue using a list (e.g. <code>list.pop(0)</code>) causes a massive performance bottleneck. Because lists are contiguous arrays, removing the first element requires the interpreter to shift the remaining <code>N-1</code> elements down in memory, resulting in O(N) complexity. In contrast, <code>collections.deque</code> (double-ended queue) is structured internally as a doubly-linked list of fixed-size blocks. It guarantees O(1) appends and pops on both ends, which is optimal for network packet buffering, scheduling queues, and sliding windows.</p>"

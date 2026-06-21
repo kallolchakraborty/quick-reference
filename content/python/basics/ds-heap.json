@@ -7,14 +7,14 @@
   "language": "python",
   "sections": [
     {
-      "title": "Min-Heap",
-      "description": "Python's heapq module provides binary heap algorithms built on top of standard lists. The minimum element is always stored at index 0 (min-heap invariant).",
-      "codeBlock": "import heapq\n\nheap = []\n\n# Push elements - O(log N) time complexity\nheapq.heappush(heap, 40)\nheapq.heappush(heap, 10)\nheapq.heappush(heap, 30)\nheapq.heappush(heap, 15)\n\n# Peek smallest element - O(1) time complexity\nprint(heap[0])         # 10\n\n# Pop smallest element - O(log N) time complexity\nprint(heapq.heappop(heap)) # 10\nprint(heapq.heappop(heap)) # 15"
+      "title": "Heap Operations & Complexity",
+      "description": "Min-Heaps support insertion and popping in O(log N) logarithmic time, heapification in O(N) linear time, and peeking at the minimum element in O(1) time.",
+      "codeBlock": "import heapq\n\n# 1. Heapify - O(N) time (converts raw list in-place)\nheap = [40, 10, 30, 15]\nheapq.heapify(heap)\nprint(heap)            # [10, 15, 30, 40] (in heap order)\n\n# 2. Push (Insert) - O(log N) time\nheapq.heappush(heap, 5)\n\n# 3. Peek Minimum - O(1) time\nmin_val = heap[0]\nprint(min_val)         # 5\n\n# 4. Pop (Delete Min) - O(log N) time\nsmallest = heapq.heappop(heap)\nprint(smallest)        # 5\nprint(heap[0])         # 10 (new minimum)"
     },
     {
-      "title": "Max-Heap",
-      "description": "Python does not have a built-in max-heap implementation, but you can easily simulate one by multiplying element values by -1 during insertion and popping.",
-      "codeBlock": "import heapq\n\nmax_heap = []\n\n# Push element multiplied by -1\nheapq.heappush(max_heap, -40)\nheapq.heappush(max_heap, -10)\nheapq.heappush(max_heap, -30)\n\n# Retrieve elements (multiply by -1 again)\nprint(-heapq.heappop(max_heap)) # 40 (largest)\nprint(-heapq.heappop(max_heap)) # 30"
+      "title": "Max-Heap Operations",
+      "description": "Since Python's heapq only supports min-heaps, max-heaps are implemented by multiplying values by -1 on insertion and reversing the sign on retrieval.",
+      "codeBlock": "import heapq\n\nmax_heap = []\n\n# 1. Push - O(log N) time\nheapq.heappush(max_heap, -40)\nheapq.heappush(max_heap, -10)\nheapq.heappush(max_heap, -30)\n\n# 2. Peek Max - O(1) time\nprint(-max_heap[0])    # 40\n\n# 3. Pop Max - O(log N) time\nprint(-heapq.heappop(max_heap)) # 40\nprint(-heapq.heappop(max_heap)) # 30"
     }
   ],
   "details": "<p class=\"mb-3\"><strong>Binary Heap Mechanics:</strong> A binary heap is a complete binary tree where the key of any node is smaller (in a min-heap) or larger (in a max-heap) than its children. Python's <code>heapq</code> module uses a zero-based flat list representation of this tree. Under the hood, for any node at index <code>i</code>, its left child is at index <code>2*i + 1</code>, and its right child is at <code>2*i + 2</code>. This layout avoids pointer overhead completely.</p><p class=\"mb-3\"><strong>Performance & Use Cases:</strong> Pushing and popping elements take O(log N) time, while heapifying a raw list takes O(N) linear time using <code>heapq.heapify()</code>. Heaps are the backing data structure for Priority Queues and are heavily used in greedy scheduling, Huffman coding, Dijkstra's shortest path algorithm, and finding the k-largest or k-smallest elements in large data streams.</p>"
