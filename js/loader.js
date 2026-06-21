@@ -10,6 +10,7 @@ const routeMap = {
   '#py-ds-heap': 'content/python/basics/ds-heap.json',
   '#py-ds-tree': 'content/python/basics/ds-tree.json',
   '#py-ds-graph': 'content/python/basics/ds-graph.json',
+  '#py-ds-faang': 'content/python/faang-ds.json',
   '#py-basics-files': 'content/python/basics/files.json',
   '#py-basics-api': 'content/python/basics/api.json',
   '#py-basics-concurrency': 'content/python/basics/concurrency.json',
