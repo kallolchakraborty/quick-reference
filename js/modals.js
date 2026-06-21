@@ -157,6 +157,13 @@
     { title: "Basics: API Handling", category: "Python", url: "docs.html#py-basics-api", tags: ["python", "basics", "api", "http", "json", "xml", "requests"] },
     { title: "Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
     { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
+    { title: "Time & Space Complexity", category: "Python", url: "docs.html#py-complexity", tags: ["python", "complexity", "big-o", "time", "space", "analysis", "asymptotic"] },
+    { title: "Algorithms & Patterns", category: "Python", url: "docs.html#py-algorithms", tags: ["python", "algorithms", "patterns", "two-pointers", "binary-search", "dp", "backtracking", "divide-conquer"] },
+    { title: "OOP & Design Patterns", category: "Python", url: "docs.html#py-oop", tags: ["python", "oop", "design", "patterns", "solid", "decorator", "metaclass", "inheritance"] },
+    { title: "What is an LLM?", category: "Gen AI", url: "docs.html#genai-what-is-llm", tags: ["genai", "llm", "transformer", "attention", "scaling", "next-token", "pretraining", "sft", "rlhf"] },
+    { title: "KV Cache", category: "Gen AI", url: "docs.html#genai-kvcache", tags: ["genai", "kv", "cache", "attention", "inference", "memory", "decoding", "transformer"] },
+    { title: "RAG", category: "Gen AI", url: "docs.html#genai-rag", tags: ["genai", "rag", "retrieval", "augmented", "generation", "vector", "search", "chunking"] },
+    { title: "Fine-Tuning & PEFT", category: "Gen AI", url: "docs.html#genai-finetuning", tags: ["genai", "fine-tuning", "peft", "lora", "qlora", "adapter", "sft", "alignment"] },
   ];
 
   var _selectedIndex = -1;
