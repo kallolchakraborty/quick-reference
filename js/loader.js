@@ -24,7 +24,9 @@ const routeMap = {
   '#genai-prompt-engineering': 'content/genai/prompt-engineering.json',
   '#genai-context-engineering': 'content/genai/context-engineering.json',
   '#genai-harness-engineering': 'content/genai/harness-engineering.json',
-  '#genai-loop-engineering': 'content/genai/loop-engineering.json'
+  '#genai-loop-engineering': 'content/genai/loop-engineering.json',
+  '#genai-moe': 'content/genai/mixture-of-experts.json',
+  '#genai-llm-serving': 'content/genai/llm-serving.json'
 };
 
 let scrollSpyCleanup = null;

@@ -2,7 +2,7 @@
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
-**Current stats:** 6 HTML pages, 21 JSON content files (6 python/basics, 2 python, 2 programming, 3 interactive, 8 genai), 16 search entries, 16 route map entries, ~1.8K JS lines, ~474 CSS lines.
+**Current stats:** 6 HTML pages, 23 JSON content files (6 python/basics, 2 python, 2 programming, 3 interactive, 10 genai), 18 search entries, 18 route map entries, ~2K JS lines, ~474 CSS lines.
 
 ## Features
 
@@ -169,7 +169,7 @@ The search index contains:
 - **Python** — History of Python
 - **Python Basics** — Data Types, Loops, I/O, Data Structures, File Handling, API Handling, Time & Space Complexity, Algorithms & Patterns, OOP & Design Patterns
 - **System Internals** — GIL, Compiler, Interpreter
-- **Gen AI** — What is an LLM?, KV Cache, RAG, Fine-Tuning & PEFT, Prompt Engineering, Context Engineering, Harness Engineering, Loop Engineering
+- **Gen AI** — What is an LLM?, KV Cache, RAG, Fine-Tuning & PEFT, Prompt Engineering, Context Engineering, Harness Engineering, Loop Engineering, Mixture of Experts, LLM Serving & Deployment
 
 ## Accessibility
 

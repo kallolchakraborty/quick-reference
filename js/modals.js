@@ -168,6 +168,8 @@
     { title: "Context Engineering", category: "Gen AI", url: "docs.html#genai-context-engineering", tags: ["genai", "context", "engineering", "window", "lost-in-the-middle", "sliding-window", "caching"] },
     { title: "Harness Engineering", category: "Gen AI", url: "docs.html#genai-harness-engineering", tags: ["genai", "harness", "engineering", "evaluation", "benchmark", "llm-as-judge", "mmlu", "gsm8k"] },
     { title: "Loop Engineering", category: "Gen AI", url: "docs.html#genai-loop-engineering", tags: ["genai", "loop", "engineering", "react", "agent", "tool-use", "reflexion", "tree-of-thoughts"] },
+    { title: "Mixture of Experts", category: "Gen AI", url: "docs.html#genai-moe", tags: ["genai", "moe", "mixture", "experts", "routing", "load-balancing", "sparse", "all-to-all"] },
+    { title: "LLM Serving & Deployment", category: "Gen AI", url: "docs.html#genai-llm-serving", tags: ["genai", "serving", "deployment", "continuous-batching", "tensor-parallelism", "pipeline-parallelism", "vllm", "prefix-caching"] },
   ];
 
   var _selectedIndex = -1;
