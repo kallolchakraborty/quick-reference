@@ -15,7 +15,8 @@ const routeMap = {
   '#py-basics-concurrency': 'content/python/basics/concurrency.json',
   '#python-history': 'content/python/python-history.json',
   '#genai-what-is-llm': 'content/genai/what-is-llm.json',
-  '#genai-kvcache': 'content/genai/kv-cache.json'
+  '#genai-kvcache': 'content/genai/kv-cache.json',
+  '#genai-llm-arch': 'content/genai/llm-architecture.json'
 };
 
 let scrollSpyCleanup = null;

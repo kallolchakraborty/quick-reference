@@ -157,6 +157,7 @@
     { title: "Basics: API Handling", category: "Python", url: "docs.html#py-basics-api", tags: ["python", "basics", "api", "http", "json", "xml", "requests"] },
     { title: "Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
     { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
+    { title: "LLM Architecture: End-to-End Component Guide", category: "Gen AI", url: "docs.html#genai-llm-arch", tags: ["genai", "llm", "architecture", "transformer", "attention", "decoder", "self-attention", "qkv", "ffn", "embedding", "swiglu", "kv", "cache", "softmax", "token", "positional", "encoding", "lm", "head", "residual", "layernorm"] },
   ];
 
   var _selectedIndex = -1;
