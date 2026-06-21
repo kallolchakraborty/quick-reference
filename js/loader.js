@@ -591,6 +591,8 @@ function setupFaangPage() {
 }
 
 window.copyCode = copyCode;
+
+window.addEventListener('DOMContentLoaded', () => {
   const initialHash = window.location.hash || '#python-history';
   loadContent(initialHash);
 });
