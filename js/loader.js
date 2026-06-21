@@ -10,14 +10,10 @@ const routeMap = {
   '#py-ds-heap': 'content/python/basics/ds-heap.json',
   '#py-ds-tree': 'content/python/basics/ds-tree.json',
   '#py-ds-graph': 'content/python/basics/ds-graph.json',
-  '#py-ds-faang': 'content/python/faang-ds.json',
   '#py-basics-files': 'content/python/basics/files.json',
   '#py-basics-api': 'content/python/basics/api.json',
   '#py-basics-concurrency': 'content/python/basics/concurrency.json',
-  '#python-history': 'content/python/python-history.json',
-  '#gil': 'content/python/gil.json',
-  '#compiler': 'content/programming/compiler.json',
-  '#interpreter': 'content/programming/interpreter.json'
+  '#python-history': 'content/python/python-history.json'
 };
 
 let scrollSpyCleanup = null;
@@ -106,17 +102,17 @@ async function loadContent(hash) {
         const t = data.timeline[ti];
         const delay = ti * 80;
         items += `
-          <div class="timeline-card group" style="animation-delay: ${delay}ms">
-            <div class="timeline-bullet">
-              <div class="timeline-bullet-inner"></div>
+          <div class="timeline-entry" style="animation-delay: ${delay}ms">
+            <div class="timeline-dot">
+              <span class="timeline-dot-year">${t.year}</span>
+              <span class="timeline-dot-ring"></span>
             </div>
-            <div class="p-5 bg-white dark:bg-[#0F1115] border border-slate-200 dark:border-slate-800/85 rounded-2xl shadow-sm hover:shadow-md hover:border-brand-500/30 dark:hover:border-brand-500/20 transition-all duration-300 transform hover:-translate-y-0.5">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <span class="text-xs font-mono font-bold text-brand-500 bg-brand-50 dark:bg-brand-500/10 px-2.5 py-1 rounded-full">${t.year}</span>
-                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">${t.tag || 'Release'}</span>
+            <div class="timeline-body">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="timeline-title">${t.title || ''}</h4>
+                <span class="timeline-tag">${t.tag || 'Release'}</span>
               </div>
-              <h4 class="text-base font-bold text-slate-900 dark:text-white mb-1.5 group-hover:text-brand-500 transition-colors duration-300">${t.title || ''}</h4>
-              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">${t.event}</p>
+              <p class="timeline-event">${t.event}</p>
             </div>
           </div>
         `;
@@ -226,11 +222,7 @@ async function loadContent(hash) {
         link.classList.remove('active-doc-link');
       }
     });
-    if (!isInitialLoad) {
-      openActiveSidebarSection();
-    } else {
-      isInitialLoad = false;
-    }
+    isInitialLoad = false;
 
     // Populate right outline dynamically
     const outlineArea = document.getElementById('docs-right-outline');
@@ -238,26 +230,26 @@ async function loadContent(hash) {
       if (data.sections) {
         let outlineHtml = data.sections.map((section, idx) => {
           const sectionId = `section-${data.id}-${idx}`;
-          return `<a href="#${sectionId}" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${section.title}</a>`;
+          return `<a href="#${sectionId}" class="outline-link">${section.title}</a>`;
         }).join('\n');
         if (data.comparisonTable) {
-          outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
+          outlineHtml += `\n<a href="#section-comparison" class="outline-link">Comparison Matrix</a>`;
         }
         if (data.diffTable) {
-          outlineHtml += `\n<a href="#section-differences" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Differences Matrix</a>`;
+          outlineHtml += `\n<a href="#section-differences" class="outline-link">Differences Matrix</a>`;
         }
-        outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
+        outlineHtml += `\n<a href="#section-dive" class="outline-link">Deep Dive</a>`;
         outlineArea.innerHTML = outlineHtml;
       } else {
         const syntaxLabel = data.id === 'python-history' ? 'Timeline' : 'Syntax Guide';
-        let outlineHtml = `<a href="#section-syntax" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">${syntaxLabel}</a>`;
+        let outlineHtml = `<a href="#section-syntax" class="outline-link">${syntaxLabel}</a>`;
         if (data.comparisonTable) {
-          outlineHtml += `\n<a href="#section-comparison" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Comparison Matrix</a>`;
+          outlineHtml += `\n<a href="#section-comparison" class="outline-link">Comparison Matrix</a>`;
         }
         if (data.diffTable) {
-          outlineHtml += `\n<a href="#section-differences" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Differences Matrix</a>`;
+          outlineHtml += `\n<a href="#section-differences" class="outline-link">Differences Matrix</a>`;
         }
-        outlineHtml += `\n<a href="#section-dive" class="outline-link block text-slate-500 hover:text-brand-500 transition-colors">Deep Dive</a>`;
+        outlineHtml += `\n<a href="#section-dive" class="outline-link">Deep Dive</a>`;
         outlineArea.innerHTML = outlineHtml;
       }
       setupOutlineSmoothScroll();
@@ -298,11 +290,6 @@ async function loadContent(hash) {
       });
     });
 
-    // Setup FAANG page enhancements
-    if (data.id === 'py-ds-faang') {
-      setupFaangPage();
-    }
-
   } catch (error) {
     console.error("Error in loadContent:", error);
     contentArea.innerHTML = `
@@ -325,13 +312,7 @@ function setupOutlineSmoothScroll() {
         
         // Highlight active right outline
         document.querySelectorAll('.outline-link').forEach(link => {
-          if (link.getAttribute('href') === targetId) {
-            link.classList.add('text-brand-500', 'font-semibold');
-            link.classList.remove('text-slate-500');
-          } else {
-            link.classList.remove('text-brand-500', 'font-semibold');
-            link.classList.add('text-slate-500');
-          }
+          link.classList.toggle('active-outline', link.getAttribute('href') === targetId);
         });
       }
     });
@@ -351,17 +332,9 @@ function setupOutlineScrollSpy() {
   function updateActiveLink() {
     const scrollPosition = window.scrollY + 120; // Offset for top header and layout spacing
     
-    // Fallback: If we've scrolled to the very bottom of the document, highlight the last section
+    // Fallback: bottom of page
     if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
-      links.forEach((link, idx) => {
-        if (idx === links.length - 1) {
-          link.classList.add('text-brand-500', 'font-semibold');
-          link.classList.remove('text-slate-500');
-        } else {
-          link.classList.remove('text-brand-500', 'font-semibold');
-          link.classList.add('text-slate-500');
-        }
-      });
+      links.forEach((link, idx) => link.classList.toggle('active-outline', idx === links.length - 1));
       return;
     }
 
@@ -381,15 +354,7 @@ function setupOutlineScrollSpy() {
 
     if (activeSection) {
       const activeId = activeSection.getAttribute('id');
-      links.forEach(link => {
-        if (link.getAttribute('href') === `#${activeId}`) {
-          link.classList.add('text-brand-500', 'font-semibold');
-          link.classList.remove('text-slate-500');
-        } else {
-          link.classList.remove('text-brand-500', 'font-semibold');
-          link.classList.add('text-slate-500');
-        }
-      });
+      links.forEach(link => link.classList.toggle('active-outline', link.getAttribute('href') === `#${activeId}`));
     }
   }
 
@@ -412,50 +377,7 @@ function setupOutlineScrollSpy() {
   };
 }
 
-// Sidebar toggle: click handler for expand/collapse
-document.addEventListener('click', function(e) {
-  var toggle = e.target.closest('.sidebar-toggle');
-  if (!toggle) return;
-
-  var group = toggle.closest('.sidebar-group');
-  if (!group) return;
-  var collapse = group.querySelector('.sidebar-collapse');
-  var chevron = group.querySelector('.sidebar-chevron');
-  var expanded = toggle.getAttribute('aria-expanded') === 'true';
-
-  // Close sibling groups
-  var sibling = group.parentElement;
-  if (sibling) {
-    sibling.querySelectorAll('.sidebar-group .sidebar-toggle[aria-expanded="true"]').forEach(function(other) {
-      if (other !== toggle) {
-        other.setAttribute('aria-expanded', 'false');
-        var otherCollapse = other.closest('.sidebar-group').querySelector('.sidebar-collapse');
-        var otherChevron = other.closest('.sidebar-group').querySelector('.sidebar-chevron');
-        if (otherCollapse) otherCollapse.style.maxHeight = '0';
-        if (otherChevron) otherChevron.style.transform = 'rotate(0deg)';
-      }
-    });
-  }
-
-  toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  if (collapse) collapse.style.maxHeight = expanded ? '0' : collapse.scrollHeight + 'px';
-  if (chevron) chevron.style.transform = expanded ? 'rotate(0deg)' : 'rotate(90deg)';
-});
-
-function openActiveSidebarSection() {
-  const active = document.querySelector('.sidebar-link.active-doc-link');
-  if (!active) return;
-  const group = active.closest('.sidebar-group');
-  if (!group) return;
-  const btn = group.querySelector('.sidebar-toggle');
-  const collapse = group.querySelector('.sidebar-collapse');
-  const chevron = group.querySelector('.sidebar-chevron');
-  if (!btn || !collapse) return;
-  if (btn.getAttribute('aria-expanded') === 'true') return;
-  btn.setAttribute('aria-expanded', 'true');
-  collapse.style.maxHeight = collapse.scrollHeight + 'px';
-  if (chevron) chevron.style.transform = 'rotate(90deg)';
-}
+// ponytail: removed sidebar toggle — only one group, no collapsible needed
 
 function escapeHtml(text) {
   return text
@@ -512,84 +434,6 @@ function copyCode(btn) {
     console.error('Failed to copy: ', err);
   });
 }
-window.copyCode = copyCode;
-
-// Setup FAANG page: search filter + progress tracker
-function setupFaangPage() {
-  var firstSection = document.getElementById('section-py-ds-faang-0');
-  if (!firstSection) return;
-
-  // Inject search filter
-  var filterHtml = [
-    '<div class="ds-filter-wrap mb-4">',
-    '<span class="material-symbols-outlined ds-filter-icon text-base">search</span>',
-    '<input type="text" class="ds-filter-input" id="ds-search-input" placeholder="Filter data structures (e.g., array, tree, heap, graph...)">',
-    '</div>'
-  ].join('\n');
-  firstSection.insertAdjacentHTML('afterend', filterHtml);
-
-  // Inject progress trackers before each section (except intro and master table)
-  var dsNames = [
-    { id: 1, items: ['Arrays', 'Linked Lists', 'Stack', 'Queue', 'Deque'] },
-    { id: 2, items: ['Dictionary', 'Set', 'Counter', 'defaultdict', 'OrderedDict'] },
-    { id: 3, items: ['Binary Tree', 'BST', 'Heap', 'Trie'] },
-    { id: 4, items: ['Graph (Adj List)', 'DFS', 'BFS', 'Dijkstra', 'Topological Sort'] },
-    { id: 5, items: ['DSU (Union-Find)', 'Segment Tree', 'Fenwick Tree'] }
-  ];
-
-  dsNames.forEach(function(group) {
-    var section = document.getElementById('section-py-ds-faang-' + group.id);
-    if (!section) return;
-    var label = section.querySelector('h3');
-    if (!label) return;
-
-    var progressHtml = '<div class="ds-progress-wrap">';
-    group.items.forEach(function(name) {
-      var key = 'qb-progress-' + name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      var checked = localStorage.getItem(key) === 'done' ? ' checked' : '';
-      progressHtml += [
-        '<label class="ds-progress-item' + (checked ? ' done' : '') + '">',
-        '<input type="checkbox" class="ds-progress-cb" data-key="' + key + '"' + checked + '>',
-        name,
-        '</label>'
-      ].join('');
-    });
-    progressHtml += '</div>';
-    label.insertAdjacentHTML('afterend', progressHtml);
-  });
-
-  // Wire up progress checkbox clicks
-  document.addEventListener('change', function(e) {
-    var cb = e.target.closest('.ds-progress-cb');
-    if (!cb) return;
-    var label = cb.closest('.ds-progress-item');
-    if (cb.checked) {
-      label.classList.add('done');
-      localStorage.setItem(cb.getAttribute('data-key'), 'done');
-    } else {
-      label.classList.remove('done');
-      localStorage.removeItem(cb.getAttribute('data-key'));
-    }
-  });
-
-  // Wire up search filter
-  var searchInput = document.getElementById('ds-search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      var q = this.value.toLowerCase().trim();
-      document.querySelectorAll('.ds-card').forEach(function(card) {
-        if (!q) {
-          card.classList.remove('ds-hidden');
-          return;
-        }
-        var text = card.textContent.toLowerCase();
-        var match = text.indexOf(q) !== -1;
-        card.classList.toggle('ds-hidden', !match);
-      });
-    });
-  }
-}
-
 window.copyCode = copyCode;
 
 window.addEventListener('DOMContentLoaded', () => {

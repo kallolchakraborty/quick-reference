@@ -87,133 +87,38 @@
   <!-- ==================== THREE-COLUMN LAYOUT ==================== -->
   <div class="max-w-7xl mx-auto px-6 w-full flex-grow flex flex-col lg:flex-row gap-8 py-8">
     
-    <!-- LEFT SIDEBAR (Collapsible sections) -->
-    <aside id="left-sidebar" class="lg:w-64 lg:sticky lg:top-24 lg:h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 pb-8 lg:pb-0 pr-0 lg:pr-6">
-      <div class="space-y-2">
+    <!-- LEFT SIDEBAR -->
+    <aside id="left-sidebar" class="lg:w-56 lg:sticky lg:top-24 lg:h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-b lg:border-b-0 border-slate-200 dark:border-slate-800 pb-4 lg:pb-0 pr-0 lg:pr-5">
+      <div class="sidebar-sections">
 
-        <!-- Python -->
-        <div class="sidebar-group">
-          <button class="sidebar-toggle w-full flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1 py-1.5" aria-expanded="false">
-            <span class="material-symbols-outlined text-sm sidebar-chevron transition-transform duration-300">keyboard_arrow_right</span>
-            Python
-          </button>
-          <div class="sidebar-collapse overflow-hidden" style="max-height: 0; transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
-            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-2 mb-0.5">History</h4>
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#python-history" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  History of Python
-                </a>
-              </li>
-            </ul>
-            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-2 mb-0.5">Basics</h4>
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#py-basics-datatypes" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Data Types &amp; Operations
-                </a>
-              </li>
-              <li>
-                <a href="#py-basics-loops" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Loops &amp; Control Flow
-                </a>
-              </li>
-              <li>
-                <a href="#py-basics-io" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Input &amp; Output
-                </a>
-              </li>
-            </ul>
-            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-2 mb-0.5">Advanced Basics</h4>
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#py-basics-files" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  File Handling
-                </a>
-              </li>
-              <li>
-                <a href="#py-basics-api" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  API Handling
-                </a>
-              </li>
-              <li>
-                <a href="#py-basics-concurrency" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Multithreading &amp; Concurrency
-                </a>
-              </li>
-            </ul>
-            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-2 mb-0.5">Data Structures</h4>
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#py-ds-builtins" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Built-in Collections
-                </a>
-              </li>
-              <li>
-                <a href="#py-ds-linkedlist" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Linked Lists
-                </a>
-              </li>
-              <li>
-                <a href="#py-ds-stackqueue" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Stacks &amp; Queues
-                </a>
-              </li>
-              <li>
-                <a href="#py-ds-heap" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Priority Queues &amp; Heaps
-                </a>
-              </li>
-              <li>
-                <a href="#py-ds-tree" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Trees &amp; BSTs
-                </a>
-              </li>
-              <li>
-                <a href="#py-ds-graph" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  Graphs &amp; Networks
-                </a>
-              </li>
-            </ul>
-            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 ml-5 mt-2 mb-0.5">Interview Prep</h4>
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#py-ds-faang" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  FAANG Interview Patterns
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div class="sidebar-section">
+          <h4 class="sidebar-label">History</h4>
+          <a href="#python-history" class="sidebar-link">History of Python</a>
         </div>
 
-        <!-- System Internals -->
-        <div class="sidebar-group">
-          <button class="sidebar-toggle w-full flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-1 py-1.5" aria-expanded="false">
-            <span class="material-symbols-outlined text-sm sidebar-chevron transition-transform duration-300">keyboard_arrow_right</span>
-            System Internals
-          </button>
-          <div class="sidebar-collapse overflow-hidden" style="max-height: 0; transition: max-height 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
-            <ul class="text-sm text-slate-600 dark:text-slate-400 border-l border-slate-200 dark:border-slate-800 ml-1">
-              <li>
-                <a href="#gil" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  How the GIL Works
-                </a>
-              </li>
-              <li>
-                <a href="#compiler" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  How a Compiler Works
-                </a>
-              </li>
-              <li>
-                <a href="#interpreter" class="sidebar-link pl-4 block border-l-2 border-transparent hover:text-brand-500 hover:border-brand-500 transition-all py-0.5">
-                  How an Interpreter Works
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div class="sidebar-section">
+          <h4 class="sidebar-label">Basics</h4>
+          <a href="#py-basics-datatypes" class="sidebar-link">Data Types &amp; Operations</a>
+          <a href="#py-basics-loops" class="sidebar-link">Loops &amp; Control Flow</a>
+          <a href="#py-basics-io" class="sidebar-link">Input &amp; Output</a>
         </div>
 
+        <div class="sidebar-section">
+          <h4 class="sidebar-label">Advanced</h4>
+          <a href="#py-basics-files" class="sidebar-link">File Handling</a>
+          <a href="#py-basics-api" class="sidebar-link">API Handling</a>
+          <a href="#py-basics-concurrency" class="sidebar-link">Multithreading &amp; Concurrency</a>
+        </div>
 
+        <div class="sidebar-section">
+          <h4 class="sidebar-label">Data Structures</h4>
+          <a href="#py-ds-builtins" class="sidebar-link">Built-in Collections</a>
+          <a href="#py-ds-linkedlist" class="sidebar-link">Linked Lists</a>
+          <a href="#py-ds-stackqueue" class="sidebar-link">Stacks &amp; Queues</a>
+          <a href="#py-ds-heap" class="sidebar-link">Priority Queues &amp; Heaps</a>
+          <a href="#py-ds-tree" class="sidebar-link">Trees &amp; BSTs</a>
+          <a href="#py-ds-graph" class="sidebar-link">Graphs &amp; Networks</a>
+        </div>
 
       </div>
     </aside>
@@ -225,7 +130,7 @@
 
     <!-- RIGHT SIDEBAR (On this page) -->
     <aside class="hidden xl:block w-48 sticky top-24 h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-l border-slate-200 dark:border-slate-800 pl-6">
-      <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-4">On this page</h4>
+      <h4 class="sidebar-label !text-[10px] !pt-0 !pb-0 mb-3">On this page</h4>
       <nav id="docs-right-outline" class="space-y-3 text-xs text-slate-500 dark:text-slate-400">
         <!-- Loaded dynamically via js/loader.js -->
       </nav>

@@ -153,14 +153,10 @@
     { title: "Data Structures: Priority Queues & Heaps", category: "Python", url: "docs.html#py-ds-heap", tags: ["python", "data", "structures", "priority", "queue", "heap", "minheap", "maxheap", "heapq"] },
     { title: "Data Structures: Trees & BSTs", category: "Python", url: "docs.html#py-ds-tree", tags: ["python", "data", "structures", "tree", "binary", "search", "bst", "traversal", "inorder", "preorder", "postorder"] },
     { title: "Data Structures: Graphs & Networks", category: "Python", url: "docs.html#py-ds-graph", tags: ["python", "data", "structures", "graph", "network", "dfs", "bfs", "adjacency", "list", "traversal"] },
-    { title: "FAANG Interview Patterns", category: "Python", url: "docs.html#py-ds-faang", tags: ["python", "faang", "interview", "data", "structures", "arrays", "trees", "graphs", "hash", "trie", "heap", "complexity", "algorithms"] },
     { title: "Basics: File Handling", category: "Python", url: "docs.html#py-basics-files", tags: ["python", "basics", "file", "json", "csv", "pathlib", "io"] },
     { title: "Basics: API Handling", category: "Python", url: "docs.html#py-basics-api", tags: ["python", "basics", "api", "http", "json", "xml", "requests"] },
     { title: "Multithreading & Concurrency", category: "Python", url: "docs.html#py-basics-concurrency", tags: ["python", "basics", "threading", "concurrency", "multiprocessing", "asyncio", "async", "parallel"] },
     { title: "History of Python", category: "Python", url: "docs.html#python-history", tags: ["python", "history", "guido", "van", "rossum", "timeline", "evolution"] },
-    { title: "How Python's GIL Works", category: "System Internals", url: "docs.html#gil", tags: ["python", "gil", "thread", "concurrency", "multiprocessing", "lock"] },
-    { title: "How a Compiler Works", category: "System Internals", url: "docs.html#compiler", tags: ["compiler", "compile", "pipeline", "ast", "lexer", "parser"] },
-    { title: "How an Interpreter Works", category: "System Internals", url: "docs.html#interpreter", tags: ["interpreter", "interpret", "runtime", "execution", "repl"] },
   ];
 
   var _selectedIndex = -1;
