@@ -651,7 +651,7 @@
 
     if (rawQuery.indexOf(':') !== -1) {
       html += '<div class="px-4 pb-2 text-center">';
-      html += '<p class="text-[10px] text-slate-400 font-mono">Filter syntax: <span class="text-brand-500">cat:networking</span> <span class="text-slate-300">or</span> <span class="text-brand-500">tag:security</span></p>';
+      html += '<p class="text-[10px] text-slate-400 font-mono">Filter syntax: <span class="text-brand-500">cat:networking</span> <span class="text-slate-500">or</span> <span class="text-brand-500">tag:security</span></p>';
       html += '</div>';
     }
 
@@ -820,7 +820,7 @@
         };
         script.onerror = function() {
           let content = document.getElementById('readme-content');
-          if (content) content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load markdown parser library.</p>';
+          if (content) content.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center font-semibold">Failed to load markdown parser library.</p>';
         };
         document.head.appendChild(script);
       } else {
@@ -875,7 +875,7 @@
         console.error(err);
         let content = document.getElementById('readme-content');
         if (content) {
-          content.innerHTML = '<p class="text-red-500 text-center font-semibold">Failed to load documentation content.</p>';
+          content.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center font-semibold">Failed to load documentation content.</p>';
         }
       });
   }

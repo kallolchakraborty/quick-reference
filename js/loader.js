@@ -119,7 +119,7 @@ async function loadContent(hash) {
         }
       });
     } catch (e) {
-      contentArea.innerHTML = '<p class="text-red-500">Failed to load README.md</p>';
+      contentArea.innerHTML = '<p class="text-red-500 dark:text-red-400">Failed to load README.md</p>';
     }
     return;
   }
@@ -250,7 +250,7 @@ async function loadContent(hash) {
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
                   ${data.diffTable.map(row => `
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                      <td class="p-3 font-mono font-semibold text-orange-600 align-top">${row.dimension}</td>
+                      <td class="p-3 font-mono font-semibold text-orange-600 dark:text-orange-400 align-top">${row.dimension}</td>
                       <td class="p-3 text-slate-600 dark:text-slate-300 text-xs align-top leading-relaxed">${row.concurrency}</td>
                       <td class="p-3 text-slate-600 dark:text-slate-300 text-xs align-top leading-relaxed">${row.multithreading}</td>
                     </tr>
