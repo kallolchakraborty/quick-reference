@@ -47,11 +47,12 @@ function renderSections(sections, dataId, langClass, extraClass) {
     if (section.title.indexOf('References') !== -1) {
       refClass = ' references-section';
     }
+    let sectionLangClass = section.language ? 'language-' + section.language : langClass;
     return (
       '<div id="' + sectionId + '" class="scroll-mt-24 flex flex-col gap-3' + refClass + '">' +
       '<h3 class="text-xl font-semibold text-slate-900 dark:text-white">' + section.title + '</h3>' +
       (section.description ? '<div class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">' + section.description + '</div>' : '') +
-      (section.codeBlock ? codeBlock(section.codeBlock, langClass) : '') +
+      (section.codeBlock ? codeBlock(section.codeBlock, sectionLangClass) : '') +
       '</div>'
     );
   }).join('\n') + '</div>';
@@ -317,14 +318,26 @@ async function loadContent(hash) {
       scrollSpyCleanup = setupOutlineScrollSpy();
     }
 
-    if (!window.__prismLoading && contentArea.querySelector('pre code')) {
-      window.__prismLoading = true;
-      var s1 = document.createElement('script'); s1.src = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js';
-      var s2 = document.createElement('script'); s2.src = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js';
-      s1.onload = function() { s2.onload = function() { Prism.highlightAll(); window.__prismLoading = false; }; document.head.appendChild(s2); };
-      document.head.appendChild(s1);
-    } else if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
+    if (contentArea.querySelector('pre code')) {
+      if (typeof Prism === 'undefined') {
+        if (!window.__prismLoading) {
+          window.__prismLoading = true;
+          var s1 = document.createElement('script');
+          s1.src = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js';
+          s1.onload = function() {
+            var s2 = document.createElement('script');
+            s2.src = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js';
+            s2.onload = function() {
+              window.__prismLoading = false;
+              Prism.highlightAll();
+            };
+            document.head.appendChild(s2);
+          };
+          document.head.appendChild(s1);
+        }
+      } else {
+        Prism.highlightAll();
+      }
     }
 
     // Trigger entrance animations

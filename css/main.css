@@ -483,16 +483,17 @@ html.dark .readme-content hr { border-top-color: #1e293b; }
 .readme-content img { max-width: 100%; border-radius: 8px; }
 
 /* ========== Syntax Highlighting (Prism overrides) ========== */
-.token.keyword { color: #E95420; }
-.token.string { color: #57D38C; }
-.token.number { color: #FFB454; }
-.token.comment { color: #6B7280; font-style: italic; }
-.token.function { color: #5DA9FF; }
-.token.builtin { color: #B38CFF; }
-.token.operator { color: #374151; }
-.token.punctuation { color: #6B7280; }
-.token.boolean { color: #E95420; }
-.token.none { color: #E95420; }
+.token.keyword { color: #E95420 !important; }
+.token.string { color: #57D38C !important; }
+.token.number { color: #FFB454 !important; }
+.token.comment { color: #6B7280 !important; font-style: italic !important; }
+.token.function { color: #5DA9FF !important; }
+.token.class-name { color: #FFB454 !important; }
+.token.builtin { color: #B38CFF !important; }
+.token.operator { color: #374151 !important; }
+.token.punctuation { color: #6B7280 !important; }
+.token.boolean { color: #E95420 !important; }
+.token.none { color: #E95420 !important; }
 pre[class*="language-"] {
   background: #f8fafc !important;
   color: #374151 !important;
@@ -523,9 +524,9 @@ code[class*="language-"] { text-shadow: none !important; color: inherit !importa
   background: transparent !important;
 }
 
-html.dark .token.operator { color: #E8E8E8; }
-html.dark .token.punctuation { color: #A0A0A0; }
-html.dark .token.comment { color: #6B7280; }
+html.dark .token.operator { color: #E8E8E8 !important; }
+html.dark .token.punctuation { color: #A0A0A0 !important; }
+html.dark .token.comment { color: #6B7280 !important; }
 
 /* ========== Docs Content Animations ========== */
 @keyframes fadeUp {
