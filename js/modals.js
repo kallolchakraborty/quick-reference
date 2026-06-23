@@ -512,7 +512,7 @@
 
   // ---- Dynamic SVG Logo Inliner & Clock Animator ----
   function initLogoInliner() {
-    let logoImgs = document.querySelectorAll('img[src*="logo.svg"]');
+    let logoImgs = document.querySelectorAll('img.logo-circular-spin');
     if (logoImgs.length === 0) return;
 
     let svgCache = null;
