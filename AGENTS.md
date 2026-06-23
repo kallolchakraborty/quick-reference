@@ -79,3 +79,38 @@ Complete FAANG-grade ML interview preparation curriculum. 20 content files acros
 | Routes | ~46 |
 | JS total | ~2,200 lines |
 | CSS total | ~550 lines |
+
+## Session 2026-06-23: Workshop 2 — Staff+ expansion + roadmap + flashcards + print CSS
+
+### Done
+- **7 new Staff+ JSON files** (llm-engineering, ml-staff-system-design, ml-leadership-strategy, ml-production-ops, ml-interpretability-fairness, ml-mock-interviews)
+- **3 existing files expanded** with Staff+ sections: ml-company-focus, ml-chestnut-questions (+10), ml-behavioral (+5)
+- **3 orphan files wired**: nlp-deep-dive, cv-deep-dive, rl-rlhf — added to loader.js routes, docs.html sidebar, index.html Phase 5 tiles, modals.js search entries
+- **Roadmap.html** created — 3 study tracks (3mo/6mo/12mo) with tab switching, glass-nav header/footer
+- **Print CSS** — `@media print` in main.css: hides nav/sidebar/footer/interactive elements, optimizes layout for paper
+- **Flashcard mode** — toggle button in docs content header, blurs `<strong>A:</strong>` paragraphs (CSS filter:blur + data-qa attribute), click-to-reveal per answer
+- **Homepage roadmap tile** — "ML Study Roadmap" tile before Phase 1 with Ubuntu-orange styling
+- **Docs sidebar roadmap link** — "📖 ML Study Roadmap" in new "Study Plan" section at top of sidebar
+- **Docs sidebar Staff+ section** — "AI/ML — Staff+ & Advanced" with 6 links, below Advanced Topics
+- **Homepage Phase 6** — "Staff+ & Advanced" phase with 6 tiles (LLM Engineering, Staff+ System Design, Leadership, Production Ops, Interpretability, Mock Interviews); renumbered Gen AI→7, System Design→8, Databases→9, FAANG Facts→10
+- **loader.js** — +6 routes (Staff+ files)
+- **modals.js** — +7 search entries (Staff+ files)
+- **AGENTS.md session log appended**
+- **README.md stats updated**
+
+### Stats
+| Metric | Value |
+|--------|-------|
+| JSON content files | ~36 active (13 Python + 3 interactive + 30 AI/ML - 1 replacement for ann-history) |
+| AI/ML files | 30 across 6 phases |
+| HTML pages | 7 (+ roadmap.html) |
+| Search entries | ~47 (23 original + 3 orphans + 7 Staff+ + 14 non-ML) |
+| Routes | ~42 (23 original + 3 orphans + 6 Staff+ + 10 non-ML) |
+| JS total | ~2,300 lines |
+| CSS total | ~600 lines |
+
+### Notable decisions
+- Flashcard mode uses `data-qa` attribute (JS-injected on load) + CSS `filter: blur(8px)` — minimal footprint, no dependencies
+- Print CSS is ~30 lines, hides navigation/interactive elements but preserves code blocks and Q&A
+- Roadmap is standalone HTML (not JSON-loaded): tab switching and external links work better raw
+- Phase 6 inserted between Phase 5 (AI/ML core) and Phase 7 (Gen AI) — logical progression: foundations → advanced → Staff+ → Gen AI

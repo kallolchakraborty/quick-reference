@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Quick Bytes — ML Study Roadmap</title>
+  <meta name="description" content="Guided study plan from absolute beginner to Staff+ FAANG ML engineer. 3 tracks: 3-month crash, 6-month standard, 12-month deep." />
+  <meta property="og:title" content="Quick Bytes — ML Study Roadmap" />
+  <meta property="og:description" content="Guided study plan from absolute beginner to Staff+ FAANG ML engineer. 3 tracks: 3-month crash, 6-month standard, 12-month deep." />
+  <meta property="og:image" content="assets/logo.svg" />
+  <meta property="og:image:width" content="100" />
+  <meta property="og:image:height" content="100" />
+  <meta property="og:url" content="/roadmap.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Quick Bytes — ML Study Roadmap" />
+  <meta name="twitter:description" content="Guided study plan from absolute beginner to Staff+ FAANG ML engineer. 3 tracks: 3-month crash, 6-month standard, 12-month deep." />
+  <meta name="twitter:image" content="assets/logo.svg" />
+  <meta name="twitter:image:alt" content="Quick Bytes logo — Circle of Knowledge" />
+  <meta name="keywords" content="quick bytes, ML study roadmap, FAANG, machine learning, interview preparation, study plan" />
+  <meta name="author" content="Kallol Chakraborty" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:site_name" content="Quick Bytes" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="theme-color" content="#E95420" />
+  <link rel="canonical" href="https://kallolchakraborty.github.io/quick-reference/roadmap.html" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="prefetch" href="docs.html" as="document" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+  (function() {
+    var key = 'theme';
+    function safeGet(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSet(key, val) {
+      try { localStorage.setItem(key, val); } catch (e) {}
+    }
+    function getTheme() {
+      var stored = safeGet(key);
+      if (stored === 'dark' || stored === 'light') return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function apply(t) {
+      document.documentElement.classList.toggle('dark', t === 'dark');
+      var icons = document.querySelectorAll('.theme-toggle-btn .material-symbols-outlined');
+      for (var i = 0; i < icons.length; i++) {
+        icons[i].textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
+      }
+    }
+    apply(getTheme());
+    document.addEventListener('DOMContentLoaded', function() {
+      var btns = document.querySelectorAll('.theme-toggle-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function() {
+          var isDark = document.documentElement.classList.contains('dark');
+          var t = isDark ? 'light' : 'dark';
+          apply(t);
+          safeSet(key, t);
+        });
+      }
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (!safeGet(key)) {
+        apply(e.matches ? 'dark' : 'light');
+      }
+    });
+  })();
+  </script>
+  <link rel="stylesheet" href="css/tailwind.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+
+<body class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans min-h-screen flex flex-col transition-colors duration-200">
+
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white dark:focus:bg-slate-900 focus:text-[#E95420] focus:border focus:border-[#E95420] focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-semibold focus:outline-none focus:ring-2 focus:ring-[#E95420]">Skip to main content</a>
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="glass-nav border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <div class="w-6 h-6 shrink-0">
+          <img src="assets/logo.svg" alt="Quick Bytes Logo" class="w-full h-full object-contain" />
+        </div>
+        <span class="font-bold text-base text-slate-900 dark:text-white tracking-tight group-hover:text-brand-500 dark:group-hover:text-brand-500 transition-colors">
+          Quick Bytes
+        </span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <button class="theme-toggle-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
+          <span class="material-symbols-outlined text-[16px]">light_mode</span>
+        </button>
+        <button class="open-share-btn w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+          <span class="material-symbols-outlined text-[16px]">share</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main id="main-content" class="flex-grow">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+
+      <!-- Hero -->
+      <div class="mb-12">
+        <h1 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+          &#x1F9ED; ML Study Roadmap
+        </h1>
+        <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-3xl">
+          A guided study plan from absolute beginner to Staff+ FAANG ML engineer.
+          Choose your track based on your background and timeline.
+          Every milestone links directly to the relevant content in the Quick Bytes documentation.
+        </p>
+      </div>
+
+      <!-- Track Selector Tabs -->
+      <div class="flex gap-2 mb-8 flex-wrap">
+        <button onclick="switchTrack('3month')" id="tab-3month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-brand-500 text-white">&#x1F680; 3-Month Crash (ML background)</button>
+        <button onclick="switchTrack('6month')" id="tab-6month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">&#x1F4DA; 6-Month Standard (Working engineer)</button>
+        <button onclick="switchTrack('12month')" id="tab-12month" class="px-4 py-2 rounded-lg text-sm font-bold transition-all bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">&#x1F331; 12-Month Deep (True beginner)</button>
+      </div>
+
+      <!-- Track 1: 3-Month Crash -->
+      <div id="track-3month" class="track-content">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F680; 3-Month Crash Track</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">For engineers who already have ML experience and need to focus on FAANG interview preparation. ~20 hours/week.</p>
+        </div>
+        <div class="flex flex-col gap-3">
+          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
+            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1: Interview Fundamentals</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a> — bias-variance, metrics, CV, data leakage</li>
+              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a> — linear/logistic regression, trees, XGBoost, SVM</li>
+              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> — 30 Q&As, (sections 1-20: core, 21-30: Staff+)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> — 13 scenarios (sections 1-8: core, 9-13: Staff+)</li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 2: Deep Learning &amp; System Design</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a> + <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a> + <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a> — micrograd, BPE, nanoGPT, KV cache</li>
+              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a> — 6 full designs + deployment/monitoring</li>
+              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a> — CF, MF, two-tower, multi-stage</li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3: Staff+ Deep Dive &amp; Mock Interviews</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a> — ML platform, real-time, multi-stage ranking, A/B platform</li>
+              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a> — RAG, fine-tuning, RLHF, agents, serving</li>
+              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a> — online learning, feature platform, cascades</li>
+              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a> — full transcripts with scoring rubrics</li>
+              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a> — org-wide influence, technical vision, incident response</li>
+              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a> — Staff+ round structure per company</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Track 2: 6-Month Standard -->
+      <div id="track-6month" class="track-content hidden">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F4DA; 6-Month Standard Track</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">For working engineers with some ML exposure. ~10-15 hours/week. Builds depth gradually.</p>
+        </div>
+        <div class="flex flex-col gap-3">
+          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
+            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1-2: Foundations</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a></li>
+              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a></li>
+              <li>&bull; <a href="docs.html#aiml-unsupervised-learning" class="text-brand-500 hover:underline">Unsupervised Learning</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-math" class="text-brand-500 hover:underline">ML Math</a> — probability, linear algebra, info theory</li>
+              <li>&bull; <a href="docs.html#aiml-ml-data-centric" class="text-brand-500 hover:underline">Data-Centric AI</a></li>
+              <li>&bull; <a href="docs.html#aiml-ab-testing-experimentation" class="text-brand-500 hover:underline">A/B Testing</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3-4: Deep Learning &amp; System Design</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ann-history" class="text-brand-500 hover:underline">Intro to Neural Networks</a></li>
+              <li>&bull; <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
+              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a></li>
+              <li>&bull; <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a></li>
+              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-gpu-deep-dive" class="text-brand-500 hover:underline">GPU Deep Dive</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-project-structure" class="text-brand-500 hover:underline">ML Project Structure</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 5-6: Staff+ &amp; Advanced + Interview Prep</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-nlp-deep-dive" class="text-brand-500 hover:underline">NLP Deep Dive</a></li>
+              <li>&bull; <a href="docs.html#aiml-cv-deep-dive" class="text-brand-500 hover:underline">Computer Vision</a></li>
+              <li>&bull; <a href="docs.html#aiml-rl-rlhf" class="text-brand-500 hover:underline">RL &amp; RLHF</a></li>
+              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-interpretability-fairness" class="text-brand-500 hover:underline">Interpretability &amp; Fairness</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> (all 30)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> (all 13)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-papers" class="text-brand-500 hover:underline">Research Papers</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-coding-patterns" class="text-brand-500 hover:underline">Coding Patterns</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Track 3: 12-Month Deep -->
+      <div id="track-12month" class="track-content hidden">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">&#x1F331; 12-Month Deep Track</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">For true beginners. ~8-10 hours/week. Assumes no ML or advanced math background.</p>
+        </div>
+        <div class="flex flex-col gap-3">
+          <div class="border border-brand-200 dark:border-brand-500/20 bg-brand-50 dark:bg-brand-500/5 rounded-xl p-4">
+            <h3 class="font-bold text-brand-600 dark:text-brand-400 text-sm mb-2">Month 1-2: Math Foundations</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; Learn Python basics (if not already)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-math" class="text-brand-500 hover:underline">ML Math</a> — probability, linear algebra, calculus, statistics</li>
+              <li>&bull; Linear algebra essentials: vectors, matrices, eigenvalues, SVD</li>
+              <li>&bull; Probability: Bayes' theorem, distributions, MLE, KL divergence</li>
+              <li>&bull; Calculus: partial derivatives, chain rule, gradient descent</li>
+              <li>&bull; Statistics: hypothesis testing, p-values, confidence intervals</li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 3-4: Classical ML Foundations</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-fundamentals" class="text-brand-500 hover:underline">ML Fundamentals</a></li>
+              <li>&bull; <a href="docs.html#aiml-supervised-learning" class="text-brand-500 hover:underline">Supervised Learning</a></li>
+              <li>&bull; <a href="docs.html#aiml-unsupervised-learning" class="text-brand-500 hover:underline">Unsupervised Learning</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-data-centric" class="text-brand-500 hover:underline">Data-Centric AI</a></li>
+              <li>&bull; <a href="docs.html#aiml-ab-testing-experimentation" class="text-brand-500 hover:underline">A/B Testing</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 5-7: Deep Learning</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ann-history" class="text-brand-500 hover:underline">Intro to Neural Networks</a></li>
+              <li>&bull; <a href="docs.html#aiml-activation-functions" class="text-brand-500 hover:underline">Activation Functions</a></li>
+              <li>&bull; <a href="docs.html#aiml-neural-network-training" class="text-brand-500 hover:underline">NN Training</a></li>
+              <li>&bull; <a href="docs.html#aiml-types-of-anns" class="text-brand-500 hover:underline">Types of ANNs</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-zero-to-hero" class="text-brand-500 hover:underline">Zero to Hero</a> — build everything from scratch</li>
+              <li>&bull; <a href="docs.html#aiml-ml-coding-patterns" class="text-brand-500 hover:underline">Coding Patterns</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 8-9: System Design &amp; Advanced Topics</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-system-design" class="text-brand-500 hover:underline">ML System Design</a></li>
+              <li>&bull; <a href="docs.html#aiml-recommendation-systems" class="text-brand-500 hover:underline">Rec Systems</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-gpu-deep-dive" class="text-brand-500 hover:underline">GPU Deep Dive</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-project-structure" class="text-brand-500 hover:underline">ML Project Structure</a></li>
+              <li>&bull; <a href="docs.html#aiml-nlp-deep-dive" class="text-brand-500 hover:underline">NLP Deep Dive</a></li>
+              <li>&bull; <a href="docs.html#aiml-cv-deep-dive" class="text-brand-500 hover:underline">Computer Vision</a></li>
+              <li>&bull; <a href="docs.html#aiml-rl-rlhf" class="text-brand-500 hover:underline">RL &amp; RLHF</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 10-11: Staff+ &amp; Advanced</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-llm-engineering" class="text-brand-500 hover:underline">LLM Engineering</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-staff-system-design" class="text-brand-500 hover:underline">Staff+ System Design</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-production-ops" class="text-brand-500 hover:underline">Production ML Ops</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-interpretability-fairness" class="text-brand-500 hover:underline">Interpretability &amp; Fairness</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-leadership-strategy" class="text-brand-500 hover:underline">Leadership &amp; Strategy</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-papers" class="text-brand-500 hover:underline">Research Papers</a></li>
+            </ul>
+          </div>
+          <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Month 12: Interview Prep &amp; Mock Interviews</h3>
+            <ul class="space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
+              <li>&bull; <a href="docs.html#aiml-ml-mock-interviews" class="text-brand-500 hover:underline">Mock Interview Walkthroughs</a></li>
+              <li>&bull; <a href="docs.html#aiml-ml-chestnut-questions" class="text-brand-500 hover:underline">Chestnut Questions</a> (all 30, especially sections 21-30 Staff+)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-behavioral" class="text-brand-500 hover:underline">Behavioral (STAR)</a> (all 13, especially 9-13 Staff+)</li>
+              <li>&bull; <a href="docs.html#aiml-ml-company-focus" class="text-brand-500 hover:underline">Company Focus</a> — target your company</li>
+              <li>&bull; Practice system design whiteboarding (45-min simulated sessions)</li>
+              <li>&bull; Schedule real mock interviews with peers</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 py-8 bg-slate-100 dark:bg-slate-900/60">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+      <span>Made with &#x2764;&#xFE0F; by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a>.</span>
+      <div class="flex gap-6 font-medium">
+        <a href="docs.html#readme" class="hover:text-brand-500 transition-colors">Docs</a>
+        <a href="https://github.com/kallolchakraborty/quick-bytes" target="_blank" rel="noopener noreferrer" class="text-brand-500 font-semibold hover:text-brand-600 transition-colors">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/modals.js" defer></script>
+
+  <script>
+    function switchTrack(trackId) {
+      document.querySelectorAll('.track-content').forEach(function(el) {
+        el.classList.add('hidden');
+      });
+      document.getElementById('track-' + trackId).classList.remove('hidden');
+      document.querySelectorAll('[id^="tab-"]').forEach(function(tab) {
+        tab.classList.remove('bg-brand-500', 'text-white');
+        tab.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+      });
+      var activeTab = document.getElementById('tab-' + trackId);
+      activeTab.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+      activeTab.classList.add('bg-brand-500', 'text-white');
+    }
+  </script>
+</body>
+</html>

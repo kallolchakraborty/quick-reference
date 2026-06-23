@@ -2,7 +2,7 @@
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
-**Current stats:** 6 HTML pages, 52 JSON content files (15 python/basics, 1 python-history, 10 genai, 20 aiml, 4 interactive, 1 sysdesign, 1 databases), 46 sidebar links across 15 sections, 42 search entries, 46 route map entries, ~1.5K JS lines across 3 files, ~837 CSS lines across 2 files.
+**Current stats:** 7 HTML pages (+roadmap.html), 62 JSON content files (29 aiml, 15 python/basics, 1 python-history, 10 genai, 4 interactive, 1 sysdesign, 1 databases, 1 faang-facts), 29 AIML sidebar links across 6 phases, 59 search entries (29 AIML), 59 route map entries, ~1.4K JS lines across 4 files, ~885 CSS lines across 2 files.
 
 ## Features
 

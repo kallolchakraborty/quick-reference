@@ -47,6 +47,15 @@ const routeMap = {
   '#aiml-supervised-learning': 'content/aiml/supervised-learning.json',
   '#aiml-types-of-anns': 'content/aiml/types-of-anns.json',
   '#aiml-unsupervised-learning': 'content/aiml/unsupervised-learning.json',
+  '#aiml-nlp-deep-dive': 'content/aiml/nlp-deep-dive.json',
+  '#aiml-cv-deep-dive': 'content/aiml/cv-deep-dive.json',
+  '#aiml-rl-rlhf': 'content/aiml/rl-rlhf.json',
+  '#aiml-llm-engineering': 'content/aiml/llm-engineering.json',
+  '#aiml-ml-staff-system-design': 'content/aiml/ml-staff-system-design.json',
+  '#aiml-ml-leadership-strategy': 'content/aiml/ml-leadership-strategy.json',
+  '#aiml-ml-production-ops': 'content/aiml/ml-production-ops.json',
+  '#aiml-ml-interpretability-fairness': 'content/aiml/ml-interpretability-fairness.json',
+  '#aiml-ml-mock-interviews': 'content/aiml/ml-mock-interviews.json',
   '#sysdesign-fundamentals': 'content/sysdesign/system-design.json',
   '#database-fundamentals': 'content/databases/databases.json',
   '#faang-facts': 'content/faang/faang-facts.json'
@@ -209,10 +218,13 @@ async function loadContent(hash) {
 
     contentArea.innerHTML = `
       <section class="flex flex-col gap-6 docs-section">
-        <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider">
-          <span>${data.category}</span>
-          <span>&bull;</span>
-          <span>${data.subcategory}</span>
+        <div class="flex items-center justify-between">
+          <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider">
+            <span>${data.category}</span>
+            <span>&bull;</span>
+            <span>${data.subcategory}</span>
+          </div>
+          <button id="flashcard-toggle" class="no-print" title="Toggle flashcard mode — blur answers, click to reveal">🃏 Flashcards</button>
         </div>
         <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
         <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base">${data.description}</p>
@@ -283,6 +295,31 @@ async function loadContent(hash) {
         </div>
       </section>
     `;
+
+    // Mark Q&A answer elements for flashcard mode
+    contentArea.querySelectorAll('p').forEach(function(p) {
+      const strong = p.querySelector('strong');
+      if (strong && strong.textContent.trim() === 'A:') {
+        p.setAttribute('data-qa', 'answer');
+        p.style.cursor = 'pointer';
+      }
+    });
+
+    // Flashcard mode toggle
+    const ft = document.getElementById('flashcard-toggle');
+    if (ft) {
+      ft.onclick = function() {
+        document.body.classList.toggle('flashcard-mode');
+        ft.classList.toggle('active');
+        ft.textContent = document.body.classList.contains('flashcard-mode') ? '🃏 Flashcards: ON' : '🃏 Flashcards';
+      };
+    }
+    // Click to reveal individual answers
+    contentArea.addEventListener('click', function(e) {
+      if (!document.body.classList.contains('flashcard-mode')) return;
+      const p = e.target.closest('p[data-qa="answer"]');
+      if (p) p.classList.toggle('qa-answer--revealed');
+    });
 
     // Highlight active link in left sidebar
     document.querySelectorAll('.sidebar-link').forEach(link => {

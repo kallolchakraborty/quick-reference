@@ -824,6 +824,58 @@ html.dark .ann-diagram .ann-label { fill:#94a3b8 }
 .ann-diagram .ann-title { font:13px system-ui,sans-serif; font-weight:600; fill:#1e293b }
 html.dark .ann-diagram .ann-title { fill:#e2e8f0 }
 
+/* ========== Flashcard Mode ========== */
+body.flashcard-mode p[data-qa="answer"]:not(.qa-answer--revealed) {
+  filter: blur(8px);
+  user-select: none;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+body.flashcard-mode p[data-qa="answer"].qa-answer--revealed {
+  filter: none;
+  user-select: auto;
+}
+#flashcard-toggle {
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  transition: all 0.15s;
+}
+html.dark #flashcard-toggle {
+  border-color: #334155;
+  background: #1e293b;
+  color: #94a3b8;
+}
+#flashcard-toggle.active {
+  background: #E95420;
+  color: #fff;
+  border-color: #E95420;
+}
+
+/* ========== Print Styles ========== */
+@media print {
+  body { font-size: 11pt; color: #000; background: #fff; }
+  nav, .glass-nav, .sidebar, .footer, #flashcard-toggle, .no-print,
+  .lp-header, .lp-track, .back-to-top, .scroll-progress-bar,
+  aside, .sidebar-section, #sidebar, .sidebar-toggle,
+  .copy-btn, button, [role="navigation"] { display: none !important; }
+  .content-area, #content, main, .doc-content, section {
+    margin: 0 !important; padding: 0 !important; max-width: 100% !important;
+  }
+  a { color: #000 !important; text-decoration: underline; }
+  pre, code { font-size: 9pt; border: 1px solid #ccc; page-break-inside: avoid; }
+  h1 { font-size: 18pt; margin-top: 0; }
+  h2 { font-size: 14pt; }
+  h3 { font-size: 12pt; }
+  img, svg { max-width: 100% !important; page-break-inside: avoid; }
+  .qa-answer { filter: none !important; user-select: auto !important; }
+  @page { margin: 1.5cm; }
+}
+
 /* ========== Reduced Motion ========== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
