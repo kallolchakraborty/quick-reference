@@ -29,9 +29,6 @@
   {"@context":"https://schema.org","@type":"WebPage","name":"ai bytes — Documentation & Study Guides","description":"Access structured developer study notes, cheat sheets, syntax references, and technical guides.","author":{"@type":"Person","name":"Kallol Chakraborty"}}
   </script>
   
-  <link rel="prefetch" href="compiler.html" as="document" />
-  <link rel="prefetch" href="interpreter.html" as="document" />
-  <link rel="prefetch" href="gil.html" as="document" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script>
@@ -105,12 +102,12 @@
         <!-- Utility Buttons -->
         <div class="flex items-center gap-2">
           <!-- Theme toggle -->
-          <button class="theme-toggle-btn w-7 h-7 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
+          <button class="theme-toggle-btn text-slate-400 hover:text-brand-500 transition-all" aria-label="Toggle theme">
             <span class="material-symbols-outlined text-[16px]">light_mode</span>
           </button>
 
           <!-- Share button -->
-          <button class="open-share-btn w-7 h-7 flex items-center justify-center text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
+          <button class="open-share-btn text-slate-400 hover:text-brand-500 transition-all" aria-label="Share this page">
             <span class="material-symbols-outlined text-[16px]">share</span>
           </button>
 
@@ -138,12 +135,12 @@
           <a href="#aiml-ml-roadmap" class="sidebar-link">ML Study Roadmap</a>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section python-section">
           <h4 class="sidebar-label">Python — History</h4>
           <a href="#python-history" class="sidebar-link">History of Python</a>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section python-section">
           <h4 class="sidebar-label">Python — Fundamentals</h4>
           <a href="#py-basics-datatypes" class="sidebar-link">Data Types &amp; Operations</a>
           <a href="#py-basics-loops" class="sidebar-link">Loops &amp; Control Flow</a>
@@ -152,7 +149,7 @@
           <a href="#py-complexity" class="sidebar-link">Time &amp; Space Complexity</a>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section python-section">
           <h4 class="sidebar-label">Python — Data Structures</h4>
           <a href="#py-ds-builtins" class="sidebar-link">Built-in Collections</a>
           <a href="#py-ds-linkedlist" class="sidebar-link">Linked Lists</a>
@@ -162,7 +159,7 @@
           <a href="#py-ds-graph" class="sidebar-link">Graphs &amp; Networks</a>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section python-section">
           <h4 class="sidebar-label">Python — Core Patterns</h4>
           <a href="#py-oop" class="sidebar-link">OOP &amp; Design Patterns</a>
           <a href="#py-testing" class="sidebar-link">Testing &amp; Debugging</a>
@@ -172,7 +169,7 @@
           <a href="#py-modules" class="sidebar-link">Module System &amp; Packaging</a>
         </div>
 
-        <div class="sidebar-section">
+        <div class="sidebar-section python-section">
           <h4 class="sidebar-label">Python — Advanced &amp; FAANG</h4>
           <a href="#py-basics-concurrency" class="sidebar-link">Multithreading &amp; Concurrency</a>
           <a href="#py-algorithms" class="sidebar-link">Algorithms &amp; Patterns</a>
@@ -280,7 +277,7 @@
     <!-- RIGHT SIDEBAR (On this page) -->
     <aside class="hidden xl:block w-48 sticky top-24 h-[calc(100vh-120px)] overflow-y-auto shrink-0 border-l border-slate-200 dark:border-slate-800 pl-6">
       <h4 class="sidebar-label !text-[10px] !pt-0 !pb-0 mb-3">On this page</h4>
-      <div id="docs-right-outline" class="space-y-3 text-xs text-slate-500 dark:text-slate-400" role="navigation" aria-label="Page sections">
+      <nav id="docs-right-outline" class="space-y-3 text-xs text-slate-500 dark:text-slate-400" aria-label="Page sections">
         <!-- Loaded dynamically via js/loader.js -->
       </nav>
     </aside>
@@ -292,8 +289,7 @@
     <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
       <span>Made with ❤️ by <a href="https://www.linkedin.com/in/kallol-chakraborty-9728a699/" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:text-brand-600 transition-colors font-semibold">Kallol Chakraborty</a></span>
       <div class="flex gap-6 font-medium">
-        <a href="docs.html#readme" class="hover:text-brand-500 transition-colors">Docs</a>
-        <a href="https://github.com/kallolchakraborty/ai-bytes" target="_blank" rel="noopener noreferrer" class="text-brand-500 font-semibold hover:text-brand-600 transition-colors">GitHub</a>
+        <a href="docs.html#readme" class="hover:text-brand-500 transition-colors">Documentation</a>
       </div>
     </div>
   </footer>

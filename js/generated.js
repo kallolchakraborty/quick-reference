@@ -875,7 +875,7 @@ window.__SEARCH_INDEX = [
   {
     "title": "Built-in Collections (legacy route)",
     "category": "Python",
-    "url": "docs.html#py-basics-ds",
+    "url": "docs.html#py-ds-builtins",
     "tags": [
       "python",
       "data",

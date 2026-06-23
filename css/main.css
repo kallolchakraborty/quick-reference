@@ -600,6 +600,82 @@ html.dark .ann-diagram .ann-title { fill:#e2e8f0 }
 .tag-badge { background: #f1f5f9; color: #64748b; }
 html.dark .tag-badge { background: rgba(148,163,184,0.1); color: #94a3b8; }
 
+/* ========== References & Further Reading ========== */
+.references-section {
+  margin-top: 12px;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+html.dark .references-section {
+  border-color: #1e293b;
+  background: rgba(30, 41, 59, 0.4);
+}
+.references-section h3 {
+  font-size: 1rem !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b !important;
+}
+html.dark .references-section h3 {
+  color: #94a3b8 !important;
+}
+.references-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.references-section ul a {
+  color: #2563eb;
+  font-size: 13px;
+  text-decoration: none;
+}
+html.dark .references-section ul a {
+  color: #60a5fa;
+}
+.references-section ul a:hover {
+  text-decoration: underline;
+}
+
+/* ========== Python sidebar path: orange hierarchy ========== */
+.python-section > .sidebar-label {
+  color: #E95420;
+}
+.python-section > .sidebar-subheader {
+  color: #f07642;
+}
+.python-section > .sidebar-link {
+  border-left-color: rgba(233, 84, 32, 0.15);
+  color: #c24318;
+}
+.python-section > .sidebar-link:hover {
+  color: #E95420;
+  background: rgba(233, 84, 32, 0.06);
+}
+html.dark .python-section > .sidebar-link {
+  color: #f5a884;
+  border-left-color: rgba(233, 84, 32, 0.25);
+}
+html.dark .python-section > .sidebar-link:hover {
+  color: #E95420;
+}
+
+/* ========== Utility buttons: blend into background ========== */
+.theme-toggle-btn, .open-share-btn {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
 /* ========== Print Styles ========== */
 @media print {
   body { font-size: 11pt; color: #000; background: #fff; }

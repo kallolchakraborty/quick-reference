@@ -2,13 +2,13 @@
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
-**Current stats:** 7 HTML pages (+roadmap.html), 62 JSON content files (29 aiml, 15 python/basics, 1 python-history, 10 genai, 4 interactive, 1 sysdesign, 1 databases, 1 faang-facts), 29 AIML sidebar links across 6 phases, 59 search entries (29 AIML), 59 route map entries, ~1.4K JS lines across 4 files, ~885 CSS lines across 2 files.
+**Current stats:** 4 HTML pages, 62 JSON content files (29 aiml, 15 python/basics, 1 python-history, 10 genai, 1 sysdesign, 1 databases, 1 faang-facts), 29 AIML sidebar links across 6 phases, 59 search entries (29 AIML), 59 route map entries, ~1.4K JS lines across 4 files, ~885 CSS lines across 2 files.
 
 ## Features
 
 - **Search-first** — Ctrl+K (or Cmd+K) opens a fuzzy search modal that indexes every page and guide. Results filter live as you type.
 - **Dark/light mode** — Persistent theme toggle with OS preference detection. Dark mode uses Tailwind's `class` strategy with `localStorage` persistence.
-- **Interactive animations** — Three visual guides (Compiler, Interpreter, GIL) with scene-based slides, auto-play, keyboard navigation, and fullscreen mode.
+- **Interactive animations** — GIL visual guide with scene-based slides, auto-play, keyboard navigation, and fullscreen mode.
 - **Dynamic content** — 20+ reference pages (Python, Gen AI, System Internals) with Prism syntax highlighting, animated code blocks, and staggered entrance animations.
 - **Collapsible sidebar** — Navigation sections close by default; parent section auto-opens when navigating to a page.
 - **Share on every page** — Share button opens a modal with URL copy + Twitter/X, LinkedIn, WhatsApp, and Email share options.
@@ -19,10 +19,7 @@ A modern, search-first documentation portal for developer study notes, cheat she
 |------|------|-------------|
 | Landing | `index.html` | Hero search bar, feature cards linking to docs categories |
 | Docs Portal | `docs.html` | Sidebar navigation, dynamic content loader, right-hand outline |
-| Compiler | `compiler.html` | 9-scene interactive on how compilers work |
-| Interpreter | `interpreter.html` | 10-scene interactive on how interpreters work |
 | GIL | `gil.html` | 10-scene interactive on Python's Global Interpreter Lock |
-| Concurrency Visualizer | `concurrency.html` | Interactive Python concurrency model comparison |
 
 ## Keyboard Shortcuts
 
@@ -30,10 +27,10 @@ A modern, search-first documentation portal for developer study notes, cheat she
 |-----|---------|--------|
 | `Ctrl+K` / `Cmd+K` | Anywhere | Open/close search modal |
 | `Escape` | Modal | Close share or search modal |
-| `ArrowLeft` | Animation page | Previous scene |
-| `ArrowRight` | Animation page | Next scene |
-| `Space` | Animation page | Play/pause auto-advance |
-| `F` | Animation page | Toggle fullscreen |
+| `ArrowLeft` | GIL page | Previous scene |
+| `ArrowRight` | GIL page | Next scene |
+| `Space` | GIL page | Play/pause auto-advance |
+| `F` | GIL page | Toggle fullscreen |
 
 ## Theme
 
@@ -48,7 +45,7 @@ Both `css/main.css` (custom styles) and `css/tailwind.css` (pre-built Tailwind) 
 
 ## Interactive Animations
 
-Each animation page (`compiler.html`, `interpreter.html`, `gil.html`) uses `js/animation-core.js` as a shared module.
+The GIL page (`gil.html`) uses `js/animation-core.js` as its animation module.
 
 - Scene data (titles, subtitles, labels) is embedded inline in each interactive HTML page.
 - Scene tags are `<button type="button" role="tab" aria-selected="...">` inside a `role="tablist"` group.
@@ -65,7 +62,7 @@ Pressing `F` or clicking the fullscreen button requests fullscreen on the `#full
 
 ## Tech Stack
 
-- **HTML** — 6 static pages (incl. Concurrency Visualizer), semantic HTML5, ARIA roles
+- **HTML** — 4 static pages, semantic HTML5, ARIA roles
 - **CSS** — Tailwind CSS v3 (static build) + custom `css/main.css`
 - **JavaScript** — Vanilla JS (no transpilation step)
 - **Icons** — Material Symbols Outlined (Google Fonts CDN)
@@ -89,8 +86,6 @@ The codebase follows several best practices for a static site without a build st
 ```
 ├── index.html              Landing page
 ├── docs.html               Documentation portal with dynamic loader
-├── compiler.html           Compiler animation page
-├── interpreter.html        Interpreter animation page
 ├── gil.html                GIL animation page
 ├── css/
 │   ├── main.css            All custom styles (player animations, timeline, Prism overrides, GIL vars)
