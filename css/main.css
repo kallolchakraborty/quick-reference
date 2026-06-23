@@ -648,6 +648,10 @@ html.dark .references-section ul a {
 .python-section > .sidebar-subheader {
   color: #f07642;
 }
+.python-section > .sidebar-link {
+  color: #64748b;
+  border-left-color: transparent;
+}
 
 /* ========== Sidebar section active state ========== */
 .section-active > .sidebar-label {
