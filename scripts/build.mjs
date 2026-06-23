@@ -7,6 +7,24 @@ import path from 'path';
 const contentDir = 'content';
 const outputFile = 'js/generated.js';
 
+function stripHtml(html) {
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+}
+
+function truncate(text, max = 150) {
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
+
 function generateHashFromId(id) {
   return '#' + id;
 }
@@ -32,11 +50,15 @@ function scanContent() {
           routes[hash] = relativePath;
 
           // Build search entry
+          const plainDesc = truncate(stripHtml(data.description || ''), 150);
+          const sectionTitles = (data.sections || []).slice(0, 5).map(s => s.title);
           const searchEntry = {
             title: data.title || id,
             category: data.category || '',
             url: `docs.html${hash}`,
-            tags: data.tags || []
+            tags: data.tags || [],
+            description: plainDesc,
+            sections: sectionTitles
           };
           searchIndex.push(searchEntry);
         } catch (e) {
@@ -62,15 +84,8 @@ function generateJs(routes, searchIndex) {
 
   const searchIndexLines = searchIndex
     .map(entry => {
-      const tags = entry.tags.map(t => `      "${t.replace(/"/g, '\\"')}"`).join(',\n');
-      return `  {
-    "title": "${entry.title.replace(/"/g, '\\"')}",
-    "category": "${entry.category.replace(/"/g, '\\"')}",
-    "url": "${entry.url}",
-    "tags": [
-${tags}
-    ]
-  }`;
+      const entryJson = JSON.stringify(entry, null, 2);
+      return '  ' + entryJson.split('\n').join('\n  ');
     })
     .join(',\n');
 

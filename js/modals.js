@@ -271,6 +271,45 @@
     return text.replace(re, '<mark class="bg-brand-100 dark:bg-brand-500/30 text-inherit rounded-sm px-0.5">$1</mark>');
   }
 
+  function _scoreItem(item, q) {
+    let score = 0;
+    const titleLower = item.title.toLowerCase();
+    const catLower = item.category.toLowerCase();
+    const qLower = q.toLowerCase();
+
+    if (titleLower === qLower) score += 100;
+    else if (titleLower.startsWith(qLower)) score += 80;
+    else if (titleLower.includes(qLower)) score += 60;
+
+    if (catLower === qLower) score += 50;
+    else if (catLower.includes(qLower)) score += 40;
+
+    if (item.description && item.description.toLowerCase().includes(qLower)) score += 20;
+
+    if (item.sections) {
+      for (const s of item.sections) {
+        if (s.toLowerCase().includes(qLower)) { score += 15; break; }
+      }
+    }
+
+    if (item.tags) {
+      for (const t of item.tags) {
+        if (t.toLowerCase().includes(qLower)) { score += 10; break; }
+      }
+    }
+    return score;
+  }
+
+  function _applySelection(el) {
+    if (!el) return;
+    el.classList.add('bg-brand-50', 'dark:bg-brand-500/10', 'border-brand-100', 'dark:border-brand-500/30');
+  }
+
+  function _clearSelection(el) {
+    if (!el) return;
+    el.classList.remove('bg-brand-50', 'dark:bg-brand-500/10', 'border-brand-100', 'dark:border-brand-500/30');
+  }
+
   function renderResults(query) {
     let results = document.getElementById('modal-search-results');
     if (!results) return;
@@ -284,8 +323,13 @@
       items = searchIndex.filter(function(item) {
         return item.title.toLowerCase().includes(q) ||
                item.category.toLowerCase().includes(q) ||
-               item.tags.some(function(tag) { return tag.includes(q); });
+               (item.tags && item.tags.some(function(tag) { return tag.toLowerCase().includes(q); })) ||
+               (item.description && item.description.toLowerCase().includes(q)) ||
+               (item.sections && item.sections.some(function(s) { return s.toLowerCase().includes(q); }));
       });
+      items.forEach(function(item) { item._score = _scoreItem(item, q); });
+      items.sort(function(a, b) { return b._score - a._score; });
+      items = items.slice(0, 12);
     }
 
     _selectedIndex = -1;
@@ -293,7 +337,7 @@
     if (items.length === 0) {
       results.innerHTML = [
         '<div role="status" aria-live="polite" class="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">',
-        'No matches found. Try searching for "python", "basics", or "compiler".',
+        'No matches found. Try a broader term or check your spelling.',
         '</div>'
       ].join('\n');
       return;
@@ -302,13 +346,36 @@
     results.innerHTML = items.map(function(item, i) {
       let titleHtml = q ? _highlight(item.title, q) : item.title;
       let catHtml = q ? _highlight(item.category, q) : item.category;
+
+      let descHtml = '';
+      if (item.description) {
+        let desc = q ? _highlight(item.description, q) : item.description;
+        descHtml = '<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed line-clamp-2">' + desc + '</p>';
+      }
+
+      let sectionsHtml = '';
+      if (item.sections && item.sections.length > 0) {
+        let matchedSections = q
+          ? item.sections.filter(function(s) { return s.toLowerCase().includes(q); })
+          : item.sections.slice(0, 3);
+        if (matchedSections.length > 0) {
+          sectionsHtml = '<div class="flex flex-wrap gap-1.5 mt-2">' +
+            matchedSections.map(function(s) {
+              return '<span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">' + (q ? _highlight(s, q) : s) + '</span>';
+            }).join('') +
+            '</div>';
+        }
+      }
+
       return [
-        '<a href="' + item.url + '" role="option" class="search-result flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group" data-index="' + i + '">',
-        '<div class="flex flex-col gap-1">',
+        '<a href="' + item.url + '" role="option" class="search-result flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-brand-50 dark:hover:bg-brand-500/10 border border-slate-100 dark:border-slate-800 hover:border-brand-100 dark:hover:border-brand-500/30 rounded-lg transition-all group" data-index="' + i + '">',
+        '<div class="flex items-center justify-between">',
         '<span class="text-xs font-bold text-brand-500 uppercase tracking-wider">' + catHtml + '</span>',
-        '<span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 transition-colors">' + titleHtml + '</span>',
-        '</div>',
         '<span class="material-symbols-outlined text-slate-400 group-hover:text-brand-500 transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>',
+        '</div>',
+        '<span class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 transition-colors">' + titleHtml + '</span>',
+        descHtml,
+        sectionsHtml,
         '</a>'
       ].join('');
     }).join('');
@@ -327,12 +394,12 @@
     if (links.length === 0) return;
 
     if (_selectedIndex >= 0 && links[_selectedIndex]) {
-      links[_selectedIndex].classList.remove('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+      _clearSelection(links[_selectedIndex]);
     }
 
     _selectedIndex = (_selectedIndex + dir + links.length) % links.length;
 
-    links[_selectedIndex].classList.add('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+    _applySelection(links[_selectedIndex]);
     links[_selectedIndex].focus();
   }
 
@@ -370,10 +437,13 @@
     let result = e.target.closest('.search-result');
     if (!result) return;
     let links = document.querySelectorAll('#modal-search-results .search-result');
+
     if (_selectedIndex >= 0 && links[_selectedIndex]) {
-      links[_selectedIndex].classList.remove('bg-brand-50', 'dark:bg-brand-500/20', 'border-brand-100', 'dark:border-brand-500/30');
+      _clearSelection(links[_selectedIndex]);
     }
+
     _selectedIndex = Array.prototype.indexOf.call(links, result);
+    _applySelection(result);
   });
 
   // ---- Readme Modal Logic & Markup ----
