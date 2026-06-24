@@ -195,16 +195,28 @@ async function loadContent(hash) {
     }
 
     contentArea.innerHTML = `
-      <article class="flex flex-col gap-6 docs-section" role="region" aria-label="${data.title || 'Documentation content'}">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div class="flex flex-wrap gap-2 text-xs font-bold text-brand-500 uppercase tracking-wider items-center">
-              <span>${data.category}</span>
-              <span class="text-slate-300 dark:text-slate-600">&bull;</span>
-              <span>${data.subcategory}</span>
-              ${data.tags ? data.tags.filter(function(t){return t !== 'FAANG';}).map(function(t){return '<span class="ml-1.5 inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider tag-badge" data-tag="' + t + '">' + t + '</span>';}).join('') : ''}
+      <article class="flex flex-col gap-5 docs-section" role="region" aria-label="${data.title || 'Documentation content'}">
+        <div class="flex flex-col gap-3">
+          <!-- Premium Minimalist Breadcrumbs -->
+          <nav class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider select-none">
+            <span>${data.category}</span>
+            <span class="material-symbols-outlined text-[12px] text-slate-300 dark:text-slate-700">chevron_right</span>
+            <span class="text-brand-500">${data.subcategory}</span>
+          </nav>
+          
+          <!-- Document Title -->
+          <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
+          
+          <!-- Tags List -->
+          ${data.tags && data.tags.length > 0 ? `
+            <div class="flex flex-wrap gap-1.5 mt-0.5">
+              ${data.tags.map(function(t) {
+                return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider tag-badge cursor-default" data-tag="' + t + '">' + t + '</span>';
+              }).join('')}
             </div>
-          </div>
-        <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
+          ` : ''}
+        </div>
+
         <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base">${data.description}</p>
         
         ${embedCode}

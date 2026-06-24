@@ -633,12 +633,24 @@ mark { background: transparent; color: inherit; }
 /* ========== Tag Badges ========== */
 /* ponytail: colors applied via JS (colorizeTags) using data-tag attribute + hash palette */
 .tag-badge {
-  background: var(--tag-bg, #f1f5f9);
-  color: var(--tag-color, #64748b);
+  background: var(--tag-bg, #f1f5f9) !important;
+  color: var(--tag-color, #64748b) !important;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 html.dark .tag-badge {
-  background: var(--tag-bg, rgba(148,163,184,0.1));
-  color: var(--tag-color, #94a3b8);
+  background: var(--tag-bg, rgba(148,163,184,0.1)) !important;
+  color: var(--tag-color, #94a3b8) !important;
+  border-color: rgba(255, 255, 255, 0.02);
+}
+.tag-badge:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.96) saturate(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+html.dark .tag-badge:hover {
+  filter: brightness(1.08) saturate(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* ========== References & Further Reading ========== */
