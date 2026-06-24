@@ -104,12 +104,55 @@ ${searchIndexLines}
 `;
 }
 
+function generateSitemap(searchIndex) {
+  const timestamp = new Date().toISOString().split('T')[0];
+  const baseUrl = 'https://kallolchakraborty.github.io/ai-bytes/';
+
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+  // Root landing page
+  xml += `  <url>\n`;
+  xml += `    <loc>${baseUrl}index.html</loc>\n`;
+  xml += `    <lastmod>${timestamp}</lastmod>\n`;
+  xml += `    <changefreq>daily</changefreq>\n`;
+  xml += `    <priority>1.0</priority>\n`;
+  xml += `  </url>\n`;
+
+  // Docs landing page
+  xml += `  <url>\n`;
+  xml += `    <loc>${baseUrl}docs.html</loc>\n`;
+  xml += `    <lastmod>${timestamp}</lastmod>\n`;
+  xml += `    <changefreq>daily</changefreq>\n`;
+  xml += `    <priority>0.9</priority>\n`;
+  xml += `  </url>\n`;
+
+  // Hash dynamic pages
+  for (const entry of searchIndex) {
+    // entry.url is like "docs.html#hash"
+    const hash = entry.url.substring(entry.url.indexOf('#'));
+    const priority = (entry.category === 'Gen AI' || entry.category === 'AI/ML') ? '0.8' : '0.6';
+
+    xml += `  <url>\n`;
+    xml += `    <loc>${baseUrl}docs.html${hash}</loc>\n`;
+    xml += `    <lastmod>${timestamp}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>${priority}</priority>\n`;
+    xml += `  </url>\n`;
+  }
+
+  xml += `</urlset>\n`;
+  fs.writeFileSync('sitemap.xml', xml);
+  console.log(`Wrote sitemap.xml containing ${searchIndex.length + 2} URLs.`);
+}
+
 function main() {
   console.log('Rebuilding js/generated.js from content/...');
   const { routes, searchIndex } = scanContent();
   const js = generateJs(routes, searchIndex);
   fs.writeFileSync(outputFile, js);
   console.log(`Wrote ${outputFile} (${Object.keys(routes).length} routes, ${searchIndex.length} search entries)`);
+  generateSitemap(searchIndex);
 }
 
 main();

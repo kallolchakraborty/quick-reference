@@ -2,10 +2,10 @@ name: CI
 on:
   push:
     branches: [main]
-    paths: ['content/**', 'config/**', 'scripts/**', 'js/**']
+    paths: ['content/**', 'config/**', 'scripts/**', 'js/**', '*.html', 'assets/**', 'robots.txt']
   pull_request:
     branches: [main]
-    paths: ['content/**', 'config/**', 'scripts/**', 'js/**']
+    paths: ['content/**', 'config/**', 'scripts/**', 'js/**', '*.html', 'assets/**', 'robots.txt']
 jobs:
   validate:
     runs-on: ubuntu-latest
