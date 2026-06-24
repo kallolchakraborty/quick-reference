@@ -952,3 +952,112 @@ body, header, aside, nav, main, article, section, footer, .glass-nav, .sidebar-l
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease, stroke 0.25s ease;
 }
 
+/* ========== Sidebar Progress & Bookmarks Styling ========== */
+#sidebar-progress-container {
+  background-color: var(--bg-secondary);
+}
+#sidebar-bookmarks-list .sidebar-link {
+  font-weight: 500;
+}
+.sidebar-link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.completion-indicator {
+  font-size: 13px !important;
+  color: #10b981;
+  flex-shrink: 0;
+  margin-left: auto;
+  animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes scaleIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ========== Collapsible Summary Accordion (details) ========== */
+details.group summary::-webkit-details-marker {
+  display: none !important;
+}
+details.group summary {
+  list-style: none !important;
+  outline: none;
+}
+details.group[open] summary {
+  background-color: var(--brand-light);
+}
+
+/* ========== Print Overrides Extension ========== */
+@media print {
+  #article-actions-toolbar,
+  #sidebar-progress-container,
+  #sidebar-bookmarks-container,
+  .open-share-btn,
+  .open-search-btn,
+  .theme-toggle-btn,
+  .material-symbols-outlined[onclick],
+  button {
+    display: none !important;
+  }
+  
+  article {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Reset background for print accessibility */
+  * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  /* Keep outline borders on code blocks */
+  pre, code, td, th, table {
+    border-color: #ddd !important;
+  }
+  
+  /* Adaptive SVGs to render in grayscale high contrast for printing */
+  svg {
+    filter: contrast(1.5) grayscale(1) !important;
+  }
+  
+  /* Ensure details is fully printed even if closed in browser */
+  details {
+    display: block !important;
+    border: 1px solid #ddd !important;
+  }
+  details summary {
+    font-weight: bold !important;
+  }
+  details > div {
+    display: block !important;
+  }
+}
+
+/* ========== Related Topic Cards Custom Styles ========== */
+.related-topic-card {
+  border-left-width: 4px !important;
+  border-left-color: rgba(233, 84, 32, 0.6) !important;
+  transition: all 0.2s ease-in-out;
+}
+html.dark .related-topic-card {
+  border-left-color: rgba(245, 163, 137, 0.6) !important;
+}
+.related-topic-card:hover {
+  border-color: var(--brand-primary) !important;
+  border-left-color: var(--brand-primary) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}
+html.dark .related-topic-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+}
+
+
+

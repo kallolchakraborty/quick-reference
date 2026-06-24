@@ -20,6 +20,265 @@ function colorizeTags(root) {
   });
 }
 
+
+// localStorage Helpers for Study Progress and Bookmarks
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem('ab_bookmarks')) || []; } catch (e) { return []; }
+}
+function saveBookmarks(bookmarks) {
+  localStorage.setItem('ab_bookmarks', JSON.stringify(bookmarks));
+}
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('ab_progress')) || []; } catch (e) { return []; }
+}
+function saveProgress(progress) {
+  localStorage.setItem('ab_progress', JSON.stringify(progress));
+}
+
+function toggleBookmark(hash) {
+  var bookmarks = getBookmarks();
+  var index = bookmarks.indexOf(hash);
+  if (index > -1) {
+    bookmarks.splice(index, 1);
+  } else {
+    bookmarks.push(hash);
+  }
+  saveBookmarks(bookmarks);
+  updateBookmarkUI(hash);
+  updateSidebarBookmarks();
+  updateSidebarLinksUI();
+}
+window.toggleBookmark = toggleBookmark;
+
+function toggleProgress(hash) {
+  var progress = getProgress();
+  var index = progress.indexOf(hash);
+  if (index > -1) {
+    progress.splice(index, 1);
+  } else {
+    progress.push(hash);
+  }
+  saveProgress(progress);
+  updateProgressUI(hash);
+  updateSidebarProgress();
+  updateSidebarLinksUI();
+}
+window.toggleProgress = toggleProgress;
+
+function updateBookmarkUI(hash) {
+  if (window.location.hash !== hash && (window.location.hash || '#python-history') !== hash) return;
+  var btn = document.getElementById('btn-bookmark');
+  if (!btn) return;
+  var isBookmarked = getBookmarks().includes(hash);
+  var icon = btn.querySelector('.material-symbols-outlined');
+  if (icon) {
+    icon.textContent = isBookmarked ? 'star' : 'star_border';
+    if (isBookmarked) {
+      btn.classList.add('text-amber-500', 'border-amber-500/40', 'bg-amber-500/5');
+      btn.classList.remove('text-slate-400');
+    } else {
+      btn.classList.remove('text-amber-500', 'border-amber-500/40', 'bg-amber-500/5');
+      btn.classList.add('text-slate-400');
+    }
+  }
+}
+
+function updateProgressUI(hash) {
+  if (window.location.hash !== hash && (window.location.hash || '#python-history') !== hash) return;
+  var btn = document.getElementById('btn-progress');
+  if (!btn) return;
+  var isCompleted = getProgress().includes(hash);
+  var icon = btn.querySelector('.material-symbols-outlined');
+  var text = btn.querySelector('.progress-btn-text');
+  if (icon && text) {
+    icon.textContent = isCompleted ? 'check_circle' : 'circle';
+    text.textContent = isCompleted ? 'Completed' : 'Mark as Done';
+    if (isCompleted) {
+      icon.classList.add('text-emerald-500');
+      icon.classList.remove('text-slate-400');
+      btn.classList.add('text-emerald-600', 'border-emerald-500/40', 'bg-emerald-500/5');
+    } else {
+      icon.classList.remove('text-emerald-500');
+      icon.classList.add('text-slate-400');
+      btn.classList.remove('text-emerald-600', 'border-emerald-500/40', 'bg-emerald-500/5');
+    }
+  }
+}
+
+function updateSidebarProgress() {
+  var progress = getProgress();
+  var total = Object.keys(_routeMap).length;
+  var completedCount = progress.filter(function(hash) { return _routeMap[hash]; }).length;
+  var percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+  
+  var textEl = document.getElementById('sidebar-progress-text');
+  var barEl = document.getElementById('sidebar-progress-bar');
+  var statsEl = document.getElementById('sidebar-progress-stats');
+  
+  if (textEl) textEl.textContent = percentage + '%';
+  if (barEl) barEl.style.width = percentage + '%';
+  if (statsEl) statsEl.textContent = completedCount + ' of ' + total + ' topics completed';
+}
+
+function updateSidebarBookmarks() {
+  var bookmarks = getBookmarks();
+  var container = document.getElementById('sidebar-bookmarks-container');
+  var list = document.getElementById('sidebar-bookmarks-list');
+  if (!container || !list) return;
+  
+  var validBookmarks = bookmarks.filter(function(hash) { return _routeMap[hash]; });
+  
+  if (validBookmarks.length === 0) {
+    container.classList.add('hidden');
+    return;
+  }
+  
+  container.classList.remove('hidden');
+  list.innerHTML = validBookmarks.map(function(hash) {
+    var title = hash;
+    var entry = (window.__SEARCH_INDEX || []).find(function(e) { return e.url === 'docs.html' + hash; });
+    if (entry) {
+      title = entry.title;
+      if (title.length > 24) title = title.substring(0, 22) + '...';
+    }
+    return '<a href="' + hash + '" class="sidebar-link !py-1 flex items-center justify-between hover:text-brand-500">' +
+      '<span class="truncate">' + title + '</span>' +
+      '<span class="material-symbols-outlined text-[12px] text-amber-500">star</span>' +
+      '</a>';
+  }).join('');
+}
+
+function updateSidebarLinksUI() {
+  var progress = getProgress();
+  document.querySelectorAll('.sidebar-link').forEach(function(link) {
+    var href = link.getAttribute('href');
+    if (!href || !href.startsWith('#')) return;
+    
+    var isCompleted = progress.includes(href);
+    var checkIndicator = link.querySelector('.completion-indicator');
+    if (isCompleted) {
+      if (!checkIndicator) {
+        checkIndicator = document.createElement('span');
+        checkIndicator.className = 'completion-indicator material-symbols-outlined text-[13px] text-emerald-500 ml-auto shrink-0';
+        checkIndicator.textContent = 'check_circle';
+        link.appendChild(checkIndicator);
+      } else {
+        checkIndicator.classList.remove('hidden');
+      }
+    } else {
+      if (checkIndicator) {
+        checkIndicator.classList.add('hidden');
+      }
+    }
+  });
+}
+
+function calculateReadingTimeAndDifficulty(data) {
+  var text = data.description || '';
+  if (data.details) text += ' ' + data.details;
+  if (data.sections) {
+    data.sections.forEach(function(s) {
+      if (s.title) text += ' ' + s.title;
+      if (s.description) text += ' ' + s.description;
+      if (s.codeBlock) text += ' ' + s.codeBlock;
+    });
+  }
+  
+  var cleanText = text.replace(/<[^>]*>/g, ' ');
+  var words = cleanText.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+  
+  var codeBlocksCount = 0;
+  if (data.sections) {
+    data.sections.forEach(function(s) { if (s.codeBlock) codeBlocksCount++; });
+  }
+  if (data.codeBlock) codeBlocksCount++;
+  
+  var readingMinutes = Math.max(1, Math.round((words / 200) + (codeBlocksCount * 0.25)));
+  
+  var tags = (data.tags || []).map(function(t) { return t.toLowerCase(); });
+  var title = (data.title || '').toLowerCase();
+  var isAdvanced = tags.includes('faang') || tags.includes('staff+') || tags.includes('scale') || tags.includes('distributed systems') || title.includes('staff+') || title.includes('distributed');
+  var isIntermediate = !isAdvanced && (tags.includes('system design') || tags.includes('machine learning') || tags.includes('architecture') || title.includes('system design') || title.includes('database') || title.includes('deep learning'));
+  
+  var difficulty = 'Foundational';
+  var diffColor = 'text-emerald-500 border-emerald-500/20 dark:border-emerald-500/30 bg-emerald-550/5';
+  var diffIcon = 'signal_cellular_1_bar';
+  
+  if (isAdvanced) {
+    difficulty = 'Advanced / Staff+';
+    diffColor = 'text-purple-500 border-purple-500/20 dark:border-purple-500/30 bg-purple-550/5';
+    diffIcon = 'signal_cellular_4_bar';
+  } else if (isIntermediate) {
+    difficulty = 'Intermediate';
+    diffColor = 'text-amber-500 border-amber-500/20 dark:border-amber-500/30 bg-amber-550/5';
+    diffIcon = 'signal_cellular_3_bar';
+  }
+  
+  return {
+    time: readingMinutes,
+    difficulty: difficulty,
+    diffColor: diffColor,
+    diffIcon: diffIcon
+  };
+}
+
+function getRelatedTopics(currentHash, currentTags, currentCategory) {
+  if (!currentTags || currentTags.length === 0) return [];
+  var searchIndex = window.__SEARCH_INDEX || [];
+  var currentUrl = 'docs.html' + currentHash;
+  
+  var related = [];
+  searchIndex.forEach(function(item) {
+    if (item.url === currentUrl) return;
+    
+    var common = 0;
+    (item.tags || []).forEach(function(t) {
+      if (currentTags.includes(t)) common++;
+    });
+    
+    if (common > 0) {
+      related.push({
+        item: item,
+        score: common + (item.category === currentCategory ? 0.5 : 0)
+      });
+    }
+  });
+  
+  related.sort(function(a, b) { return b.score - a.score; });
+  return related.slice(0, 3).map(function(r) { return r.item; });
+}
+
+function renderRelatedTopics(currentHash, currentTags, currentCategory) {
+  var related = getRelatedTopics(currentHash, currentTags, currentCategory);
+  if (related.length === 0) return '';
+  
+  var cards = related.map(function(item) {
+    var hash = item.url.substring(item.url.indexOf('#'));
+    return `
+      <a href="${hash}" class="related-topic-card flex flex-col gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1115] group cursor-pointer">
+        <span class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">${item.category}</span>
+        <h4 class="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors">${item.title}</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 flex-1">${item.description}</p>
+        <span class="text-xs font-semibold text-brand-500 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 mt-1">
+          Read Guide
+          <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+        </span>
+      </a>
+    `;
+  }).join('');
+  
+  return `
+    <div class="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6">
+      <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-1.5 select-none">
+        <span class="material-symbols-outlined text-[16px] text-brand-500">grid_view</span> Related Study Guides
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        ${cards}
+      </div>
+    </div>
+  `;
+}
+
 async function fetchWithCache(path) {
   var cacheKey = 'ab:' + path;
   try {
@@ -194,19 +453,55 @@ async function loadContent(hash) {
       embedCode = `<div id="section-syntax" class="scroll-mt-24">${data.codeBlock ? codeBlock(data.codeBlock, langClass) : ''}</div>`;
     }
 
+    var meta = calculateReadingTimeAndDifficulty(data);
+    var relatedHtml = renderRelatedTopics(hash, data.tags, data.category);
+
     contentArea.innerHTML = `
       <article class="flex flex-col gap-5 docs-section" role="region" aria-label="${data.title || 'Documentation content'}">
         <div class="flex flex-col gap-3">
-          <!-- Premium Minimalist Breadcrumbs -->
-          <nav class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider select-none">
-            <span>${data.category}</span>
-            <span class="material-symbols-outlined text-[12px] text-slate-300 dark:text-slate-700">chevron_right</span>
-            <span class="text-brand-500">${data.subcategory}</span>
-          </nav>
+          <!-- Premium Minimalist Breadcrumbs & Actions Row -->
+          <div class="flex items-center justify-between gap-4 flex-wrap select-none">
+            <nav class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              <span>${data.category}</span>
+              <span class="material-symbols-outlined text-[12px] text-slate-300 dark:text-slate-700">chevron_right</span>
+              <span class="text-brand-500">${data.subcategory}</span>
+            </nav>
+            
+            <!-- Article Action Buttons -->
+            <div class="flex items-center gap-2" id="article-actions-toolbar">
+              <!-- Bookmark -->
+              <button onclick="toggleBookmark('${hash}')" id="btn-bookmark" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-amber-500 hover:border-amber-500/30 flex items-center justify-center transition-all bg-white dark:bg-slate-900" aria-label="Pin this guide">
+                <span class="material-symbols-outlined text-[18px]">star_border</span>
+              </button>
+              
+              <!-- Progress Checkbox -->
+              <button onclick="toggleProgress('${hash}')" id="btn-progress" class="h-8 px-3 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 flex items-center gap-1.5 text-[11px] font-semibold transition-all bg-white dark:bg-slate-900">
+                <span class="material-symbols-outlined text-[16px] text-slate-400">circle</span>
+                <span class="progress-btn-text">Mark as Done</span>
+              </button>
+              
+              <!-- Print Button -->
+              <button onclick="window.print()" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-brand-500 hover:border-brand-500/30 flex items-center justify-center transition-all bg-white dark:bg-slate-900" aria-label="Print this guide">
+                <span class="material-symbols-outlined text-[18px]">print</span>
+              </button>
+            </div>
+          </div>
           
           <!-- Document Title -->
           <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">${data.title}</h1>
           
+          <!-- Metadata Badges -->
+          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 select-none">
+            <span class="inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-slate-405">schedule</span>
+              <span>${meta.time} min read</span>
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${meta.diffColor}">
+              <span class="material-symbols-outlined text-[12px]">${meta.diffIcon}</span>
+              <span>${meta.difficulty}</span>
+            </span>
+          </div>
+
           <!-- Tags List -->
           ${data.tags && data.tags.length > 0 ? `
             <div class="flex flex-wrap gap-1.5 mt-0.5">
@@ -277,15 +572,32 @@ async function loadContent(hash) {
           </div>
         ` : ''}
         ${data.details ? `
-        <div id="section-dive" class="scroll-mt-24 p-5 rounded-xl text-sm leading-relaxed deep-dive-box">
-          <div>
-            <h4 class="font-bold text-slate-900 dark:text-white mb-1">Deep Dive</h4>
-            ${data.details}
-          </div>
+        <div id="section-dive" class="scroll-mt-24">
+          <details class="group border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 rounded-xl overflow-hidden transition-all duration-300">
+            <summary class="flex items-center justify-between p-4 font-bold text-sm text-slate-800 dark:text-slate-200 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-brand-500">lightbulb</span>
+                <span>Quick Summary &amp; Deep Dive Takeaways</span>
+              </span>
+              <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-open:rotate-180 text-slate-400">expand_more</span>
+            </summary>
+            <div class="px-5 pb-5 pt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed border-t border-slate-100 dark:border-slate-800/60 font-sans">
+              ${data.details}
+            </div>
+          </details>
         </div>
         ` : ''}
+
+        ${relatedHtml}
       </article>
     `;
+
+    updateBookmarkUI(hash);
+    updateProgressUI(hash);
+    updateSidebarProgress();
+    updateSidebarBookmarks();
+    updateSidebarLinksUI();
+    addCopyButtonsToPreElements(contentArea);
 
     colorizeTags(contentArea);
 
@@ -521,9 +833,69 @@ function copyCode(btn) {
   });
 }
 window.copyCode = copyCode;
+
+function addCopyButtonsToPreElements(container) {
+  (container || document).querySelectorAll('pre').forEach(function(pre) {
+    if (pre.parentElement.classList.contains('group') && pre.parentElement.querySelector('button[onclick*="copyCode"]')) {
+      return;
+    }
+    if (!pre.querySelector('code')) return;
+    if (pre.classList.contains('copy-btn-initialized')) return;
+    pre.classList.add('copy-btn-initialized');
+    
+    var wrapper = document.createElement('div');
+    wrapper.className = 'border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 rounded-xl p-5 text-sm leading-relaxed overflow-x-auto relative group';
+    
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+    
+    var btn = document.createElement('button');
+    btn.className = 'absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 px-2.5 py-1.5 rounded-lg text-xs font-sans text-slate-500 transition-all flex items-center gap-1.5';
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm" aria-hidden="true">content_copy</span> Copy';
+    btn.addEventListener('click', function() {
+      copyCode(btn);
+    });
+    wrapper.insertBefore(btn, pre);
+  });
+}
+window.addCopyButtonsToPreElements = addCopyButtonsToPreElements;
+
 window.addEventListener('DOMContentLoaded', () => {
   const initialHash = window.location.hash || '#python-history';
   loadContent(initialHash);
+  
+  // Initialize progress and bookmark views on load
+  updateSidebarProgress();
+  updateSidebarBookmarks();
+  updateSidebarLinksUI();
+
+  // ---- Reading scroll progress bar ----
+  (function() {
+    var bar = document.getElementById('reading-progress-bar');
+    if (!bar) return;
+    var ticking = false;
+    function updateReadingProgress() {
+      var article = document.getElementById('docs-dynamic-content');
+      if (!article) { bar.style.width = '0%'; ticking = false; return; }
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var articleTop = article.offsetTop || 0;
+      var articleHeight = article.scrollHeight || 1;
+      var viewportH = window.innerHeight;
+      var scrollable = articleTop + articleHeight - viewportH;
+      if (scrollable <= 0) { bar.style.width = '100%'; ticking = false; return; }
+      var progress = Math.min(100, Math.max(0, ((scrollTop - articleTop + viewportH * 0.1) / scrollable) * 100));
+      bar.style.width = progress.toFixed(1) + '%';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!ticking) { requestAnimationFrame(updateReadingProgress); ticking = true; }
+    }, { passive: true });
+    // Also reset on hash change (new content loaded)
+    window.addEventListener('hashchange', function() {
+      setTimeout(updateReadingProgress, 300);
+    });
+    updateReadingProgress();
+  })();
 });
 
 window.addEventListener('hashchange', () => {
@@ -533,4 +905,6 @@ window.addEventListener('hashchange', () => {
 
 window.addEventListener('theme-changed', () => {
   colorizeTags();
+  updateSidebarLinksUI();
 });
+
