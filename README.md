@@ -2,13 +2,14 @@
 
 A modern, search-first documentation portal for developer study notes, cheat sheets, and interactive visual guides — built as a static site for GitHub Pages.
 
-**Current stats:** 3 HTML pages, 73 JSON content files (32 aiml, 15 python/basics, 1 python-history, 16 genai, 4 sysdesign, 2 databases, 1 faang-facts, 1 sre, 1 oop, 1 product, 1 os, 1 security, 1 programming), 37 AI/ML/Infra sidebar links across 8 phases, 103 search entries, 103 route map entries, ~1.5K JS lines, ~950 CSS lines.
+**Current stats:** 2 HTML pages, 103 JSON content files, 103 search entries, 103 route map entries, ~1.5K JS lines, ~950 CSS lines.
 
 ## Features
 
 - **Search-first** — Ctrl+K (or Cmd+K) opens a fuzzy search modal that indexes every page and guide. Results filter live as you type.
 - **Dark/light mode** — Persistent theme toggle with OS preference detection. Default is light mode with transition parameters.
 - **Dynamic content** — Reference pages with Prism syntax highlighting, SVG dynamic animations, and math typesetting templates.
+- **Theme-responsive Diagrams** — Inline, interactive SVG diagrams for data structures (Linked Lists, Stacks & Queues, Heaps & Priority Queues, Trees & BSTs) that automatically adapt to light/dark themes.
 - **Collapsible sidebar** — Navigation sections close by default; parent section auto-opens when navigating to a page.
 - **Share on every page** — Share button opens a modal with URL copy + Twitter/X, LinkedIn, WhatsApp, and Email share options.
 
@@ -83,7 +84,13 @@ The codebase follows several best practices for a static site:
 │   ├── databases/          SQL & NoSQL database systems
 │   ├── security/           Security engineering guides
 │   ├── sre/                Site reliability engineering guides
-│   └── faang/              FAANG facts
+│   ├── faang/              FAANG facts
+│   ├── networking/         Computer networking guides
+│   ├── oop/                Object-oriented programming concepts
+│   ├── os/                 Operating systems notes
+│   ├── patterns/           System design and architectural patterns
+│   ├── product/            Product sense and product engineering
+│   └── programming/        Data structures and algorithms
 ├── assets/
 │   └── logo.svg            Circle of Knowledge logo
 ├── tailwind.config.js      Unified Tailwind configuration
@@ -167,11 +174,10 @@ Every page includes Open Graph (`og:title`, `og:description`, `og:image`, `og:ur
 ## Adding a New Guide
 
 1. Create a JSON file in `content/<category>/<guide-name>.json`.
-2. Add the hash route to `js/loader.js` (`routeMap`).
-3. Add a search entry to `js/modals.js` (`searchIndex` array).
-4. Add a sidebar link in `docs.html`.
-5. Optionally add a feature card in `index.html`.
-6. Rebuild CSS if new Tailwind utility classes are used: `npm run build:css`.
+2. Run the build script to update the route map, search index, and sitemap: `npm run build`.
+3. Add a sidebar link in `docs.html`.
+4. Optionally add a feature card in `index.html`.
+5. Rebuild CSS if new Tailwind utility classes are used: `npm run build:css`.
 
 ## License
 
