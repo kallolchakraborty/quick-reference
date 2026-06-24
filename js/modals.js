@@ -868,6 +868,9 @@
           content.querySelectorAll('pre').forEach(function(pre) {
             pre.className = 'bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4 text-slate-800 dark:text-slate-200';
           });
+          if (typeof Prism !== 'undefined') {
+            Prism.highlightAllUnder(content);
+          }
           readmeLoaded = true;
         }
       })

@@ -105,6 +105,10 @@ async function loadContent(hash) {
 
       document.body.appendChild(modal);
 
+      if (typeof Prism !== 'undefined') {
+        Prism.highlightAllUnder(modal);
+      }
+
       function closeReadme() {
         modal.remove();
         window.location.hash = '#python-history';
