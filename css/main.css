@@ -920,3 +920,9 @@ html.dark .dark\:border-brand-500\/20 {
 html.dark .dark\:border-brand-500\/30 {
   border-color: rgba(233, 84, 32, 0.3) !important;
 }
+
+/* ========== Global Smooth Theme Transitions ========== */
+body, header, aside, nav, main, article, section, footer, .glass-nav, .sidebar-link, .outline-link, .tag-badge, .search-result, table, th, td, pre, code, svg, rect, circle, path, line, text, .deep-dive-box {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease, stroke 0.25s ease;
+}
+

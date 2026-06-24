@@ -17,6 +17,9 @@
     for (var i = 0; i < icons.length; i++) {
       icons[i].textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
     }
+    try {
+      window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: t } }));
+    } catch (e) {}
   }
   apply(getTheme());
   document.addEventListener('DOMContentLoaded', function() {

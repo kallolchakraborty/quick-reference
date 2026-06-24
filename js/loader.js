@@ -530,3 +530,7 @@ window.addEventListener('hashchange', () => {
   loadContent(window.location.hash);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+
+window.addEventListener('theme-changed', () => {
+  colorizeTags();
+});
