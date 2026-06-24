@@ -796,7 +796,7 @@ html.dark .tag-badge:hover {
 #section-dive .not-prose.grid > div:nth-child(3) { animation-delay: 0.3s; }
 
 /* ========== Utility buttons: blend into background ========== */
-.theme-toggle-btn, .open-share-btn {
+.theme-toggle-btn, .open-share-btn, #sidebar-toggle {
   background: transparent !important;
   border: none !important;
   outline: none !important;
