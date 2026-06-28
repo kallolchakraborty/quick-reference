@@ -306,13 +306,14 @@ function renderSections(sections, dataId, langClass, extraClass) {
   return `<div class="flex flex-col gap-8${extraClass || ''}">` + sections.map(function(section, idx) {
     let sectionId = 'section-' + dataId + '-' + idx;
     let refClass = '';
-    if (section.title.indexOf('References') !== -1) {
+    if (section.title && section.title.indexOf('References') !== -1) {
       refClass = ' references-section';
     }
     let sectionLangClass = section.language ? 'language-' + section.language : langClass;
+    let titleHtml = section.title ? '<h3 class="text-xl font-semibold text-slate-900 dark:text-white">' + section.title + '</h3>' : '';
     return (
       '<div id="' + sectionId + '" class="scroll-mt-24 flex flex-col gap-3' + refClass + '">' +
-      '<h3 class="text-xl font-semibold text-slate-900 dark:text-white">' + section.title + '</h3>' +
+      titleHtml +
       (section.description ? '<div class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">' + section.description + '</div>' : '') +
       (section.codeBlock ? codeBlock(section.codeBlock, sectionLangClass) : '') +
       '</div>'
@@ -622,9 +623,10 @@ async function loadContent(hash) {
     if (outlineArea) {
       if (data.sections) {
         let outlineHtml = data.sections.map((section, idx) => {
+          if (!section.title) return '';
           const sectionId = `section-${data.id}-${idx}`;
           return `<a href="#${sectionId}" class="outline-link">${section.title}</a>`;
-        }).join('\n');
+        }).filter(Boolean).join('\n');
         if (data.comparisonTable) {
           outlineHtml += `\n<a href="#section-comparison" class="outline-link">Comparison Matrix</a>`;
         }
